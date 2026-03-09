@@ -45,9 +45,9 @@
 # https://github.com/dongsheng123132/u-claw/releases
 
 # After extracting / 解压后：
-# Mac: double-click "启动菜单.command"
-# Linux: bash ./运行.sh
-# Win: double-click "启动菜单.bat"
+# Mac: double-click "Mac-启动菜单.command"
+# Linux: bash ./Linux-运行.sh
+# Win: double-click "Windows-启动菜单.bat"
 ```
 
 ### Option 2: Build Your Own / 自己构建
@@ -84,9 +84,13 @@ Just copy the `U-Claw/` folder. That's it.
 ```
 U-Claw/                            (~1.3GB, 8GB USB minimum)
 │
-├── 启动菜单.command / .bat         ← Launcher menu (YuLinMuFeng style)
-├── 运行.command / .sh / .bat       ← Quick start (skip menu)
-├── 安装到电脑.command / .bat       ← Install to computer (permanent)
+├── Mac-启动菜单.command             ← macOS launcher menu
+├── Windows-启动菜单.bat            ← Windows launcher menu
+├── Mac-运行.command                ← macOS quick start
+├── Windows-运行.bat                ← Windows quick start
+├── Linux-运行.sh                   ← Linux quick start
+├── Mac-安装到电脑.command           ← Install to Mac (permanent)
+├── Windows-安装到电脑.bat           ← Install to Windows (permanent)
 ├── 使用说明.txt                    ← Basic instructions
 ├── 中国用户指南.txt                 ← China quick-start guide
 ├── 教程-OpenClaw中国区完全指南.md   ← Full tutorial (12 chapters)
@@ -108,29 +112,31 @@ U-Claw/                            (~1.3GB, 8GB USB minimum)
 
 ## Launcher Menu / 启动菜单
 
-16 functions, inspired by YuLinMuFeng (雨林木风) installer UI:
+17 functions, inspired by YuLinMuFeng (雨林木风) installer UI:
 
 ```
 ╔════════════════════════════════════════════════════════╗
-║     🦞  U-Claw v1.0                                   ║
+║     🦞  U-Claw 虾盘 v1.1                              ║
 ║     Optimized for China · Offline · One-click          ║
 ╠════════════════════════════════════════════════════════╣
 
   ━━ Install ━━
-  [1] Install to computer    [2] Install deps
-  [3] Build project          [4] Run from USB
+  [1] Run from USB           [2] Install to computer
+  [3] System info            [4] OpenClaw status
 
   ━━ China Optimization ━━
-  [5] Chinese AI models      [6] Chat platforms (QQ/Feishu/WeChat)
-  [7] Set China mirror
+  [5] Setup wizard (model/platform/API Key)
+  [6] Chat platforms (QQ/Feishu/WeChat)
+  [7] Manage channels
 
   ━━ Maintenance ━━
-  [8] Diagnose & repair      [9] Backup     [10] Restore
-  [11] Reset (3 levels)      [12] Clean cache
+  [8] Diagnose & repair      [9] Update OpenClaw
+  [10] Skills   [11] Tools (MCP)   [12] Plugins
 
   ━━ Skills & Usage ━━
-  [13] Browse 52 skills      [14] China user guide
-  [15] Instructions          [16] System info
+  [13] Browse skills market  [14] China user guide
+  [15] Instructions          [16] About
+  [17] Open web dashboard
 ```
 
 ## Supported AI Models / 支持的 AI 模型
