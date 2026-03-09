@@ -1,0 +1,148 @@
+╔══════════════════════════════════════════════════════════╗
+║                                                          ║
+║    U-Claw 虾盘 — 中国用户快速上手指南                     ║
+║                                                          ║
+╚══════════════════════════════════════════════════════════╝
+
+
+第一步：选择 AI 模型
+══════════════════════
+
+OpenClaw 支持大量国产模型，以下是推荐:
+
+1. DeepSeek（深度求索）—— 推荐首选
+   - 便宜好用，编程能力强
+   - 注册: https://platform.deepseek.com/
+   - 免费额度: 有
+
+2. Kimi（月之暗面）—— 超长上下文
+   - 256K 上下文，适合长文档
+   - 注册: https://platform.moonshot.cn/
+   - 免费额度: 有
+
+3. 通义千问 Qwen（阿里）—— 免费额度最大
+   - 注册: https://dashscope.console.aliyun.com/
+   - 免费额度: 非常多
+
+4. 智谱 GLM（清华系）—— 学术场景强
+   - 注册: https://open.bigmodel.cn/
+   - 免费额度: 有
+
+5. MiniMax —— 语音和多模态强
+   - 注册: https://platform.minimaxi.com/
+
+6. 豆包 Doubao（字节跳动）—— 火山引擎
+   - 注册: https://console.volcengine.com/ark
+
+7. 百度千帆 —— 百度智能云
+   - 注册: https://console.bce.baidu.com/qianfan/
+
+8. 小米 Mimo
+   - 注册: https://dev.mi.com/mimo
+
+在启动菜单选 [5] 即可一键配置
+
+
+第二步：选择聊天平台
+══════════════════════
+
+让 AI 接入你的聊天工具:
+
+已内置:
+  - QQ（腾讯官方）★  — 国内首选！3条命令搞定，免费免翻墙
+  - 飞书 Feishu       — 企业首选，功能最全
+  - Telegram           — 海外推荐
+  - Discord            — 游戏/社区
+  - WhatsApp           — 海外用户
+  - Slack              — 外企用户
+
+QQ 接入方法（腾讯官方，1分钟搞定）:
+  1. 扫码注册: http://q.qq.com/qqbot/openclaw/login.html
+  2. 点击"创建机器人"，获取 AppID 和 AppSecret
+  3. 运行 3 条命令:
+     openclaw plugins install @sliverp/qqbot@latest
+     openclaw channels add --channel qqbot --token "AppID:AppSecret"
+     openclaw gateway restart
+  4. 安全: 记得设置白名单 openclaw config set channels.qqbot.allowFrom "你的QQ号"
+  详见: 启动菜单 [6] 中国聊天平台
+
+微信接入:
+  - 社区插件: openclaw plugins install @icesword760/openclaw-wechat
+  - 基于 iPad 协议，支持文字/图片/文件
+
+
+第三步：常用技能（Skills）
+══════════════════════════
+
+U-Claw 已预装 52 个技能，以下是最实用的:
+
+【效率工具】
+  - github       — GitHub 操作（Issues/PR/代码审查）
+  - coding-agent — 委派编程任务给其他 AI
+  - summarize    — 总结文本/网页/播客
+  - nano-pdf     — 自然语言编辑 PDF
+
+【笔记 & 任务】
+  - apple-notes    — Apple 备忘录自动化
+  - obsidian       — Obsidian 笔记操作
+  - notion         — Notion 页面和数据库
+  - apple-reminders— Apple 提醒事项
+  - things-mac     — Things 3 任务管理
+  - trello         — Trello 看板
+
+【AI & 创作】
+  - openai-image-gen — AI 图片生成
+  - openai-whisper   — 语音转文字
+  - gemini           — Gemini 一键问答
+  - sag              — ElevenLabs 文字转语音
+
+【通讯】
+  - himalaya   — 邮件收发（IMAP/SMTP）
+  - discord    — Discord 消息操作
+  - slack      — Slack 消息操作
+  - wacli      — WhatsApp 消息
+
+【系统 & 搜索】
+  - weather     — 天气查询
+  - peekaboo    — macOS 屏幕截图和自动化
+  - tmux        — 远程终端管理
+  - clawhub     — 搜索安装更多技能
+
+使用方法: 在 OpenClaw 对话中直接说 "帮我查天气" 或 "帮我发邮件" 即可
+
+
+第四步：日常使用场景
+══════════════════════
+
+场景1: 编程助手
+  "帮我写一个 Python 脚本，批量重命名文件"
+  "审查这个 PR: #123"
+
+场景2: 内容创作
+  "帮我总结这篇文章: [URL]"
+  "帮我生成一张关于AI的图片"
+
+场景3: 日常办公
+  "帮我发邮件给 xxx@example.com，主题是..."
+  "帮我在 Notion 创建一个新页面"
+  "提醒我明天下午3点开会"
+
+场景4: 信息查询
+  "今天深圳天气怎么样?"
+  "帮我搜索 GitHub 上最新的 AI 项目"
+
+场景5: 多平台 AI 助手
+  配置飞书/QQ/Telegram 后，直接在聊天中 @AI 即可
+
+
+遇到问题?
+══════════════════════
+
+1. 插 U 盘，双击「启动菜单」
+2. 选 [8] 诊断修复
+3. 如果修不好，选 [11] 重置
+4. 重置前会自动提醒你备份
+
+加入社区:
+  - u-claw.org
+  - GitHub: github.com/dongsheng123132/u-claw

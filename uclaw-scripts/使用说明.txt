@@ -1,0 +1,108 @@
+╔══════════════════════════════════════════════════════════╗
+║                                                          ║
+║          U-Claw 虾盘 v1.0                                ║
+║          OpenClaw 离线安装 U 盘                           ║
+║                                                          ║
+║          by OpenClaw Community                           ║
+║          u-claw.org                                      ║
+║                                                          ║
+╚══════════════════════════════════════════════════════════╝
+
+什么是 U-Claw?
+═══════════════
+U-Claw 虾盘是 OpenClaw（开源 AI 助手）的离线安装包。
+就像当年的"雨林木风"Windows 光盘一样，
+把所有依赖打包好，插上 U 盘就能用。
+
+特别适合中国大陆用户 - 不需要访问 GitHub、npm 等海外服务。
+
+
+U 盘里有什么?
+═══════════════
+U-Claw/
+├── 运行.command        <- Mac 用户双击这个
+├── 运行.bat            <- Windows 用户双击这个
+├── 安装到电脑.command   <- Mac 永久安装
+├── 安装到电脑.bat       <- Windows 永久安装
+├── runtime/            <- Node.js 运行环境 (Mac/Win)
+├── openclaw/           <- OpenClaw 源码 + 依赖
+├── memory/             <- AI 记忆文件
+├── persona/            <- AI 人格配置
+├── skills/             <- AI 技能
+└── 使用说明.txt         <- 你正在看的这个
+
+
+快速开始
+═══════════════
+
+【方式一：直接从 U 盘运行（免安装）】
+
+  Mac 用户:
+    1. 插入 U 盘
+    2. 打开 U-Claw 文件夹
+    3. 双击 "运行.command"
+    4. 如果提示"无法打开"，右键 -> 打开
+    5. 等待启动完成
+
+  Windows 用户:
+    1. 插入 U 盘
+    2. 打开 U-Claw 文件夹
+    3. 双击 "运行.bat"
+    4. 等待启动完成
+
+  首次运行可能需要几分钟安装依赖（已预打包，无需联网）
+
+
+【方式二：安装到电脑（推荐）】
+
+  Mac 用户:
+    1. 双击 "安装到电脑.command"
+    2. 按提示操作
+    3. 安装后在终端输入 openclaw 即可使用
+
+  Windows 用户:
+    1. 双击 "安装到电脑.bat"
+    2. 按提示操作
+    3. 安装后在命令提示符输入 openclaw 即可使用
+
+  安装位置: ~/.uclaw/ (Mac) 或 %USERPROFILE%\.uclaw\ (Win)
+
+
+系统要求
+═══════════════
+- macOS 12+ (Intel 或 Apple Silicon)
+- Windows 10/11 (64位)
+- 内存: 2GB 以上（推荐 4GB+）
+- 磁盘: 2GB 可用空间
+
+
+更新方法
+═══════════════
+下载新版 U-Claw，重新运行 "安装到电脑" 即可覆盖更新。
+你的记忆文件和配置会自动保留。
+
+
+常见问题
+═══════════════
+
+Q: Mac 提示"无法打开，因为它来自身份不明的开发者"
+A: 右键点击文件 -> 选择 "打开" -> 再点 "打开"
+
+Q: Windows 提示"Windows 已保护你的电脑"
+A: 点击 "更多信息" -> "仍要运行"
+
+Q: 运行报错 "Node.js v22+ is required"
+A: U-Claw 自带 Node.js，请确保从 U-Claw 文件夹内启动
+
+Q: 如何配置 AI 模型的 API Key?
+A: 运行 openclaw 后按引导配置，或编辑 openclaw/.env 文件
+
+Q: 能离线使用吗?
+A: OpenClaw 本身需要联网调用 AI API（如 Claude、DeepSeek）。
+   但安装过程完全离线，不需要访问 GitHub 或 npm。
+
+
+获取帮助
+═══════════════
+- OpenClaw 官方: https://github.com/openclaw/openclaw
+- U-Claw 项目: https://u-claw.org

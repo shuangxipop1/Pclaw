@@ -1,0 +1,20 @@
+# U-Claw build outputs (too large for git)
+U-Claw/runtime/
+U-Claw/openclaw/node_modules/
+U-Claw/openclaw/dist/
+U-Claw/openclaw/.git/
+U-Claw/backups/
+
+# OpenClaw source (users download separately)
+openclaw-2026.3.7/
+openclaw-2026.3.7.zip
+
+# Build cache
+.download-cache/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Claude
+.claude/
