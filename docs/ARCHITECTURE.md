@@ -1,6 +1,27 @@
 # Pclaw 架构设计文档
 
-## 一、整体架构图
+## 一、愿景与定位
+
+### 终极定位
+
+> **Pclaw = 人类与 Agent 协作的"责任桥梁"**
+> - 核心理念：Agent 做事，人类确认，系统存证
+> - 设计原则：最小核心 + 可组合 + 进化适应 + 开放生态
+
+### 第一性原理
+
+```
+工程项目管理的本质 = 资源调配 + 任务协调 + 责任归属
+
+AI Agent 的本质 = 经验(训练) + 算力(运行) + 工具(扩展)
+
+Pclaw 本质 = Agent协作平台 + 人类审核系统 + 责任存证系统
+           = 让Agent替人类干活，人类为结果负责
+```
+
+---
+
+## 二、整体架构图
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
@@ -31,72 +52,70 @@
 
 ---
 
-## 二、核心模块设计
+## 三、核心层设计（不变）
 
-### 2.1 注册中心 (Registry)
+### 3.1 最小核心原则
 
-```typescript
-interface ClawRegistry {
-  // Claw 实例注册
-  register(claw: ClawInstance): Promise<ClawId>
-  
-  // 版本管理
-  versions: Map<ClawId, ClawVersion[]>
-  
-  // 能力发现
-  capabilities: Map<ClawId, Capability[]>
-  
-  // 组织发现（远程连接）
-  discoverOrg(): OrganizationNode[]
-}
+```
+┌─────────────────────────────────────────┐
+│           Pclaw Minimal Core            │
+├─────────────────────────────────────────┤
+│                                         │
+│   意图输入 → Agent 执行 → 结果确认     │
+│       ↑              ↑              ↑   │
+│       └──────────────┼──────────────┘   │
+│                     │                   │
+│               责任归属（唯一核心）       │
+│                                         │
+└─────────────────────────────────────────┘
 ```
 
-### 2.2 组织管理层（动态架构）
+**核心只有 3 件事**：
+1. **意图引擎** - 理解人类目标
+2. **Agent 编排** - 分解 + 调度执行
+3. **确认流** - 人类审核节点 → 责任归属
+
+### 3.2 核心接口定义
 
 ```typescript
-interface Organization {
-  // 动态组织架构
-  nodes: OrganizationNode[]
-  
-  // 节点类型
-  nodeTypes: ['human', 'agent', 'mixed']
-  
-  // 汇报关系（可动态调整）
-  relationships: Relationship[]
-  
-  // 组织版本（快照）
-  versions: OrganizationSnapshot[]
+// 意图输入
+interface IntentInput {
+  goal: string           // 人类目标
+  constraints: string[]  // 约束条件
+  deadline: Date        // 截止时间
+  humanId: string        // 下令人
 }
 
-// 关系类型
-type Relationship = 
-  | { type: 'report', from: NodeId, to: NodeId }  // 汇报
-  | { type: 'collaborate', nodes: NodeId[] }       // 协作
-  | { type: 'delegate', from: NodeId, to: NodeId }  // 委托
-```
+// Agent 执行
+interface AgentExecution {
+  taskId: string
+  agentId: string
+  plan: Task[]          // 分解的任务
+  status: 'pending' | 'running' | 'completed' | 'failed'
+  progress: number     // 0-100
+  logs: ExecutionLog[]  // 执行日志
+}
 
-### 2.3 Claw 版本管理
-
-```typescript
-interface ClawVersion {
-  id: string
-  name: string              // e.g., "Pclaw v1.0", "OpenClaw v2.1"
-  base: string              // 基于的 Claw 类型
-  capabilities: Capability[]
-  releaseDate: Date
-  status: 'stable' | 'beta' | 'deprecated'
-  
-  // 升级路径
-  upgradeFrom?: string[]
-  upgradeTo?: string[]
+// 结果确认（责任归属关键）
+interface ResultConfirmation {
+  taskId: string
+  agentId: string
+  humanId: string       // 审核人
+  result: any
+  confirmStatus: 'pending' | 'approved' | 'rejected'
+  confirmTime: Date
+  liability: {
+    human: string       // 最终责任人
+    weight: number      // 责任比例 0-1
+  }
 }
 ```
 
 ---
 
-## 三、扩展性设计
+## 四、扩展层设计（可变）
 
-### 3.1 模块化架构
+### 4.1 可组合原则
 
 ```
 ┌─────────────────────────────────────┐
@@ -112,25 +131,35 @@ interface ClawVersion {
     │   Modules │
     ├──────────┤
     │ Registry │  ← 注册中心（必须）
-    │ Org     │  ← 组织管理（必须）
+    │ Intent   │  ← 意图引擎（必须）
+    │ Execute  │  ← Agent编排（必须）
+    │ Confirm  │  ← 确认流（必须）
+    │ Org     │  ← 组织管理
     │ Task    │  ← 任务管理
     │ Payment │  ← 结算（未来）
     │ Reward  │  ← 报酬（可选）
     │ Penalty │  ← 处罚（未来）
+    │ Knowledge│  ← 知识中心
     └─────────┘
 ```
 
-### 3.2 配置驱动
+### 4.2 配置驱动
 
 ```yaml
 # pclaw.config.json
 {
+  "core": {
+    "intent": "required",
+    "execute": "required", 
+    "confirm": "required"
+  },
   "modules": {
-    "org": "required",
-    "task": "required", 
-    "payment": "future",     # 未来启用
-    "reward": "optional",   # 可选
-    "penalty": "future"     # 未来启用
+    "org": "optional",
+    "task": "optional", 
+    "payment": "future",
+    "reward": "optional",
+    "penalty": "future",
+    "knowledge": "optional"
   },
   "features": {
     "multiClaw": true,
@@ -142,22 +171,118 @@ interface ClawVersion {
 
 ---
 
-## 四、远程连接设计
+## 五、进化适应原则
 
-### 4.1 P2P 连接发现
+### 5.1 分层架构
+
+```
+                    ┌─────────────┐
+                    │   适应层    │  ← UI/行业模板/工作流
+                    └──────┬──────┘
+                           │
+┌──────────────────────────┼──────────────────────────┐
+│                    核心层                         │  ← 不变
+│  意图 → Agent执行 → 人类确认 → 责任归属          │
+└──────────────────────────┼──────────────────────────┘
+                           │
+                    ┌──────┴──────┐
+                    │   扩展层    │  ← 插件/模块
+                    └─────────────┘
+```
+
+**核心不变，功能无限扩展**
+
+---
+
+## 六、组织架构（动态）
+
+### 6.1 Agent 时代的新型组织
+
+```
+                    ┌─────────────┐
+                    │   董事会    │  ← 人类（最终决策）
+                    └──────┬──────┘
+                           │
+         ┌─────────────────┼─────────────────┐
+         │                 │                 │
+    ┌────▼────┐      ┌─────▼────┐      ┌────▼────┐
+    │ 项目群   │      │  项目群   │      │ 项目群   │
+    │ Agent   │      │  Agent   │      │  Agent   │
+    └────┬────┘      └────┬─────┘      └────┬────┘
+         │                 │                 │
+    ┌────┴────┐      ┌─────┴────┐      ┌────┴────┐
+    │ 专业 Agent │      │ 专业 Agent │      │ 专业 Agent │
+    │ (设计)   │      │ (施工)    │      │ (造价)   │
+    └────┬────┘      └────┬─────┘      └────┬────┘
+         │                 │                 │
+    人类审核 ←─────────────┼─────────────→ 人类审核
+         ↑                 ↑                 ↑
+      人类确认           人类确认           人类确认
+```
+
+### 6.2 人类新角色
+
+```
+┌────────────────────────────────────┐
+│         人类新角色                 │
+├────────────────────────────────────┤
+│  🎯 目标制定者   - 下达任务目标    │
+│  🔍 结果审核者   - 确认 Agent 产出 │
+│  ⚖️ 责任承担者   - 对最终结果负责  │
+│  🧠 知识输入者   - 提供领域知识    │
+│  🚨 异常干预者   - 处理边界情况    │
+└────────────────────────────────────┘
+```
+
+---
+
+## 七、责任与报酬体系
+
+### 7.1 责任金字塔
+
+```
+┌─────────────────────────────────────────────────────┐
+│                 责任金字塔                          │
+│                                                     │
+│                    法律责任                         │
+│                   ┌─────────┐                       │
+│                  /  人类    \   ← 最终责任主体       │
+│                 /───────────\                       │
+│                /   Agent     \  ← 执行责任          │
+│               /────────────────\                    │
+│              /    系统/设备     \  ← 环境责任       │
+└─────────────────────────────────────────────────────┘
+```
+
+**关键原则**：
+- Agent 犯错 = 人类审核失误
+- 人类不确认 = 交付无效
+- 重大决策必须人类在场
+
+### 7.2 报酬体系
+
+```
+报酬 = Agent执行成本 + 人类审核价值 + 风险溢价
+
+分配比例（示例）：
+├── Agent 执行：60%
+├── 人类审核：30%
+└── 平台/组织：10%
+```
+
+---
+
+## 八、远程连接设计
+
+### 8.1 P2P 连接发现
 
 ```typescript
 interface RemoteConnection {
-  // 连接方式
   type: 'direct' | 'relay' | 'blockchain'
-  
-  // 发现服务
   discovery: {
     announce: (info: ClawInfo) => void
     find: (filter: Filter) => ClawInfo[]
   }
-  
-  // 安全传输
   security: {
     encryption: '端到端加密'
     auth: 'Token / DID'
@@ -165,7 +290,7 @@ interface RemoteConnection {
 }
 ```
 
-### 4.2 组织网络
+### 8.2 跨组织协作
 
 ```
      组织 A                    组织 B
@@ -178,55 +303,41 @@ interface RemoteConnection {
    - 跨组织协作
    - 资源共享
    - 联合项目
+   - 结算
 ```
 
 ---
 
-## 五、结算与利益分配（未来模块）
+## 九、结算与利益分配（未来模块）
 
-### 5.1 结算模型
+### 9.1 结算模型
 
 ```typescript
 interface Settlement {
-  // 结算主体
   from: AgentId | OrganizationId
   to: AgentId | OrganizationId
-  
-  // 结算内容
   resource: {
     type: 'compute' | 'data' | 'task' | 'knowledge'
     amount: number
     unit: string
   }
-  
-  // 价格
   price: {
     token: string
     amount: number
   }
-  
-  // 确认
   status: 'pending' | 'confirmed' | 'disputed'
 }
 ```
 
-### 5.2 利益分配规则
+### 9.2 利益分配规则
 
 ```typescript
 interface ProfitDistribution {
-  // 分配规则
   rules: {
-    // 任务贡献分配
     task: { agent: number, human: number }
-    
-    // 资源贡献分配
     resource: { owner: number, platform: number }
-    
-    // 组织贡献分配
     org: { member: number, org: number }
   }
-  
-  // 争议处理
   dispute: {
    仲裁: '社区投票' | 'DAO' | '人工'
   }
@@ -235,65 +346,16 @@ interface ProfitDistribution {
 
 ---
 
-## 六、责任与处罚（未来模块）
-
-### 6.1 责任追溯
-
-```typescript
-interface Accountability {
-  // 任务链追溯
-  taskChain: TaskNode[]
-  
-  // 决策记录
-  decisions: Decision[]
-  
-  // 人工审核点
-  humanApprovals: Approval[]
-  
-  // 责任判定
-  liability: {
-    responsible: AgentId | HumanId
-    weight: number    // 0-1
-    reason: string
-  }
-}
-```
-
-### 6.2 处罚机制
-
-```typescript
-interface Penalty {
-  // 触发条件
-  trigger: {
-    type: 'error' | 'delay' | 'misconduct'
-    threshold: number
-  }
-  
-  // 处罚方式
-  method: {
-    type: 'reputation' | 'resource' | 'access'
-    amount: number
-  }
-  
-  // 申诉机制
-  appeal: {
-    enabled: boolean
-    process: '人工' | 'DAO'
-  }
-}
-```
-
----
-
-## 七、实施路线图
+## 十、实施路线图
 
 ### Phase 1: 基础版（当前）
+- [x] 核心三层：意图 + 执行 + 确认
 - [x] 组织架构管理
 - [x] 任务分发
 - [x] 汇报关系
 - [x] 基础权限
 
-### Phase 2: 结算版（近期）
+### Phase 2: 扩展版（近期）
 - [ ] 多 Claw 注册
 - [ ] 版本管理
 - [ ] 远程连接
@@ -303,18 +365,21 @@ interface Penalty {
 - [ ] 完整结算系统
 - [ ] 利益分配
 - [ ] 责任追溯
+- [ ] 知识中心
 
 ### Phase 4: 自治版（远期）
 - [ ] 处罚机制
 - [ ] DAO 治理
 - [ ] 完全自动化
+- [ ] 数字劳动力市场
 
 ---
 
-## 八、扩展性保障
+## 十一、扩展性保障
 
 | 原则 | 实现方式 |
 |------|----------|
+| **最小核心** | 核心层永不变，只有3个接口 |
 | **模块化** | 插件系统，按需加载 |
 | **配置化** | JSON/YAML 驱动 |
 | **版本化** | API 版本管理 + 数据迁移 |
@@ -323,4 +388,16 @@ interface Penalty {
 
 ---
 
-*本文档为 Pclaw 架构设计 v1.0*
+## 十二、关键哲学问题（持续思考）
+
+1. Agent 能否"背锅"？ - 法律上不能，但系统内可追责
+2. 人类审核的意义？ - 不仅是风控，更是责任归属
+3. Agent 是否需要"休息"？ - 7×24 vs 维护窗口
+4. Agent 之间是否平等？ - 专业分工 + 协作关系
+5. 如何防止人类"甩锅"给 Agent？ - 强制确认流程
+
+---
+
+*本文档为 Pclaw 架构设计 v2.0*
+*更新日期: 2026-03-12*
+*核心理念: Agent做事，人类确认，系统存证*
