@@ -1,0 +1,41 @@
+{
+  "id": "confirm_a89c6b1f",
+  "executionId": "exec_694e931c",
+  "taskId": "task_769fd708",
+  "taskTitle": "办公楼结构设计",
+  "intentId": "intent_b5f83789",
+  "executorId": "agent_design",
+  "executorName": "设计Agent",
+  "result": {
+    "mock": true,
+    "message": "OpenClaw 集成待完善，当前使用模拟结果",
+    "prompt": "办公楼结构设计",
+    "suggestedIntegration": "HTTP/WebSocket/CLI",
+    "timestamp": "2026-03-12T07:00:35.236Z"
+  },
+  "confirmType": "system",
+  "confirmStatus": "approved",
+  "evidence": {
+    "fileId": null,
+    "filePath": null,
+    "fileHash": null,
+    "emailId": null,
+    "emailFrom": null,
+    "emailSubject": null,
+    "blockchainTx": null,
+    "timestamp": null
+  },
+  "liability": {
+    "weight": 1,
+    "reason": "系统确认，承担全部责任"
+  },
+  "createdAt": "2026-03-12T07:00:36.453Z",
+  "confirmedAt": "2026-03-12T07:00:36.454Z",
+  "comments": [
+    {
+      "type": "system",
+      "content": "设计符合要求",
+      "timestamp": "2026-03-12T07:00:36.454Z"
+    }
+  ]
+}

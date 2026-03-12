@@ -1,0 +1,44 @@
+{
+  "id": "confirm_da33bf64",
+  "executionId": "exec_caa3a56c",
+  "taskId": "task_55567a0a",
+  "taskTitle": "施工方案",
+  "intentId": "intent_95c05334",
+  "executorId": "agent_construction",
+  "executorName": "施工Agent",
+  "result": {
+    "mock": true,
+    "message": "OpenClaw 集成待完善，当前使用模拟结果",
+    "prompt": "施工方案",
+    "suggestedIntegration": "HTTP/WebSocket/CLI",
+    "timestamp": "2026-03-12T07:00:54.936Z"
+  },
+  "confirmType": "signature",
+  "confirmStatus": "approved",
+  "evidence": {
+    "fileId": "file_e604a6ac",
+    "filePath": "/data/approvals/construction_v1.pdf",
+    "fileHash": "sha256_abc123",
+    "timestamp": "2026-03-12T07:00:56.152Z"
+  },
+  "liability": {
+    "humanName": "项目经理张三",
+    "weight": 1,
+    "reason": "签字文件确认，承担全部责任"
+  },
+  "createdAt": "2026-03-12T07:00:56.113Z",
+  "confirmedAt": "2026-03-12T07:00:56.152Z",
+  "comments": [
+    {
+      "type": "signature",
+      "content": "已签字确认: 项目经理张三",
+      "timestamp": "2026-03-12T07:00:56.152Z",
+      "evidence": {
+        "fileId": "file_e604a6ac",
+        "filePath": "/data/approvals/construction_v1.pdf",
+        "fileHash": "sha256_abc123",
+        "timestamp": "2026-03-12T07:00:56.152Z"
+      }
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "id": "confirm_5b87819e",
+  "executionId": "exec_a46af3db",
+  "taskId": "task_3dbdcb72",
+  "taskTitle": "造价预算",
+  "intentId": "intent_80616581",
+  "executorId": "agent_cost",
+  "executorName": "造价Agent",
+  "result": {
+    "mock": true,
+    "message": "OpenClaw 集成待完善，当前使用模拟结果",
+    "prompt": "造价预算",
+    "suggestedIntegration": "HTTP/WebSocket/CLI",
+    "timestamp": "2026-03-12T07:01:07.428Z"
+  },
+  "confirmType": "email",
+  "confirmStatus": "approved",
+  "evidence": {
+    "emailId": "email_123",
+    "emailFrom": "pm@company.com",
+    "emailSubject": "Re: 造价预算审批",
+    "emailBody": "同意该造价预算方案，请继续执行。",
+    "timestamp": "2026-03-12T07:01:08.681Z"
+  },
+  "liability": {
+    "weight": 1,
+    "reason": "邮件确认，承担全部责任"
+  },
+  "createdAt": "2026-03-12T07:01:08.643Z",
+  "confirmedAt": "2026-03-12T07:01:08.681Z",
+  "comments": [
+    {
+      "type": "email",
+      "content": "邮件确认: Re: 造价预算审批",
+      "from": "pm@company.com",
+      "timestamp": "2026-03-12T07:01:08.681Z",
+      "evidence": {
+        "emailId": "email_123",
+        "emailFrom": "pm@company.com",
+        "emailSubject": "Re: 造价预算审批",
+        "emailBody": "同意该造价预算方案，请继续执行。",
+        "timestamp": "2026-03-12T07:01:08.681Z"
+      }
+    }
+  ]
+}

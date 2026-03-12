@@ -76,14 +76,18 @@ class PclawCore {
       return { status: 'not_ready' };
     }
     
+    // 获取 Agent 名称
+    const agent = this.executor.agents.get(execution.agentId);
+    
     // 执行完成，创建确认请求
     const confirmation = this.confirm.createConfirmation(
       executionId,
       {
         taskId: execution.taskId,
-        title: '任务完成待确认',
+        taskTitle: execution.taskTitle,
         intentId: execution.intentId,
         agentId: execution.agentId,
+        agentName: agent?.name || execution.agentId,
         result: execution.result
       }
     );

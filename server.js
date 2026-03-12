@@ -95,17 +95,62 @@ async function handle(req, res) {
       }
       
       if (action === 'approve') {
-        pclaw.core.confirm.approve(check.confirmation.id, comments);
+        pclaw.core.confirm.systemConfirm(check.confirmation.id, comments);
       } else if (action === 'reject') {
-        pclaw.core.confirm.reject(check.confirmation.id, reason);
+        pclaw.core.confirm.rejectConfirmation(check.confirmation.id, reason, { confirmType: 'system' });
       }
       
       return response(res, { success: true, data: check.confirmation });
     }
     
+    // 签字文件确认
+    if (path === '/api/confirm/sign' && method === 'POST') {
+      const body = await parseBody(req);
+      const { confirmationId, signedFilePath, signerName, signatureHash } = body;
+      
+      const confirmation = await pclaw.core.confirm.signConfirmation(confirmationId, {
+        signedFilePath,
+        signerName,
+        signatureHash
+      });
+      
+      return response(res, { success: true, data: confirmation });
+    }
+    
+    // 邮件确认
+    if (path === '/api/confirm/email' && method === 'POST') {
+      const body = await parseBody(req);
+      const { confirmationId, emailId, emailFrom, emailSubject, emailBody } = body;
+      
+      const confirmation = await pclaw.core.confirm.emailConfirmation(confirmationId, {
+        emailId,
+        emailFrom,
+        emailSubject,
+        emailBody
+      });
+      
+      return response(res, { success: true, data: confirmation });
+    }
+    
+    // 审计日志
+    if (path === '/api/confirm/audit' && method === 'GET') {
+      const urlParams = url.searchParams;
+      const taskId = urlParams.get('taskId');
+      const startDate = urlParams.get('startDate');
+      const endDate = urlParams.get('endDate');
+      
+      const logs = pclaw.core.confirm.getAuditLog(taskId, startDate, endDate);
+      return response(res, { success: true, data: logs });
+    }
+    
     if (path === '/api/confirm/pending' && method === 'GET') {
       const pending = pclaw.core.confirm.getPendingConfirmations();
       return response(res, { success: true, data: pending });
+    }
+    
+    if (path === '/api/confirm/confirmed' && method === 'GET') {
+      const confirmed = pclaw.core.confirm.getConfirmedList();
+      return response(res, { success: true, data: confirmed });
     }
     
     // === 组织管理 API ===
