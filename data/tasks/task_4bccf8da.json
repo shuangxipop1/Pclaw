@@ -1,0 +1,42 @@
+{
+  "id": "task_4bccf8da",
+  "goal": "建筑方案",
+  "executor": {
+    "type": "Agent",
+    "id": "agent_design",
+    "name": "设计Agent"
+  },
+  "status": "pending",
+  "confirm": {
+    "type": "email",
+    "status": "pending",
+    "signer": null,
+    "evidence": {},
+    "liability": null,
+    "timestamp": null
+  },
+  "result": {
+    "output": null,
+    "artifacts": []
+  },
+  "subtasks": [],
+  "parent": "task_f6f476e1",
+  "metadata": {
+    "priority": "medium",
+    "deadline": null,
+    "tags": [],
+    "dependencies": [],
+    "cost": {
+      "compute": 0,
+      "human": 0
+    }
+  },
+  "history": [
+    {
+      "event": "parsed",
+      "timestamp": "2026-03-12T07:43:13.337Z"
+    }
+  ],
+  "createdAt": "2026-03-12T07:43:13.337Z",
+  "updatedAt": "2026-03-12T07:43:13.337Z"
+}

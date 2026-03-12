@@ -24,3 +24,5 @@ Thumbs.db
 # Claude
 .claude/
 extension/dist/pclaw-extension.zip
+data/
+node_modules/

@@ -1,0 +1,53 @@
+{
+  "id": "task_f3ae21a0",
+  "goal": "结构设计",
+  "executor": {
+    "type": "Agent",
+    "id": "agent_struct",
+    "name": "结构Agent"
+  },
+  "status": "confirming",
+  "confirm": {
+    "type": "system",
+    "status": "pending",
+    "signer": null,
+    "evidence": {},
+    "liability": null,
+    "timestamp": null
+  },
+  "result": {
+    "output": "Task \"结构设计\" executed by 结构Agent",
+    "artifacts": []
+  },
+  "subtasks": [],
+  "parent": "task_172d3335",
+  "metadata": {
+    "priority": "medium",
+    "deadline": null,
+    "tags": [],
+    "dependencies": [],
+    "cost": {
+      "compute": 0,
+      "human": 0
+    }
+  },
+  "history": [
+    {
+      "event": "created",
+      "timestamp": "2026-03-12T07:34:15.845Z",
+      "actor": "agent_struct"
+    },
+    {
+      "event": "started",
+      "timestamp": "2026-03-12T07:34:19.931Z",
+      "actor": "agent_struct"
+    },
+    {
+      "event": "completed",
+      "timestamp": "2026-03-12T07:34:19.931Z",
+      "actor": "agent_struct"
+    }
+  ],
+  "createdAt": "2026-03-12T07:34:15.845Z",
+  "updatedAt": "2026-03-12T07:34:19.931Z"
+}

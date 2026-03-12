@@ -1,0 +1,46 @@
+{
+  "id": "task_3414ecb2",
+  "goal": "开发办公楼项目",
+  "executor": {
+    "type": "Agent",
+    "id": "agent_pm",
+    "name": "项目经理Agent"
+  },
+  "status": "pending",
+  "confirm": {
+    "type": "signature",
+    "status": "pending",
+    "signer": null,
+    "evidence": {},
+    "liability": null,
+    "timestamp": null
+  },
+  "result": {
+    "output": null,
+    "artifacts": []
+  },
+  "subtasks": [
+    "task_02f9d0c3",
+    "task_a785fe61",
+    "task_3e01379e"
+  ],
+  "parent": null,
+  "metadata": {
+    "priority": "medium",
+    "deadline": null,
+    "tags": [],
+    "dependencies": [],
+    "cost": {
+      "compute": 0,
+      "human": 0
+    }
+  },
+  "history": [
+    {
+      "event": "parsed",
+      "timestamp": "2026-03-12T07:42:21.342Z"
+    }
+  ],
+  "createdAt": "2026-03-12T07:42:21.342Z",
+  "updatedAt": "2026-03-12T07:42:21.342Z"
+}

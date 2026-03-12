@@ -1,28 +1,29 @@
+const path = require('path');
+
 /**
- * Pclaw API Server
- * REST API 接口
+ * Pclaw API Server V2
+ * 基于 Task Engine - 一切皆 Task
  */
 
 const http = require('http');
-const { Pclaw } = require('./src');
-
-const pclaw = new Pclaw();
+const { Pclaw } = require('./src/pclaw');
 
 const PORT = process.env.PORT || 3000;
+const pclaw = new Pclaw({ dataDir: path.join(__dirname, 'data') });
 
 /**
- * 统一响应格式
+ * 统一响应
  */
 function response(res, data, status = 200) {
   res.writeHead(status, { 'Content-Type': 'application/json' });
-  res.end(JSON.stringify(data));
+  res.end(JSON.stringify(data, null, 2));
 }
 
 /**
  * 解析请求体
  */
-function parseBody(req) {
-  return new Promise((resolve, reject) => {
+async function parseBody(req) {
+  return new Promise((resolve) => {
     let body = '';
     req.on('data', chunk => body += chunk);
     req.on('end', () => {
@@ -32,7 +33,6 @@ function parseBody(req) {
         resolve({});
       }
     });
-    req.on('error', reject);
   });
 }
 
@@ -53,190 +53,181 @@ async function handle(req, res) {
   }
   
   try {
-    // === 意图引擎 API ===
-    if (path === '/api/intent' && method === 'POST') {
+    // === Task CRUD ===
+    
+    // 创建任务（支持嵌套）
+    if (path === '/api/task' && method === 'POST') {
       const body = await parseBody(req);
-      const result = pclaw.core.intent.parse(body);
-      return response(res, { success: true, data: result });
+      const task = pclaw.create(body);
+      return response(res, { success: true, data: task });
     }
     
-    if (path.startsWith('/api/intent/') && method === 'GET') {
-      const intentId = path.split('/')[3];
-      const intent = pclaw.core.intent.getIntent(intentId);
-      return response(res, { success: true, data: intent });
-    }
-    
-    // === Agent API ===
-    if (path === '/api/agents' && method === 'GET') {
-      const agents = Array.from(pclaw.core.executor.agents.values());
-      return response(res, { success: true, data: agents });
-    }
-    
-    if (path === '/api/execute' && method === 'POST') {
-      const body = await parseBody(req);
-      const result = await pclaw.core.process(body);
-      return response(res, { success: true, data: result });
-    }
-    
-    if (path.startsWith('/api/execution/') && method === 'GET') {
-      const executionId = path.split('/')[3];
-      const execution = pclaw.core.executor.getExecution(executionId);
-      return response(res, { success: true, data: execution });
-    }
-    
-    // === 确认流 API ===
-    if (path === '/api/confirm' && method === 'POST') {
-      const body = await parseBody(req);
-      const { executionId, action, comments, reason } = body;
-      
-      const check = pclaw.core.checkAndConfirm(executionId);
-      if (check.status === 'not_ready') {
-        return response(res, { success: false, message: '执行未完成' }, 400);
-      }
-      
-      if (action === 'approve') {
-        pclaw.core.confirm.systemConfirm(check.confirmation.id, comments);
-      } else if (action === 'reject') {
-        pclaw.core.confirm.rejectConfirmation(check.confirmation.id, reason, { confirmType: 'system' });
-      }
-      
-      return response(res, { success: true, data: check.confirmation });
-    }
-    
-    // 签字文件确认
-    if (path === '/api/confirm/sign' && method === 'POST') {
-      const body = await parseBody(req);
-      const { confirmationId, signedFilePath, signerName, signatureHash } = body;
-      
-      const confirmation = await pclaw.core.confirm.signConfirmation(confirmationId, {
-        signedFilePath,
-        signerName,
-        signatureHash
-      });
-      
-      return response(res, { success: true, data: confirmation });
-    }
-    
-    // 邮件确认
-    if (path === '/api/confirm/email' && method === 'POST') {
-      const body = await parseBody(req);
-      const { confirmationId, emailId, emailFrom, emailSubject, emailBody } = body;
-      
-      const confirmation = await pclaw.core.confirm.emailConfirmation(confirmationId, {
-        emailId,
-        emailFrom,
-        emailSubject,
-        emailBody
-      });
-      
-      return response(res, { success: true, data: confirmation });
-    }
-    
-    // 审计日志
-    if (path === '/api/confirm/audit' && method === 'GET') {
-      const urlParams = url.searchParams;
-      const taskId = urlParams.get('taskId');
-      const startDate = urlParams.get('startDate');
-      const endDate = urlParams.get('endDate');
-      
-      const logs = pclaw.core.confirm.getAuditLog(taskId, startDate, endDate);
-      return response(res, { success: true, data: logs });
-    }
-    
-    if (path === '/api/confirm/pending' && method === 'GET') {
-      const pending = pclaw.core.confirm.getPendingConfirmations();
-      return response(res, { success: true, data: pending });
-    }
-    
-    if (path === '/api/confirm/confirmed' && method === 'GET') {
-      const confirmed = pclaw.core.confirm.getConfirmedList();
-      return response(res, { success: true, data: confirmed });
-    }
-    
-    // === 组织管理 API ===
-    if (path === '/api/org' && method === 'GET') {
-      const tree = pclaw.org.getOrgTree();
-      return response(res, { success: true, data: tree });
-    }
-    
-    if (path === '/api/org' && method === 'POST') {
-      const body = await parseBody(req);
-      const node = pclaw.org.createNode(body);
-      return response(res, { success: true, data: node });
-    }
-    
-    if (path.startsWith('/api/org/') && method === 'GET') {
-      const nodeId = path.split('/')[3];
-      const node = pclaw.org.getNode(nodeId);
-      return response(res, { success: true, data: node });
-    }
-    
-    // === 任务管理 API ===
+    // 获取任务列表
     if (path === '/api/task' && method === 'GET') {
-      const urlParams = url.searchParams;
-      const filter = {};
-      if (urlParams.get('status')) filter.status = urlParams.get('status');
-      if (urlParams.get('type')) filter.type = urlParams.get('type');
-      if (urlParams.get('assigneeId')) filter.assigneeId = urlParams.get('assigneeId');
-      
-      const tasks = filter.status || filter.type || filter.assigneeId 
-        ? pclaw.task.getAllTasks(filter)
-        : Array.from(pclaw.task.tasks.values());
-      
+      const status = url.searchParams.get('status');
+      const executorType = url.searchParams.get('executorType');
+      const tasks = pclaw.query({ status, executorType });
       return response(res, { success: true, data: tasks });
     }
     
-    if (path === '/api/task' && method === 'POST') {
-      const body = await parseBody(req);
-      const task = pclaw.task.create(body);
+    // 获取单个任务
+    if (path.match(/^\/api\/task\/[\w_]+$/) && method === 'GET') {
+      const taskId = path.split('/')[3];
+      const task = pclaw.get(taskId);
+      if (!task) {
+        return response(res, { error: 'Task not found' }, 404);
+      }
       return response(res, { success: true, data: task });
     }
     
-    if (path.startsWith('/api/task/') && method === 'PUT') {
+    // === 执行 ===
+    
+    // 执行任务
+    if (path.match(/^\/api\/task\/[\w_]+\/execute$/) && method === 'POST') {
+      const taskId = path.split('/')[3];
+      try {
+        const result = await pclaw.execute(taskId);
+        return response(res, { success: true, data: result });
+      } catch (e) {
+        return response(res, { error: e.message }, 400);
+      }
+    }
+    
+    // 执行任务（含子任务）
+    if (path.match(/^\/api\/task\/[\w_]+\/execute-all$/) && method === 'POST') {
+      const taskId = path.split('/')[3];
+      try {
+        const results = await pclaw.executeAll(taskId);
+        return response(res, { success: true, data: results });
+      } catch (e) {
+        return response(res, { error: e.message }, 400);
+      }
+    }
+    
+    // === 确认 ===
+    
+    // 确认任务
+    if (path.match(/^\/api\/task\/[\w_]+\/confirm$/) && method === 'POST') {
       const taskId = path.split('/')[3];
       const body = await parseBody(req);
-      
-      let task;
-      if (body.status) {
-        task = pclaw.task.updateStatus(taskId, body.status);
-      } else if (body.assigneeId) {
-        task = pclaw.task.assign(taskId, body.assigneeId);
+      try {
+        const task = pclaw.confirm(taskId, body);
+        return response(res, { success: true, data: task });
+      } catch (e) {
+        return response(res, { error: e.message }, 400);
       }
-      
+    }
+    
+    // 签字确认
+    if (path.match(/^\/api\/task\/[\w_]+\/confirm\/signature$/) && method === 'POST') {
+      const taskId = path.split('/')[3];
+      const body = await parseBody(req);
+      const task = pclaw.confirm(taskId, {
+        type: 'signature',
+        signer: body.signer,
+        evidence: { filePath: body.filePath, fileHash: body.fileHash }
+      });
       return response(res, { success: true, data: task });
     }
     
-    // === 权限 API ===
-    if (path === '/api/role' && method === 'GET') {
-      const roles = pclaw.permission.getAllRoles();
-      return response(res, { success: true, data: roles });
+    // 邮件确认
+    if (path.match(/^\/api\/task\/[\w_]+\/confirm\/email$/) && method === 'POST') {
+      const taskId = path.split('/')[3];
+      const body = await parseBody(req);
+      const task = pclaw.confirm(taskId, {
+        type: 'email',
+        signer: body.signer,
+        evidence: { emailId: body.emailId, emailSubject: body.emailSubject }
+      });
+      return response(res, { success: true, data: task });
     }
     
-    if (path === '/api/permission/check' && method === 'POST') {
+    // 驳回
+    if (path.match(/^\/api\/task\/[\w_]+\/reject$/) && method === 'POST') {
+      const taskId = path.split('/')[3];
       const body = await parseBody(req);
-      const { userId, permission } = body;
-      const hasPermission = pclaw.permission.checkPermission(userId, permission);
-      return response(res, { success: true, data: { hasPermission } });
+      const task = pclaw.reject(taskId, body.reason);
+      return response(res, { success: true, data: task });
+    }
+    
+    // === 历史 & 审计 ===
+    
+    // 获取任务历史
+    if (path.match(/^\/api\/task\/[\w_]+\/history$/) && method === 'GET') {
+      const taskId = path.split('/')[3];
+      const history = pclaw.getHistory(taskId);
+      return response(res, { success: true, data: history });
+    }
+    
+    // 审计日志
+    if (path === '/api/audit' && method === 'GET') {
+      const taskId = url.searchParams.get('taskId');
+      const audit = pclaw.getAudit({ taskId });
+      return response(res, { success: true, data: audit });
+    }
+    
+    // 待确认列表
+    if (path === '/api/confirm/pending' && method === 'GET') {
+      const pending = pclaw.getPendingConfirmations();
+      return response(res, { success: true, data: pending });
+    }
+    
+    // === Agent ===
+    
+    // 获取 Agent 列表
+    if (path === '/api/agent' && method === 'GET') {
+      const agents = pclaw.getAgents();
+      return response(res, { success: true, data: agents });
+    }
+    
+    // === 快照 ===
+    
+    // 创建快照
+    if (path === '/api/snapshot' && method === 'POST') {
+      const body = await parseBody(req);
+      const snapshot = pclaw.createSnapshot(body.name || 'default');
+      return response(res, { success: true, data: snapshot });
+    }
+    
+    // 恢复快照
+    if (path.match(/^\/api\/snapshot\/[\w_]+\/restore$/) && method === 'POST') {
+      const snapshotId = path.split('/')[3];
+      const snapshot = pclaw.restoreSnapshot(snapshotId);
+      return response(res, { success: true, data: snapshot });
     }
     
     // === 根路径 ===
     if (path === '/' || path === '/api') {
       return response(res, {
         name: 'Pclaw API',
-        version: '1.0.0',
-        status: 'running',
-        endpoints: [
-          'POST /api/intent - 创建意图',
-          'GET /api/intent/:id - 获取意图',
-          'GET /api/agents - 获取Agent列表',
-          'POST /api/execute - 执行任务',
-          'POST /api/confirm - 确认结果',
-          'GET /api/confirm/pending - 待确认列表',
-          'GET/POST /api/org - 组织管理',
-          'GET/POST /api/task - 任务管理',
-          'GET /api/role - 角色列表',
-          'POST /api/permission/check - 权限检查'
-        ]
+        version: '2.0.0',
+        design: '一切皆 Task - 基于 Lisp 思想',
+        modules: ['Parser', 'Executor', 'Storage'],
+        endpoints: {
+          task: [
+            'POST /api/task - 创建任务',
+            'GET /api/task - 任务列表',
+            'GET /api/task/:id - 获取任务',
+            'POST /api/task/:id/execute - 执行任务',
+            'POST /api/task/:id/execute-all - 执行(含子任务)',
+            'POST /api/task/:id/confirm - 确认',
+            'POST /api/task/:id/confirm/signature - 签字',
+            'POST /api/task/:id/confirm/email - 邮件',
+            'POST /api/task/:id/reject - 驳回',
+            'GET /api/task/:id/history - 历史'
+          ],
+          audit: [
+            'GET /api/audit - 审计日志',
+            'GET /api/confirm/pending - 待确认'
+          ],
+          agent: [
+            'GET /api/agent - Agent列表'
+          ],
+          snapshot: [
+            'POST /api/snapshot - 创建快照',
+            'POST /api/snapshot/:id/restore - 恢复快照'
+          ]
+        }
       });
     }
     
@@ -254,9 +245,9 @@ const server = http.createServer(handle);
 server.listen(PORT, () => {
   console.log(`
 ╔═══════════════════════════════════════════╗
-║     🦞 Pclaw API Server                   ║
-║     Version: 1.0.0                         ║
-║     Port: ${PORT}                            ║
+║     🦞 Pclaw API Server V2              ║
+║     Design: 一切皆 Task                 ║
+║     Port: ${PORT}                           ║
 ╚═══════════════════════════════════════════╝
   `);
 });

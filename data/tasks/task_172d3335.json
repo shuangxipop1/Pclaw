@@ -1,0 +1,72 @@
+{
+  "id": "task_172d3335",
+  "goal": "设计办公楼",
+  "executor": {
+    "type": "Agent",
+    "id": "agent_design",
+    "name": "设计Agent"
+  },
+  "status": "completed",
+  "confirm": {
+    "type": "signature",
+    "status": "approved",
+    "signer": {
+      "id": "user_pm",
+      "name": "项目经理张三"
+    },
+    "evidence": {
+      "filePath": "/data/approvals/office_design_v1.pdf",
+      "fileHash": "sha256_abc123"
+    },
+    "liability": {
+      "human": "user_pm",
+      "weight": 1,
+      "reason": "signature confirmation, full liability"
+    },
+    "timestamp": "2026-03-12T07:34:24.229Z"
+  },
+  "result": {
+    "output": "Task \"设计办公楼\" executed by 设计Agent",
+    "artifacts": []
+  },
+  "subtasks": [
+    "task_75fbbd75",
+    "task_f3ae21a0"
+  ],
+  "parent": null,
+  "metadata": {
+    "priority": "medium",
+    "deadline": null,
+    "tags": [],
+    "dependencies": [],
+    "cost": {
+      "compute": 0,
+      "human": 0
+    }
+  },
+  "history": [
+    {
+      "event": "created",
+      "timestamp": "2026-03-12T07:34:15.843Z",
+      "actor": "agent_design"
+    },
+    {
+      "event": "started",
+      "timestamp": "2026-03-12T07:34:19.931Z",
+      "actor": "agent_design"
+    },
+    {
+      "event": "completed",
+      "timestamp": "2026-03-12T07:34:19.931Z",
+      "actor": "agent_design"
+    },
+    {
+      "event": "confirmed",
+      "timestamp": "2026-03-12T07:34:24.229Z",
+      "actor": "user_pm",
+      "confirmType": "signature"
+    }
+  ],
+  "createdAt": "2026-03-12T07:34:15.844Z",
+  "updatedAt": "2026-03-12T07:34:24.229Z"
+}

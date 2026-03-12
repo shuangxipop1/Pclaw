@@ -1,0 +1,13 @@
+{
+  "id": "audit_1773301512846",
+  "event": "task_confirmed",
+  "taskId": "task_d557f1cc",
+  "signerId": "user_pm",
+  "confirmType": "signature",
+  "liability": {
+    "human": "user_pm",
+    "weight": 1,
+    "reason": "signature confirmation"
+  },
+  "timestamp": "2026-03-12T07:45:12.846Z"
+}

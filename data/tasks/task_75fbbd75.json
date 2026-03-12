@@ -1,0 +1,69 @@
+{
+  "id": "task_75fbbd75",
+  "goal": "建筑方案",
+  "executor": {
+    "type": "Agent",
+    "id": "agent_arch",
+    "name": "建筑Agent"
+  },
+  "status": "completed",
+  "confirm": {
+    "type": "email",
+    "status": "approved",
+    "signer": {
+      "id": "user_arch",
+      "name": "建筑负责人李四"
+    },
+    "evidence": {
+      "emailId": "email_001",
+      "emailSubject": "Re: 建筑方案审批"
+    },
+    "liability": {
+      "human": "user_arch",
+      "weight": 1,
+      "reason": "email confirmation, full liability"
+    },
+    "timestamp": "2026-03-12T07:34:38.035Z"
+  },
+  "result": {
+    "output": "Task \"建筑方案\" executed by 建筑Agent",
+    "artifacts": []
+  },
+  "subtasks": [],
+  "parent": "task_172d3335",
+  "metadata": {
+    "priority": "medium",
+    "deadline": null,
+    "tags": [],
+    "dependencies": [],
+    "cost": {
+      "compute": 0,
+      "human": 0
+    }
+  },
+  "history": [
+    {
+      "event": "created",
+      "timestamp": "2026-03-12T07:34:15.845Z",
+      "actor": "agent_arch"
+    },
+    {
+      "event": "started",
+      "timestamp": "2026-03-12T07:34:19.930Z",
+      "actor": "agent_arch"
+    },
+    {
+      "event": "completed",
+      "timestamp": "2026-03-12T07:34:19.930Z",
+      "actor": "agent_arch"
+    },
+    {
+      "event": "confirmed",
+      "timestamp": "2026-03-12T07:34:38.035Z",
+      "actor": "user_arch",
+      "confirmType": "email"
+    }
+  ],
+  "createdAt": "2026-03-12T07:34:15.845Z",
+  "updatedAt": "2026-03-12T07:34:38.035Z"
+}

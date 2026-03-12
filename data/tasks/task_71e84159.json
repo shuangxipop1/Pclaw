@@ -1,0 +1,45 @@
+{
+  "id": "task_71e84159",
+  "goal": "智慧大厦项目",
+  "executor": {
+    "type": "Agent",
+    "id": "agent_pm",
+    "name": "项目经理Agent"
+  },
+  "status": "pending",
+  "confirm": {
+    "type": "signature",
+    "status": "pending",
+    "signer": null,
+    "evidence": {},
+    "liability": null,
+    "timestamp": null
+  },
+  "result": {
+    "output": null,
+    "artifacts": []
+  },
+  "subtasks": [
+    "task_a284bd52",
+    "task_df3d601f"
+  ],
+  "parent": null,
+  "metadata": {
+    "priority": "medium",
+    "deadline": null,
+    "tags": [],
+    "dependencies": [],
+    "cost": {
+      "compute": 0,
+      "human": 0
+    }
+  },
+  "history": [
+    {
+      "event": "parsed",
+      "timestamp": "2026-03-12T07:44:05.050Z"
+    }
+  ],
+  "createdAt": "2026-03-12T07:44:05.050Z",
+  "updatedAt": "2026-03-12T07:44:05.050Z"
+}

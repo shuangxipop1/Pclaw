@@ -1,0 +1,72 @@
+{
+  "id": "task_d557f1cc",
+  "goal": "智慧大厦项目",
+  "executor": {
+    "type": "Agent",
+    "id": "agent_pm",
+    "name": "项目经理"
+  },
+  "status": "completed",
+  "confirm": {
+    "type": "signature",
+    "status": "approved",
+    "signer": {
+      "id": "user_pm",
+      "name": "项目经理王五"
+    },
+    "evidence": {
+      "filePath": "/data/approvals/v1.pdf",
+      "fileHash": "sha256_xyz"
+    },
+    "liability": {
+      "human": "user_pm",
+      "weight": 1,
+      "reason": "signature confirmation"
+    },
+    "timestamp": "2026-03-12T07:45:12.846Z"
+  },
+  "result": {
+    "output": "Task completed: 智慧大厦项目",
+    "artifacts": []
+  },
+  "subtasks": [
+    "task_535cb657",
+    "task_b2452a90"
+  ],
+  "parent": null,
+  "metadata": {
+    "priority": "medium",
+    "deadline": null,
+    "tags": [],
+    "dependencies": [],
+    "cost": {
+      "compute": 0,
+      "human": 0
+    }
+  },
+  "history": [
+    {
+      "event": "parsed",
+      "timestamp": "2026-03-12T07:44:52.155Z"
+    },
+    {
+      "event": "started",
+      "timestamp": "2026-03-12T07:45:06.897Z",
+      "actor": "agent_pm"
+    },
+    {
+      "event": "executed",
+      "timestamp": "2026-03-12T07:45:07.001Z",
+      "actor": "agent_design",
+      "executionId": "exec_f009db2f"
+    },
+    {
+      "event": "confirmed",
+      "timestamp": "2026-03-12T07:45:12.846Z",
+      "actor": "user_pm",
+      "confirmType": "signature"
+    }
+  ],
+  "createdAt": "2026-03-12T07:44:52.155Z",
+  "updatedAt": "2026-03-12T07:44:52.155Z"
+}
