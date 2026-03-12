@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pclaw AI 助手</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; 
+            background: #0a0a0b; color: #f5f5f7; width: 380px; height: 520px;
+        }
+        header { 
+            background: #141416; border-bottom: 1px solid #2a2a2e; padding: 12px 16px; 
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .logo { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 16px; }
+        .logo-icon { width: 28px; height: 28px; background: linear-gradient(135deg, #ff6b35, #00d4aa); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+        
+        .chat-container { display: flex; flex-direction: column; height: 460px; }
+        .messages { flex: 1; overflow-y: auto; padding: 12px; }
+        .message { margin-bottom: 12px; display: flex; gap: 8px; }
+        .message.user { flex-direction: row-reverse; }
+        .avatar { width: 28px; height: 28px; background: #1c1c1f; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+        .message.user .avatar { background: #ff6b35; }
+        .message-content { background: #141416; border: 1px solid #2a2a2e; border-radius: 8px; padding: 8px 12px; max-width: 75%; font-size: 13px; line-height: 1.5; }
+        .message.user .message-content { background: #1c1c1f; border-color: #ff6b35; }
+        
+        .input-area { 
+            background: #141416; border-top: 1px solid #2a2a2e; padding: 10px 12px; 
+            display: flex; gap: 8px; 
+        }
+        .input-area input { 
+            flex: 1; background: #1c1c1f; border: 1px solid #2a2a2e; border-radius: 6px;
+            color: #f5f5f7; font-size: 13px; padding: 8px 12px; outline: none;
+        }
+        .input-area input:focus { border-color: #ff6b35; }
+        .input-area button { 
+            background: #ff6b35; color: white; border: none; padding: 8px 16px; border-radius: 6px; 
+            cursor: pointer; font-weight: 600; font-size: 13px; transition: background 0.2s;
+        }
+        .input-area button:hover { background: #ff8555; }
+        .input-area button:disabled { background: #555; cursor: not-allowed; }
+        
+        .quick-questions { display: flex; gap: 6px; flex-wrap: wrap; padding: 0 12px 12px; }
+        .quick-btn { 
+            background: #1c1c1f; border: 1px solid #2a2a2e; color: #8e8e93; 
+            padding: 6px 10px; border-radius: 14px; font-size: 11px; cursor: pointer; transition: all 0.2s;
+        }
+        .quick-btn:hover { border-color: #ff6b35; color: #ff6b35; }
+        
+        .welcome { text-align: center; padding: 20px 12px; }
+        .welcome h3 { font-size: 16px; margin-bottom: 8px; }
+        .welcome p { color: #8e8e93; font-size: 12px; margin-bottom: 16px; }
+        
+        .typing { display: none; align-items: center; gap: 6px; color: #8e8e93; font-size: 11px; padding: 8px 0; }
+        .typing.active { display: flex; }
+        .typing-dot { width: 5px; height: 5px; background: #8e8e93; border-radius: 50%; animation: bounce 1.4s infinite; }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes bounce { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-4px); } }
+        
+        .footer { text-align: center; padding: 6px; font-size: 10px; color: #555; border-top: 1px solid #1c1c1f; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo"><div class="logo-icon">🦞</div>Pclaw AI</div>
+        <div style="font-size: 11px; color: #00d4aa;">🟢 在线</div>
+    </header>
+    
+    <div class="chat-container">
+        <div class="welcome" id="welcome">
+            <h3>🦞 Pclaw AI 助手</h3>
+            <p>工程行业智能助手</p>
+            <div class="quick-questions">
+                <button class="quick-btn" onclick="sendMessage('什么是海洋工程？')">海洋工程</button>
+                <button class="quick-btn" onclick="sendMessage('海上风电设计要点')">风电设计</button>
+                <button class="quick-btn" onclick="sendMessage('技术标书大纲')">标书大纲</button>
+                <button class="quick-btn" onclick="sendMessage('工程规范有哪些')">规范标准</button>
+            </div>
+        </div>
+        
+        <div class="messages" id="messages" style="display: none;"></div>
+        
+        <div class="typing" id="typing">
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+            <span>Pclaw思考中...</span>
+        </div>
+        
+        <div class="input-area">
+            <input type="text" id="userInput" placeholder="输入工程问题..." onkeypress="handleKeyPress(event)">
+            <button onclick="sendMessage()" id="sendBtn">发送</button>
+        </div>
+    </div>
+    
+    <div class="footer">Pclaw v1.0 · 工程AI专家</div>
+
+    <script>
+        const responses = {
+            '什么是海洋工程': `海洋工程是指在海洋环境中进行的一切工程活动，包括：
+
+🌊 **主要领域**
+• 海洋油气开发：海底油气田开采设施
+• 海上风电：风力发电机组及基础结构
+• 港口航道：码头、防波堤、航道疏浚
+• 海洋桥梁：跨海大桥结构
+• 深海养殖：海洋牧场、网箱系统
+
+📋 **常用规范**
+• API (美国石油学会) 标准
+• DNV-GL (挪威船级社) 规范
+• ABS (美国船级社) 规则
+• 国标 GB/T 系列`,
+            
+            '海上风电设计要点': `🏗 海上风电结构设计要点：
+
+## 1. 基础设计
+• 单桩基础：适用于水深20-50m
+• 导管架基础：适用于水深30-80m
+• 浮动基础：适用于水深80m以上
+
+## 2. 关键设计参数
+• 风荷载：轮毂高度处50年一遇风速
+• 波浪荷载：有效波高H1/3
+• 水流力：表层流速×截面系数
+
+## 3. 材料选择
+• 钢结构：Q355及以上
+• 防腐：涂层+阴极保护`,
+            
+            '技术标书大纲': `📋 技术标书大纲（海洋工程）：
+
+## 一、工程概况
+1.1 项目背景
+1.2 工程技术特点
+1.3 工期目标
+
+## 二、施工方案
+2.1 总体施工工艺
+2.2 主要施工流程
+2.3 关键工序控制
+
+## 三、质量保证措施
+3.1 质量管理体系
+3.2 质量控制点
+
+## 四、安全管理
+4.1 安全保证体系
+4.2 危险源辨识
+4.3 应急预案`,
+            
+            '工程规范有哪些': `📚 海洋工程常用规范：
+
+### 国际规范
+| 规范 | 适用领域 |
+|------|----------|
+| API RP 2A | 固定式平台 |
+| DNV-OS-C101 | 海上风电 |
+| ISO 19902 | 海洋钢结构 |
+
+### 国内规范
+| 规范 | 适用领域 |
+|------|----------|
+| GB 50191 | 抗震规范 |
+| JTS 145 | 港口工程 |
+| GB/T 50662 | 油气工程 |`
+        };
+
+        function handleKeyPress(e) {
+            if (e.key === 'Enter') sendMessage();
+        }
+
+        function sendMessage(text) {
+            const input = document.getElementById('userInput');
+            const msg = text || input.value.trim();
+            if (!msg) return;
+            
+            input.value = '';
+            document.getElementById('welcome').style.display = 'none';
+            document.getElementById('messages').style.display = 'block';
+            
+            addMessage(msg, 'user');
+            document.getElementById('typing').classList.add('active');
+            
+            setTimeout(() => {
+                document.getElementById('typing').classList.remove('active');
+                let key = Object.keys(responses).find(k => msg.includes(k));
+                let response = key ? responses[key] : `感谢您的提问！关于"${msg}"，作为Pclaw AI助手，我可以帮您解答工程专业问题、提供技术方案建议。如需详细咨询，请访问官网。`;
+                addMessage(response, 'assistant');
+            }, 800 + Math.random() * 700);
+        }
+
+        function addMessage(content, role) {
+            const container = document.getElementById('messages');
+            const div = document.createElement('div');
+            div.className = `message ${role}`;
+            div.innerHTML = `
+                <div class="avatar">${role === 'user' ? '👤' : '🦞'}</div>
+                <div class="message-content">${content.replace(/\n/g, '<br>')}</div>
+            `;
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        }
+    </script>
+</body>
+</html>

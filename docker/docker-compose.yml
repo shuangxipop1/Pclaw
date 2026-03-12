@@ -1,0 +1,58 @@
+# Pclaw Docker 部署配置
+# 使用方法: docker-compose up -d
+
+services:
+  # Pclaw Gateway 服务
+  gateway:
+    image: node:20-alpine
+    container_name: pclaw-gateway
+    restart: unless-stopped
+    ports:
+      - "19001:19001"  # Gateway 端口
+    volumes:
+      - pclaw-data:/home/node/pclaw
+    environment:
+      - NODE_ENV=production
+      - OPENCLAW_PORT=19001
+    command: >
+      sh -c "npm install -g openclaw@latest &&
+             openclaw gateway start"
+    networks:
+      - pclaw-network
+
+  # Pclaw Web UI (可选)
+  web:
+    image: nginx:alpine
+    container_name: pclaw-web
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      - ./web-content:/usr/share/nginx/html:ro
+    depends_on:
+      - gateway
+    networks:
+      - pclaw-network
+
+  # 可选: 添加 Telegram Bot 服务
+  bot-telegram:
+    image: node:20-alpine
+    container_name: pclaw-bot
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - pclaw-data:/home/node/pclaw
+    command: >
+      sh -c "npm install -g openclaw@latest &&
+             openclaw channels telegram start"
+    networks:
+      - pclaw-network
+
+volumes:
+  pclaw-data:
+    name: pclaw-data
+
+networks:
+  pclaw-network:
+    driver: bridge
