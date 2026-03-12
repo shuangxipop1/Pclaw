@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pclaw - Engineering AI Agent Management Platform</title>
-    <meta name="description" content="Pclaw - AI Agent Management Platform for Engineering Industry">
+    <meta name="description" content="Pclaw - AI Agent Management Platform for Engineering Industry, built on OpenClaw">
     <meta name="theme-color" content="#ff6b35">
     <script>
         const lang = navigator.language || navigator.userLanguage;
@@ -34,10 +34,10 @@
         .hero h1 { font-size: 56px; margin-bottom: 16px; }
         .hero h1 span { color: #ff6b35; }
         .hero p { font-size: 20px; color: #8e8e93; margin-bottom: 40px; max-width: 600px; margin-left: auto; margin-right: auto; }
-        .btn-group { display: flex; gap: 16px; justify-content: center; }
+        .btn-group { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
         .btn {
             padding: 14px 32px; border-radius: 12px; font-size: 16px; font-weight: 600;
-            text-decoration: none; transition: all 0.3s;
+            text-decoration: none; transition: all 0.3s; display: inline-block;
         }
         .btn-primary { background: #ff6b35; color: white; }
         .btn-primary:hover { background: #ff8555; transform: translateY(-2px); }
@@ -54,7 +54,7 @@
         .feature h3 { font-size: 20px; margin-bottom: 12px; }
         .feature p { color: #8e8e93; font-size: 14px; line-height: 1.6; }
         
-        .stats { display: flex; justify-content: center; gap: 60px; margin-top: 80px; padding: 40px; background: rgba(255,255,255,0.03); border-radius: 16px; }
+        .stats { display: flex; justify-content: center; gap: 60px; margin-top: 80px; padding: 40px; background: rgba(255,255,255,0.03); border-radius: 16px; flex-wrap: wrap; }
         .stat { text-align: center; }
         .stat-value { font-size: 36px; font-weight: bold; color: #ff6b35; }
         .stat-label { color: #8e8e93; font-size: 14px; margin-top: 4px; }
@@ -64,11 +64,27 @@
         .platforms { display: flex; justify-content: center; gap: 24px; flex-wrap: wrap; }
         .platform-card {
             background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 16px; padding: 32px; min-width: 200px;
+            border-radius: 16px; padding: 32px; min-width: 200px; text-decoration: none; color: inherit;
+            transition: all 0.3s;
         }
+        .platform-card:hover { border-color: #ff6b35; transform: translateY(-4px); }
         .platform-icon { font-size: 48px; margin-bottom: 12px; }
         .platform-name { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
         .platform-status { font-size: 13px; color: #00d4aa; }
+        
+        .install-section { margin-top: 60px; text-align: center; padding: 40px; background: rgba(255,107,53,0.1); border: 1px solid #ff6b35; border-radius: 16px; }
+        .install-section h3 { font-size: 24px; margin-bottom: 16px; }
+        .install-section p { color: #8e8e93; margin-bottom: 20px; }
+        .code-block { 
+            background: #1a1a1f; padding: 16px; border-radius: 8px; text-align: left;
+            font-family: 'Monaco', 'Menlo', monospace; font-size: 14px; overflow-x: auto;
+            max-width: 600px; margin: 0 auto; border: 1px solid #3a3a3c;
+        }
+        
+        .contact-section { margin-top: 60px; text-align: center; padding: 40px; background: rgba(255,255,255,0.03); border-radius: 16px; }
+        .contact-section h3 { font-size: 24px; margin-bottom: 16px; }
+        .contact-item { color: #8e8e93; margin-bottom: 8px; }
+        .contact-item a { color: #ff6b35; text-decoration: none; }
         
         footer { text-align: center; padding: 40px; color: #8e8e93; font-size: 14px; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 80px; }
         footer a { color: #ff6b35; text-decoration: none; }
@@ -88,7 +104,7 @@
         <nav class="nav">
             <a href="#features">Features</a>
             <a href="#download">Download</a>
-            <a href="#docs">Docs</a>
+            <a href="#install">Install</a>
             <a href="https://github.com/shuangxipop1/Pclaw" target="_blank">GitHub</a>
         </nav>
     </header>
@@ -98,7 +114,7 @@
             <h1>Engineering AI Agent<br><span>Management Platform</span></h1>
             <p>Built on OpenClaw - Next-gen AI Assistant Platform designed for Engineering Industry</p>
             <div class="btn-group">
-                <a href="#download" class="btn btn-primary">Download Now</a>
+                <a href="https://github.com/shuangxipop1/Pclaw/releases" target="_blank" class="btn btn-primary">Download Now</a>
                 <a href="https://github.com/shuangxipop1/Pclaw" target="_blank" class="btn btn-secondary">View Source</a>
             </div>
         </div>
@@ -122,11 +138,24 @@
             </div>
         </div>
         
+        <div class="install-section" id="install">
+            <h3>🚀 One-Click Install (Recommended)</h3>
+            <p>Run the following command in your terminal:</p>
+            <div class="code-block">
+curl -sSL https://raw.githubusercontent.com/shuangxipop1/Pclaw/main/install.sh | bash
+            </div>
+        </div>
+        
         <div class="features" id="features">
             <div class="feature">
                 <div class="feature-icon">💻</div>
                 <h3>Native Client</h3>
                 <p>macOS / Windows dmg/exe installers, easy installation, ready to use</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">📦</div>
+                <h3>Portable Version</h3>
+                <p>Extract and run, built on u-claw design philosophy</p>
             </div>
             <div class="feature">
                 <div class="feature-icon">🐳</div>
@@ -166,29 +195,37 @@
         </div>
         
         <div class="download-section" id="download">
-            <h2>Download Now</h2>
+            <h2>Download Center</h2>
+            <p style="color: #8e8e93; margin-bottom: 24px;">Choose your preferred installation method</p>
             <div class="platforms">
-                <div class="platform-card">
+                <a href="https://github.com/shuangxipop1/Pclaw/releases" target="_blank" class="platform-card">
                     <div class="platform-icon">🍎</div>
                     <div class="platform-name">macOS</div>
-                    <div class="platform-status">Coming Soon</div>
-                </div>
-                <div class="platform-card">
+                    <div class="platform-status">dmg Installer</div>
+                </a>
+                <a href="https://github.com/shuangxipop1/Pclaw/releases" target="_blank" class="platform-card">
                     <div class="platform-icon">🪟</div>
                     <div class="platform-name">Windows</div>
-                    <div class="platform-status">Coming Soon</div>
-                </div>
-                <div class="platform-card">
+                    <div class="platform-status">exe Installer</div>
+                </a>
+                <a href="https://github.com/shuangxipop1/Pclaw/releases" target="_blank" class="platform-card">
                     <div class="platform-icon">📦</div>
                     <div class="platform-name">Portable</div>
-                    <div class="platform-status">Coming Soon</div>
-                </div>
-                <div class="platform-card">
+                    <div class="platform-status">tar.gz Extract & Run</div>
+                </a>
+                <a href="https://github.com/shuangxipop1/Pclaw/tree/main/docker" target="_blank" class="platform-card">
                     <div class="platform-icon">🐳</div>
                     <div class="platform-name">Docker</div>
-                    <div class="platform-status">Coming Soon</div>
-                </div>
+                    <div class="platform-status">docker-compose</div>
+                </a>
             </div>
+        </div>
+        
+        <div class="contact-section">
+            <h3>Contact Us</h3>
+            <p class="contact-item">WeChat: <strong>Pclawai</strong> (Recommended)</p>
+            <p class="contact-item">GitHub: <a href="https://github.com/shuangxipop1/Pclaw" target="_blank">https://github.com/shuangxipop1/Pclaw</a></p>
+            <p class="contact-item">Built on <a href="https://github.com/openclaw/openclaw" target="_blank">OpenClaw</a></p>
         </div>
     </div>
     
