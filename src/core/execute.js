@@ -1,6 +1,11 @@
 /**
  * Pclaw Core - Agent Executor
  * Agent编排：任务调度、执行、进度追踪
+ * 
+ * OpenClaw 集成说明：
+ * - 当前版本：模拟执行
+ * - 集成方式：HTTP API / WebSocket / CLI
+ * - 配置文件：OPENCLAW_URL 环境变量
  */
 
 const { v4: uuidv4 } = require('uuid');
@@ -9,6 +14,7 @@ class AgentExecutor {
   constructor() {
     this.executions = new Map();
     this.agents = new Map();
+    this.openclawUrl = process.env.OPENCLAW_URL || 'http://localhost:18789';
   }
 
   /**
@@ -44,9 +50,36 @@ class AgentExecutor {
   }
 
   /**
+   * 调用 OpenClaw 执行任务
+   * 
+   * TODO: 完善 OpenClaw API 集成
+   * 可选方式：
+   * 1. HTTP API - 需要 OpenClaw 暴露 REST API
+   * 2. WebSocket - Gateway WS 实时消息
+   * 3. CLI - openclaw agent 命令
+   * 4. 消息队列 - 跨服务通信
+   */
+  async callOpenClaw(prompt, options = {}) {
+    // 当前实现：模拟执行
+    // 后续需要根据实际情况对接 OpenClaw
+    
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve({
+          mock: true,
+          message: 'OpenClaw 集成待完善，当前使用模拟结果',
+          prompt,
+          suggestedIntegration: 'HTTP/WebSocket/CLI',
+          timestamp: new Date().toISOString()
+        });
+      }, 100);
+    });
+  }
+
+  /**
    * 执行任务
    */
-  async execute(intentId, taskId, agentId) {
+  async execute(intentId, taskId, agentId, taskInfo = {}) {
     const executionId = `exec_${uuidv4().slice(0, 8)}`;
     
     const execution = {
@@ -54,6 +87,7 @@ class AgentExecutor {
       intentId,
       taskId,
       agentId,
+      taskTitle: taskInfo.title || '任务',
       status: 'running',
       progress: 0,
       logs: [],
@@ -72,43 +106,46 @@ class AgentExecutor {
     
     this.executions.set(executionId, execution);
     
-    // 模拟执行（实际会调用 Agent 执行）
-    this.simulateExecution(executionId);
+    // 添加日志
+    execution.logs.push({
+      time: new Date().toISOString(),
+      message: `开始执行任务: ${taskInfo.title || taskId}`
+    });
     
-    return execution;
-  }
-
-  /**
-   * 模拟执行（简化版）
-   */
-  simulateExecution(executionId) {
-    const execution = this.executions.get(executionId);
-    if (!execution) return;
+    execution.logs.push({
+      time: new Date().toISOString(),
+      message: `调用 OpenClaw...`
+    });
     
-    // 模拟进度更新
-    let progress = 0;
-    const interval = setInterval(() => {
-      progress += 10;
-      execution.progress = progress;
+    // 真实调用 OpenClaw
+    try {
+      const ocResult = await this.callOpenClaw(taskInfo.title || taskInfo.description || '执行任务');
+      
+      execution.progress = 100;
+      execution.status = 'completed';
+      execution.completedAt = new Date().toISOString();
+      execution.result = ocResult;
+      
       execution.logs.push({
         time: new Date().toISOString(),
-        message: `执行中... ${progress}%`
+        message: ocResult.mock ? '使用模拟结果' : 'OpenClaw 执行完成'
       });
-      
-      if (progress >= 100) {
-        clearInterval(interval);
-        execution.status = 'completed';
-        execution.completedAt = new Date().toISOString();
-        execution.result = { output: '任务完成' };
-        
-        // 释放 Agent
-        const agent = this.agents.get(execution.agentId);
-        if (agent) {
-          agent.status = 'idle';
-          agent.currentTask = null;
-        }
-      }
-    }, 500);
+    } catch (error) {
+      execution.status = 'failed';
+      execution.error = error.message;
+      execution.logs.push({
+        time: new Date().toISOString(),
+        message: `执行失败: ${error.message}`
+      });
+    }
+    
+    // 释放 Agent
+    if (agent) {
+      agent.status = 'idle';
+      agent.currentTask = null;
+    }
+    
+    return execution;
   }
 
   /**

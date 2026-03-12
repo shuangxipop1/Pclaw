@@ -14,5 +14,8 @@
     "collaboration"
   ],
   "author": "Pclaw Team",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "uuid": "^13.0.0"
+  }
 }

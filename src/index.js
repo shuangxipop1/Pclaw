@@ -3,10 +3,10 @@
  * 主入口：整合所有模块
  */
 
-const { PclawCore } = require('./src/core');
-const { OrganizationManager } = require('./src/modules/org');
-const { TaskManager } = require('./src/modules/task');
-const { PermissionManager } = require('./src/modules/permission');
+const { PclawCore } = require('./core');
+const { OrganizationManager } = require('./modules/org');
+const { TaskManager } = require('./modules/task');
+const { PermissionManager } = require('./modules/permission');
 
 class Pclaw {
   constructor() {

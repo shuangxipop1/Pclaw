@@ -49,7 +49,11 @@ class PclawCore {
     for (const task of intent.tasks) {
       const agentId = assignAgentId || this.executor.getAvailableAgents()[0]?.id;
       if (agentId) {
-        const execution = await this.executor.execute(intent.id, task.id, agentId);
+        const execution = await this.executor.execute(intent.id, task.id, agentId, {
+          title: task.title,
+          description: task.description,
+          constraints: task.constraints
+        });
         tasks.push({ task, execution });
         console.log(`[Pclaw] 任务已分配给 ${agentId}: ${execution.id}`);
       }

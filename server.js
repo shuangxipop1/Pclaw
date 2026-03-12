@@ -78,6 +78,12 @@ async function handle(req, res) {
       return response(res, { success: true, data: result });
     }
     
+    if (path.startsWith('/api/execution/') && method === 'GET') {
+      const executionId = path.split('/')[3];
+      const execution = pclaw.core.executor.getExecution(executionId);
+      return response(res, { success: true, data: execution });
+    }
+    
     // === 确认流 API ===
     if (path === '/api/confirm' && method === 'POST') {
       const body = await parseBody(req);
