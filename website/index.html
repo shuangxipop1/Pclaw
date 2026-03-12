@@ -44,7 +44,29 @@
         .btn-secondary { background: rgba(255,255,255,0.1); color: #f5f5f7; border: 1px solid #3a3a3c; }
         .btn-secondary:hover { background: rgba(255,255,255,0.15); }
         
-        .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-top: 80px; }
+        .install-section { margin-top: 40px; text-align: center; padding: 32px; background: rgba(255,107,53,0.1); border: 1px solid #ff6b35; border-radius: 16px; }
+        .install-section h3 { font-size: 24px; margin-bottom: 16px; }
+        .install-section p { color: #8e8e93; margin-bottom: 20px; }
+        .install-wrapper { display: flex; justify-content: center; align-items: stretch; gap: 0; max-width: 700px; margin: 0 auto; }
+        .code-block { 
+            background: #1a1a1f; padding: 14px 16px; border-radius: 8px 0 0 8px;
+            font-family: 'Monaco', 'Menlo', monospace; font-size: 13px; overflow-x: auto;
+            flex: 1; border: 1px solid #ff6b35; border-right: none; color: #00d4aa;
+        }
+        .copy-btn {
+            background: #ff6b35; color: white; border: none; padding: 14px 20px;
+            border-radius: 0 8px 8px 0; cursor: pointer; font-size: 14px; font-weight: 600;
+            transition: all 0.3s; white-space: nowrap;
+        }
+        .copy-btn:hover { background: #ff8555; }
+        .copy-btn.copied { background: #00d4aa; }
+        
+        .stats { display: flex; justify-content: center; gap: 60px; margin-top: 60px; padding: 40px; background: rgba(255,255,255,0.03); border-radius: 16px; flex-wrap: wrap; }
+        .stat { text-align: center; }
+        .stat-value { font-size: 36px; font-weight: bold; color: #ff6b35; }
+        .stat-label { color: #8e8e93; font-size: 14px; margin-top: 4px; }
+        
+        .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-top: 60px; }
         .feature {
             background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
             border-radius: 16px; padding: 32px; transition: all 0.3s;
@@ -54,12 +76,7 @@
         .feature h3 { font-size: 20px; margin-bottom: 12px; }
         .feature p { color: #8e8e93; font-size: 14px; line-height: 1.6; }
         
-        .stats { display: flex; justify-content: center; gap: 60px; margin-top: 80px; padding: 40px; background: rgba(255,255,255,0.03); border-radius: 16px; flex-wrap: wrap; }
-        .stat { text-align: center; }
-        .stat-value { font-size: 36px; font-weight: bold; color: #ff6b35; }
-        .stat-label { color: #8e8e93; font-size: 14px; margin-top: 4px; }
-        
-        .download-section { margin-top: 80px; text-align: center; }
+        .download-section { margin-top: 60px; text-align: center; }
         .download-section h2 { font-size: 36px; margin-bottom: 32px; }
         .platforms { display: flex; justify-content: center; gap: 24px; flex-wrap: wrap; }
         .platform-card {
@@ -71,15 +88,6 @@
         .platform-icon { font-size: 48px; margin-bottom: 12px; }
         .platform-name { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
         .platform-status { font-size: 13px; color: #00d4aa; }
-        
-        .install-section { margin-top: 60px; text-align: center; padding: 40px; background: rgba(255,107,53,0.1); border: 1px solid #ff6b35; border-radius: 16px; }
-        .install-section h3 { font-size: 24px; margin-bottom: 16px; }
-        .install-section p { color: #8e8e93; margin-bottom: 20px; }
-        .code-block { 
-            background: #1a1a1f; padding: 16px; border-radius: 8px; text-align: left;
-            font-family: 'Monaco', 'Menlo', monospace; font-size: 14px; overflow-x: auto;
-            max-width: 600px; margin: 0 auto; border: 1px solid #3a3a3c;
-        }
         
         .contact-section { margin-top: 60px; text-align: center; padding: 40px; background: rgba(255,255,255,0.03); border-radius: 16px; }
         .contact-section h3 { font-size: 24px; margin-bottom: 16px; }
@@ -113,6 +121,16 @@
         <div class="hero">
             <h1>工程行业<span>AI智能体</span>管理平台</h1>
             <p>基于 OpenClaw 构建，专为工程建设行业设计的下一代 AI 助手管理平台</p>
+            
+            <div class="install-section" id="install" style="margin-top: 0; margin-bottom: 40px;">
+                <h3>🚀 一键安装（推荐）</h3>
+                <p>复制以下命令到终端运行：</p>
+                <div class="install-wrapper">
+                    <div class="code-block" id="installCmd">curl -sSL https://raw.githubusercontent.com/shuangxipop1/Pclaw/main/install.sh | bash</div>
+                    <button class="copy-btn" onclick="copyCmd()">一键复制</button>
+                </div>
+            </div>
+            
             <div class="btn-group">
                 <a href="https://github.com/shuangxipop1/Pclaw/releases" target="_blank" class="btn btn-primary">立即下载</a>
                 <a href="https://github.com/shuangxipop1/Pclaw" target="_blank" class="btn btn-secondary">查看源码</a>
@@ -135,14 +153,6 @@
             <div class="stat">
                 <div class="stat-value">MIT</div>
                 <div class="stat-label">开源协议</div>
-            </div>
-        </div>
-        
-        <div class="install-section" id="install">
-            <h3>🚀 一键安装（推荐）</h3>
-            <p>在终端运行以下命令即可快速安装：</p>
-            <div class="code-block">
-curl -sSL https://raw.githubusercontent.com/shuangxipop1/Pclaw/main/install.sh | bash
             </div>
         </div>
         
@@ -233,5 +243,20 @@ curl -sSL https://raw.githubusercontent.com/shuangxipop1/Pclaw/main/install.sh |
         <p>© 2026 Pclaw. 基于 <a href="https://github.com/openclaw/openclaw" target="_blank">OpenClaw</a> 构建</p>
         <p>MIT 开源协议 · <a href="https://github.com/shuangxipop1/Pclaw" target="_blank">GitHub</a></p>
     </footer>
+    
+    <script>
+    function copyCmd() {
+        const cmd = document.getElementById('installCmd').textContent;
+        navigator.clipboard.writeText(cmd).then(function() {
+            const btn = document.querySelector('.copy-btn');
+            btn.textContent = '已复制!';
+            btn.classList.add('copied');
+            setTimeout(function() {
+                btn.textContent = '一键复制';
+                btn.classList.remove('copied');
+            }, 2000);
+        });
+    }
+    </script>
 </body>
 </html>

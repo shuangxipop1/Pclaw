@@ -29,44 +29,49 @@ echo ""
 # 创建安装目录
 PCLAW_DIR="$HOME/Pclaw"
 mkdir -p "$PCLAW_DIR"
-
-echo -e "${GREEN}正在下载 Pclaw...${NC}"
+cd "$PCLAW_DIR"
 
 # 根据系统选择下载
+RELEASE_URL="https://github.com/shuangxipop1/Pclaw/releases/download/v1.0.0"
+
+echo -e "${GREEN}正在下载 Pclaw 便携版...${NC}"
+
 if [ "$OS" = "Darwin" ]; then
     if [ "$ARCH" = "arm64" ]; then
-        echo "Apple Silicon (M1-M4)"
-        # 下载便携版
-        echo "请从以下地址下载 macOS 版本："
-        echo "https://github.com/shuangxipop1/Pclaw/releases"
+        echo "下载 macOS Apple Silicon 版本..."
+        curl -L -o Pclaw.zip "$RELEASE_URL/Pclaw-Portable-macOS.zip"
     else
-        echo "Intel Mac"
-        echo "请从以下地址下载 macOS Intel 版本："
-        echo "https://github.com/shuangxipop1/Pclaw/releases"
+        echo "下载通用便携版..."
+        curl -L -o Pclaw.zip "$RELEASE_URL/Pclaw-Portable-Full.zip"
     fi
+elif [[ "$OS" == "MINGW_NT"* ]] || [[ "$OS" == "MSYS_NT"* ]; then
+    echo "下载 Windows 便携版..."
+    curl -L -o Pclaw.zip "$RELEASE_URL/Pclaw-Portable-Full.zip"
 elif [ "$OS" = "Linux" ]; then
-    echo "Linux 系统"
-    echo "请使用 Docker 部署："
-    echo "git clone https://github.com/shuangxipop1/Pclaw.git"
-    echo "cd Pclaw/docker"
-    echo "docker-compose up -d"
-elif [ "$OS" = "MSYS_NT" ] || [ "$OS" = "MINGW_NT" ]; then
-    echo "Windows 系统"
-    echo "请从以下地址下载 Windows 版本："
-    echo "https://github.com/shuangxipop1/Pclaw/releases"
+    echo "下载 Linux 便携版..."
+    curl -L -o Pclaw.zip "$RELEASE_URL/Pclaw-Portable-Full.zip"
 else
     echo -e "${RED}不支持的系统: $OS${NC}"
     exit 1
 fi
 
+echo -e "${GREEN}解压文件...${NC}"
+unzip -q Pclaw.zip
+rm -f Pclaw.zip
+
+echo -e "${GREEN}完成！${NC}"
 echo ""
-echo -e "${GREEN}═══════════════════════════════════════════════${NC}"
+echo "下一步："
 echo ""
-echo "安装指引："
+if [ "$OS" = "Darwin" ]; then
+    echo "1. 在终端运行: cd $PCLAW_DIR/pclaw-portable"
+    echo "2. 运行: ./setup.sh"
+    echo "3. 双击 Mac-Start.command 启动"
+elif [[ "$OS" == "MINGW_NT"* ]] || [[ "$OS" == "MSYS_NT"* ]]; then
+    echo "1. 进入 $PCLAW_DIR\\pclaw-portable 目录"
+    echo "2. 双击 setup.bat"
+    echo "3. 双击 Windows-Start.bat 启动"
+fi
 echo ""
-echo "1. 访问 https://github.com/shuangxipop1/Pclaw/releases"
-echo "2. 下载对应平台的安装包"
-echo "3. 解压并运行"
-echo ""
-echo -e "${GREEN}微信：Pclawai（联系我们）${NC}"
+echo "详细说明请阅读: README.txt"
 echo ""

@@ -1,164 +1,84 @@
 # 🦞 Pclaw
 
-**工程行业AI智能体管理平台**
+**人类与 Agent 协作的"责任桥梁"**
 
-**Engineering AI Agent Management Platform**
+> 核心理念：Agent 做事，人类确认，系统存证
 
-> 基于 OpenClaw 构建的下一代 AI 助手管理平台，专为工程建设行业打造
-
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-
----
-
-## 关于 Pclaw
-
-Pclaw 是专为工程行业设计的 AI 智能体管理平台，基于 OpenClaw 框架构建，提供原生客户端、Docker 部署和浏览器插件等多种使用方式。
-
-### 设计理念
-
-每个运行 Pclaw 的机器背后都有一个人，这个人是为 Pclaw 的产出负责的，是属于真实架构中的一份子，需受组织管理的约束与管理。
-
----
-
-## 核心特性
-
-### 一、多种部署形态
-
-| 形态 | 说明 |
-|------|------|
-| **客户端** | dmg / exe 安装包，Pclaw 自有 UI |
-| **便携版** | 解压即用，继承 u-claw 设计理念 |
-| **安装脚本** | 一键导入安装脚本 |
-| **Docker** | docker-compose 一键部署 |
-| **浏览器插件** | Chrome/Edge 侧边栏 |
-
-### 二、工程行业专用功能
-
-| 模块 | 说明 |
-|------|------|
-| **项目管理** | 9大专业经理 + 项目文件夹体系 |
-| **组织连接** | 上下级 Pclaw 汇报关系 + 审批流 |
-| **HR组织架构** | 授权查看组织图 |
-| **报酬核算** | 对下级工作评估，KPI 报价（可选） |
-
-### 三、数据隔离架构
+## 核心架构
 
 ```
-Pclaw/
-├── app/                    # 软件（可升级）
-│   ├── core/              # OpenClaw 核心
-│   ├── runtime/           # Node.js 运行时
-│   └── ui/                # Pclaw 客户端 UI
-├── data/                   # 用户数据（配置、历史）
-├── pclaw-data/            # Pclaw 专属数据
-│   ├── org/              # 组织架构
-│   ├── hr/               # HR 数据
-│   ├── reports/          # 汇报文件
-│   └── compensation/      # 报酬核算
-└── system/                # 升级脚本
+意图输入 → Agent 执行 → 人类确认 → 责任归属
 ```
 
-### 四、升级机制
+## 功能模块
 
-- 三层目录隔离，软件/用户数据/Pclaw数据完全分离
-- 模块化升级（core/runtime/skills 单独升级）
-- 热插拔支持
-- 启动时自动检查更新，用户确认后安装
+### 核心层（必须）
+- 🧠 **Intent Engine** - 意图引擎，理解人类目标
+- ⚙️ **Agent Executor** - Agent 编排调度
+- ✅ **Confirmation Flow** - 确认流，人类审核
 
----
-
-## 项目组织架构
-
-### 9大专业经理
-
-| 角色 | 职责 |
-|------|------|
-| 项目经理 | 全面负责项目对接、统筹协调 |
-| 设计经理 | 设计进度/质量管控 |
-| 采购经理 | 供应商管理、物资采购 |
-| 施工经理 | 现场管理、施工进度 |
-| 控制经理 | 进度管理、变更管理 |
-| 费控经理 | 费用预算、成本分析 |
-| 财务经理 | 资金管理、付款审核 |
-| 文控经理 | 文档收发、档案管理 |
-| 商务经理 | 市场对接、招投标 |
-
-### 项目文件夹体系
-
-| 类别 | 文件夹 |
-|------|--------|
-| 管理类 | 项目进度管理、变更管理、文档管理、质量管理、安全管理 |
-| 技术类 | 设计规范、船级社(ABS/DNV/CCS)、标准规范、行业最佳实践 |
-| 商务类 | 供应商寻源、历史合同、经验教训、招投标信息 |
-
----
-
-## 组织连接功能
-
-### 上下级关系
-
-- 每个 Pclaw 可连接多个上级 Pclaw
-- 每个 Pclaw 可连接多个下级 Pclaw
-- 上级可查询下级工作汇报文件夹
-
-### 汇报审批流程
-
-1. 下级创建汇报内容 → 2. 进入待审批文件夹 → 3. 用户审批 → 4. 归档到正式文件夹
-
----
-
-## 报酬核算功能（可选）
-
-### 核心功能
-
-- 对下级 Pclaw 的工作进行评估
-- 核算应付报酬
-- 下级连接时提供基础报价及交付标准（KPI）
-
-### KPI 维度
-
-| 维度 | 说明 |
-|------|------|
-| 交付质量 | 成果完整性、准确性 |
-| 交付时间 | 按时/提前/延迟 |
-| 工作量 | 任务数量、难度 |
-| 客户满意度 | 上级评价 |
-
----
+### 扩展层（可选）
+- 🏢 **Organization** - 组织管理
+- 📋 **Task** - 任务分发
+- 🔐 **Permission** - 权限管理
 
 ## 快速开始
 
-### 客户端安装
-
-从 [Releases](https://github.com/shuangxipop1/Pclaw/releases) 下载：
-
-- **macOS**: `.dmg` 磁盘镜像
-- **Windows**: `.exe` 安装程序
-- **便携版**: `.tar.gz` 解压即用
-- **安装脚本**: 一键导入
-
-### Docker 部署
-
 ```bash
-git clone https://github.com/shuangxipop1/Pclaw.git
-cd Pclaw/docker
-docker-compose up -d
+# 安装依赖（如需要）
+npm install uuid
+
+# 启动服务
+npm start
 ```
 
-### 浏览器插件
+服务启动后访问：`http://localhost:3000`
 
-Chrome/Edge: `chrome://extensions/` → 开启开发者模式 → 加载已解压的扩展程序
+## API 接口
 
----
+### 意图引擎
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| POST | /api/intent | 创建意图 |
+| GET | /api/intent/:id | 获取意图 |
 
-## 开源协议
+### Agent 管理
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| GET | /api/agents | 获取 Agent 列表 |
+| POST | /api/execute | 执行任务 |
 
-MIT License - 详见 [LICENSE](LICENSE) 文件
+### 确认流
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| POST | /api/confirm | 审核结果 |
+| GET | /api/confirm/pending | 待确认列表 |
 
----
+### 组织管理
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| GET | /api/org | 获取组织架构 |
+| POST | /api/org | 创建节点 |
 
-## 相关链接
+### 任务管理
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| GET | /api/task | 获取任务列表 |
+| POST | /api/task | 创建任务 |
+| PUT | /api/task/:id | 更新任务 |
 
-- [OpenClaw 官网](https://openclaw.ai)
-- [OpenClaw GitHub](https://github.com/openclaw/openclaw)
-- [U-Claw 原版](https://github.com/dongsheng123132/u-claw)
+### 权限管理
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| GET | /api/role | 获取角色列表 |
+| POST | /api/permission/check | 权限检查 |
+
+## 设计理念
+
+- **最小核心** - 只有 3 层：意图 + 执行 + 确认
+- **可组合** - 插件系统，按需加载
+- **进化适应** - 核心不变，功能扩展
+
+## License
+
+MIT
