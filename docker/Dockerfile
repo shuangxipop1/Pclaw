@@ -1,31 +1,23 @@
-# Pclaw Docker 镜像构建文件
-# 构建命令: docker build -t pclaw:latest .
-# 运行命令: docker run -d -p 19001:19001 -v pclaw-data:/data pclaw:latest
-
+# Pclaw Dockerfile
 FROM node:20-alpine
 
-# 安装必要工具
-RUN apk add --no-cache \
-    git \
-    python3 \
-    make \
-    g++
-
-# 设置工作目录
 WORKDIR /app
 
-# 全局安装 OpenClaw
-RUN npm install -g openclaw@latest
+# 安装依赖
+COPY package*.json ./
+RUN npm ci --only=production
 
-# 创建数据目录
-RUN mkdir -p /data && chown -R node:node /data
+# 复制应用代码
+COPY src/ ./src/
+COPY server.js ./
+COPY pclaw-admin.html ./
 
-# 设置环境变量
-ENV OPENCLAW_DATA_DIR=/data
+# 环境变量
 ENV NODE_ENV=production
+ENV PORT=3000
 
 # 暴露端口
-EXPOSE 19001
+EXPOSE 3000
 
 # 启动命令
-CMD ["sh", "-c", "openclaw gateway start"]
+CMD ["node", "server.js"]

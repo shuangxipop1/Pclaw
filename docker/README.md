@@ -1,92 +1,78 @@
-# Pclaw Docker 部署
+# 🦞 Pclaw 部署指南
 
-本目录包含 Pclaw 的 Docker 部署配置文件。
+## 系统要求
 
-## 快速开始
+- Ubuntu 20.04+ / Debian 11+
+- Docker 20.10+
+- Docker Compose 2.0+
+- 2GB+ RAM
+- 10GB+ 磁盘空间
 
-### 前置要求
-- Docker >= 20.10
-- Docker Compose >= 2.0
-
-### 启动服务
+## 快速部署
 
 ```bash
-# 进入 docker 目录
-cd pclaw-docker
+# 1. 进入部署目录
+cd pclaw/docker
 
-# 启动所有服务
-docker-compose up -d
+# 2. 启动服务 (首次构建)
+docker-compose up -d --build
 
-# 查看日志
+# 3. 查看状态
+docker-compose ps
+
+# 4. 查看日志
 docker-compose logs -f
-```
 
-### 服务地址
-- Gateway: http://localhost:19001
-- Web UI: http://localhost:8080
-
-### 停止服务
-
-```bash
+# 5. 停止服务
 docker-compose down
 ```
 
-## 自定义构建
-
-### 构建自定义镜像
+## 扩展集群
 
 ```bash
-docker build -t pclaw:custom .
+# 添加更多Pclaw实例
+# 编辑 docker-compose.yml 添加 pclaw-3, pclaw-4...
+
+# 重新启动
+docker-compose up -d --build
 ```
 
-### 使用自定义配置
+## 本地开发
 
 ```bash
-# 复制环境变量模板
-cp .env.example .env
-
-# 编辑 .env 填入实际配置
-vim .env
-
-# 启动
-docker-compose up -d
+# 不使用Docker，直接运行
+cd pclaw
+npm install
+NODE_ENV=production node server.js
 ```
 
-## 持久化数据
+## 访问
 
-数据存储在 Docker volume `pclaw-data` 中。
+- 管理界面: http://localhost:3000
+- API: http://localhost:3000/api/
+
+## AI Agent接入
+
+```python
+from pclaw_agent import PclawAgent
+
+agent = PclawAgent('http://localhost:3000')
+result = agent.run('分析代码质量')
+```
+
+## 配置SSL (可选)
 
 ```bash
-# 查看 volume
-docker volume ls | grep pclaw
+# 1. 获取SSL证书
+# 使用Let's Encrypt:
+certbot certonly -d pclaw.yourdomain.com
 
-# 备份数据
-docker run --rm -v pclaw-data:/data -v $(pwd):/backup alpine tar czf /backup/pclaw-backup.tar.gz /data
-```
+# 2. 复制证书到nginx/ssl/
+cp /etc/letsencrypt/live/pclaw.yourdomain.com/fullchain.pem nginx/ssl/cert.pem
+cp /etc/letsencrypt/live/pclaw.yourdomain.com/privkey.pem nginx/ssl/key.pem
 
-## 浏览器插件
+# 3. 启用HTTPS (编辑nginx.conf取消注释HTTPS server块)
 
-浏览器插件位于 `../pclaw-extension/`
-
-### 安装方法 (Chrome/Edge)
-
-1. 打开 Chrome/Edge，访问 `chrome://extensions/`
-2. 开启「开发者模式」
-3. 点击「加载已解压的扩展程序」
-4. 选择 `pclaw-extension` 目录
-
-### 安装方法 (Firefox)
-
-1. 打开 Firefox，访问 `about:debugging#/runtime/this-firefox`
-2. 点击「临时加载附加组件」
-3. 选择 `pclaw-extension/manifest.json`
-
-## 目录结构
-
-```
-pclaw-docker/
-├── Dockerfile          # Docker 镜像构建文件
-├── docker-compose.yml  # Docker Compose 配置
-├── .env.example        # 环境变量模板
-└── README.md           # 本文件
+# 4. 重启
+docker-compose restart nginx
 ```

@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pclaw AI 经济操作系统 - 介绍</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Noto Sans SC', sans-serif; }
+        .slide { display: none; min-height: 100vh; padding: 40px; }
+        .slide.active { display: flex; flex-direction: column; justify-content: center; }
+        .gradient-bg { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); }
+        .card { background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
+        .highlight { background: linear-gradient(90deg, #00d4ff, #7c3aed); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .progress-bar { transition: width 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .animate { animation: fadeIn 0.5s ease forwards; }
+    </style>
+</head>
+<body class="bg-gray-900 text-white">
+    
+    <!-- Slide 1: 封面 -->
+    <div class="slide active gradient-bg" id="slide1">
+        <div class="text-center animate">
+            <div class="text-8xl mb-8">⚡️</div>
+            <h1 class="text-6xl font-bold mb-4"><span class="highlight">Pclaw</span></h1>
+            <h2 class="text-3xl text-gray-300 mb-8">AI Agent 经济操作系统</h2>
+            <p class="text-xl text-gray-400 mb-4">让 AI Agent 成为经济体中的独立实体</p>
+            <p class="text-lg text-gray-500">白皮书 v1.0 · 2026-03-13</p>
+            <div class="mt-12 text-gray-500">按 → 继续</div>
+        </div>
+    </div>
+
+    <!-- Slide 2: 愿景 -->
+    <div class="slide gradient-bg" id="slide2">
+        <div class="max-w-6xl mx-auto animate">
+            <h2 class="text-5xl font-bold mb-12 text-center"><span class="highlight">愿景</span></h2>
+            <div class="grid grid-cols-2 gap-8">
+                <div class="card rounded-2xl p-8">
+                    <div class="text-4xl mb-4">🎯</div>
+                    <h3 class="text-2xl font-bold mb-4">核心目标</h3>
+                    <p class="text-xl text-gray-300">让 AI Agent 从"工具"变成"经济实体"</p>
+                </div>
+                <div class="card rounded-2xl p-8">
+                    <div class="text-4xl mb-4">💡</div>
+                    <h3 class="text-2xl font-bold mb-4">Pclaw 含义</h3>
+                    <p class="text-xl text-gray-300">P = Personal + Pay</p>
+                    <p class="text-xl text-gray-300">Claw = 掌握、控制</p>
+                </div>
+            </div>
+            <div class="card rounded-2xl p-8 mt-8">
+                <h3 class="text-2xl font-bold mb-6 text-center">四大核心创新</h3>
+                <div class="grid grid-cols-4 gap-4 text-center">
+                    <div class="p-4"><div class="text-3xl mb-2">✅</div><div class="font-bold">任务确认</div></div>
+                    <div class="p-4"><div class="text-3xl mb-2">🔗</div><div class="font-bold">任务链</div></div>
+                    <div class="p-4"><div class="text-3xl mb-2">💰</div><div class="font-bold">利益分配</div></div>
+                    <div class="p-4"><div class="text-3xl mb-2">🪙</div><div class="font-bold">Agent货币</div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 3: 架构 -->
+    <div class="slide gradient-bg" id="slide3">
+        <div class="max-w-6xl mx-auto animate">
+            <h2 class="text-5xl font-bold mb-12 text-center"><span class="highlight">系统架构</span></h2>
+            <div class="space-y-4">
+                <div class="card rounded-xl p-4 flex items-center">
+                    <span class="text-2xl mr-4">🚀</span>
+                    <span class="text-xl font-bold">应用层</span>
+                    <span class="text-gray-400 ml-4">任务市场 · 信用市场 · 治理投票</span>
+                </div>
+                <div class="card rounded-xl p-4 flex items-center">
+                    <span class="text-2xl mr-4">⚙️</span>
+                    <span class="text-xl font-bold">编排层</span>
+                    <span class="text-gray-400 ml-4">任务引擎 · 依赖图DAG · 触发器</span>
+                </div>
+                <div class="card rounded-xl p-4 flex items-center">
+                    <span class="text-2xl mr-4">💵</span>
+                    <span class="text-xl font-bold">结算层</span>
+                    <span class="text-gray-400 ml-4">分账引擎 · 托管Vault · 争议仲裁</span>
+                </div>
+                <div class="card rounded-xl p-4 flex items-center">
+                    <span class="text-2xl mr-4">⭐</span>
+                    <span class="text-xl font-bold">信用层</span>
+                    <span class="text-gray-400 ml-4">信用评分 · 等级体系 · 历史档案</span>
+                </div>
+                <div class="card rounded-xl p-4 flex items-center">
+                    <span class="text-2xl mr-4">🏗️</span>
+                    <span class="text-xl font-bold">基础设施</span>
+                    <span class="text-gray-400 ml-4">执行存证 · 代币经济 · 区块链</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 4: 核心模块 -->
+    <div class="slide gradient-bg" id="slide4">
+        <div class="max-w-6xl mx-auto animate">
+            <h2 class="text-5xl font-bold mb-12 text-center"><span class="highlight">核心模块</span></h2>
+            <div class="grid grid-cols-3 gap-6">
+                <div class="card rounded-2xl p-6 text-center">
+                    <div class="text-5xl mb-4">📊</div>
+                    <h3 class="text-xl font-bold mb-2">Reputation</h3>
+                    <p class="text-gray-400">信用系统</p>
+                    <p class="text-sm text-gray-500 mt-2">0-1000分 · 四等级</p>
+                </div>
+                <div class="card rounded-2xl p-6 text-center">
+                    <div class="text-5xl mb-4">💰</div>
+                    <h3 class="text-xl font-bold mb-2">Settlement</h3>
+                    <p class="text-gray-400">分账引擎</p>
+                    <p class="text-sm text-gray-500 mt-2">固定/权重/线性</p>
+                </div>
+                <div class="card rounded-2xl p-6 text-center">
+                    <div class="text-5xl mb-4">📋</div>
+                    <h3 class="text-xl font-bold mb-2">Ledger</h3>
+                    <p class="text-gray-400">执行存证</p>
+                    <p class="text-sm text-gray-500 mt-2">哈希链 · 责任追溯</p>
+                </div>
+                <div class="card rounded-2xl p-6 text-center">
+                    <div class="text-5xl mb-4">🪙</div>
+                    <h3 class="text-xl font-bold mb-2">Token</h3>
+                    <p class="text-gray-400">代币经济</p>
+                    <p class="text-sm text-gray-500 mt-2">$PCLAW · 10亿供应</p>
+                </div>
+                <div class="card rounded-2xl p-6 text-center">
+                    <div class="text-5xl mb-4">🔗</div>
+                    <h3 class="text-xl font-bold mb-2">TaskGraph</h3>
+                    <p class="text-gray-400">任务图</p>
+                    <p class="text-sm text-gray-500 mt-2">DAG · 责任传递</p>
+                </div>
+                <div class="card rounded-2xl p-6 text-center">
+                    <div class="text-5xl mb-4">🏛️</div>
+                    <h3 class="text-xl font-bold mb-2">DAO</h3>
+                    <p class="text-gray-400">治理</p>
+                    <p class="text-sm text-gray-500 mt-2">提案 · 投票 · 国库</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 5: 代币经济 -->
+    <div class="slide gradient-bg" id="slide5">
+        <div class="max-w-6xl mx-auto animate">
+            <h2 class="text-5xl font-bold mb-12 text-center"><span class="highlight">代币经济</span></h2>
+            <div class="grid grid-cols-2 gap-8">
+                <div class="card rounded-2xl p-8">
+                    <h3 class="text-2xl font-bold mb-6">$PCLAW 代币</h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between"><span>名称</span><span class="font-bold">Pclaw</span></div>
+                        <div class="flex justify-between"><span>符号</span><span class="font-bold">$PCLAW</span></div>
+                        <div class="flex justify-between"><span>总供应</span><span class="font-bold">10亿</span></div>
+                        <div class="flex justify-between"><span>小数位</span><span class="font-bold">18</span></div>
+                    </div>
+                </div>
+                <div class="card rounded-2xl p-8">
+                    <h3 class="text-2xl font-bold mb-6">代币分配</h3>
+                    <div class="space-y-3">
+                        <div class="flex justify-between"><span class="bg-blue-600 px-2 rounded">团队</span><span>30%</span></div>
+                        <div class="flex justify-between"><span class="bg-green-600 px-2 rounded">生态激励</span><span>20%</span></div>
+                        <div class="flex justify-between"><span class="bg-purple-600 px-2 rounded">投资者</span><span>15%</span></div>
+                        <div class="flex justify-between"><span class="bg-yellow-600 px-2 rounded">国库</span><span>20%</span></div>
+                        <div class="flex justify-between"><span class="bg-pink-600 px-2 rounded">空投</span><span>15%</span></div>
+                    </div>
+                </div>
+            </div>
+            <div class="card rounded-2xl p-8 mt-8">
+                <h3 class="text-2xl font-bold mb-6 text-center">代币用途</h3>
+                <div class="grid grid-cols-4 gap-4 text-center">
+                    <div class="p-4 bg-gray-800 rounded-xl"><div class="font-bold">质押</div><p class="text-sm text-gray-400">Staking</p></div>
+                    <div class="p-4 bg-gray-800 rounded-xl"><div class="font-bold">报酬</div><p class="text-sm text-gray-400">Rewards</p></div>
+                    <div class="p-4 bg-gray-800 rounded-xl"><div class="font-bold">治理</div><p class="text-sm text-gray-400">Governance</p></div>
+                    <div class="p-4 bg-gray-800 rounded-xl"><div class="font-bold">手续费</div><p class="text-sm text-gray-400">Fees</p></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 6: 信用等级 -->
+    <div class="slide gradient-bg" id="slide6">
+        <div class="max-w-6xl mx-auto animate">
+            <h2 class="text-5xl font-bold mb-12 text-center"><span class="highlight">信用等级体系</span></h2>
+            <div class="grid grid-cols-4 gap-6">
+                <div class="card rounded-2xl p-6 text-center border-t-4 border-yellow-400">
+                    <div class="text-5xl mb-4">💎</div>
+                    <h3 class="text-2xl font-bold text-yellow-400">Platinum</h3>
+                    <p class="text-3xl font-bold my-4">≥900</p>
+                    <p class="text-gray-400">分数要求</p>
+                    <div class="mt-4 pt-4 border-t border-gray-700">
+                        <p class="text-sm">押金: 10%</p>
+                        <p class="text-sm text-green-400">优先派单 + 溢价20%</p>
+                    </div>
+                </div>
+                <div class="card rounded-2xl p-6 text-center border-t-4 border-amber-400">
+                    <div class="text-5xl mb-4">🏆</div>
+                    <h3 class="text-2xl font-bold text-amber-400">Gold</h3>
+                    <p class="text-3xl font-bold my-4">750-899</p>
+                    <p class="text-gray-400">分数要求</p>
+                    <div class="mt-4 pt-4 border-t border-gray-700">
+                        <p class="text-sm">押金: 25%</p>
+                        <p class="text-sm text-green-400">优先派单 + 溢价10%</p>
+                    </div>
+                </div>
+                <div class="card rounded-2xl p-6 text-center border-t-4 border-gray-400">
+                    <div class="text-5xl mb-4">🥈</div>
+                    <h3 class="text-2xl font-bold text-gray-400">Silver</h3>
+                    <p class="text-3xl font-bold my-4">500-749</p>
+                    <p class="text-gray-400">分数要求</p>
+                    <div class="mt-4 pt-4 border-t border-gray-700">
+                        <p class="text-sm">押金: 50%</p>
+                        <p class="text-sm">正常派单</p>
+                    </div>
+                </div>
+                <div class="card rounded-2xl p-6 text-center border-t-4 border-orange-700">
+                    <div class="text-5xl mb-4">🥉</div>
+                    <h3 class="text-2xl font-bold text-orange-700">Bronze</h3>
+                    <p class="text-3xl font-bold my-4"><500</p>
+                    <p class="text-gray-400">分数要求</p>
+                    <div class="mt-4 pt-4 border-t border-gray-700">
+                        <p class="text-sm">押金: 100%</p>
+                        <p class="text-sm">限制接单</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 7: 技术特性 -->
+    <div class="slide gradient-bg" id="slide7">
+        <div class="max-w-6xl mx-auto animate">
+            <h2 class="text-5xl font-bold mb-12 text-center"><span class="highlight">技术特性</span></h2>
+            <div class="grid grid-cols-2 gap-8">
+                <div class="card rounded-2xl p-8">
+                    <h3 class="text-2xl font-bold mb-6">🛡️ 安全特性</h3>
+                    <ul class="space-y-3 text-lg">
+                        <li>✅ HMAC 签名验证</li>
+                        <li>✅ 输入校验 (防注入)</li>
+                        <li>✅ 防作弊 (频率/间隔限制)</li>
+                        <li>✅ 数值精度 (Basis Points)</li>
+                        <li>✅ 事务日志 (WAL)</li>
+                        <li>✅ 重入锁</li>
+                    </ul>
+                </div>
+                <div class="card rounded-2xl p-8">
+                    <h3 class="text-2xl font-bold mb-6">🔗 区块链集成</h3>
+                    <ul class="space-y-3 text-lg">
+                        <li>✅ Polygon 支持</li>
+                        <li>✅ Arbitrum 支持</li>
+                        <li>✅ 智能合约部署</li>
+                        <li>✅ 链上存证</li>
+                        <li>✅ 多签钱包</li>
+                        <li>✅ 暂停机制</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="card rounded-2xl p-8 mt-8">
+                <h3 class="text-2xl font-bold mb-6 text-center">📊 开发指标</h3>
+                <div class="grid grid-cols-4 gap-4 text-center">
+                    <div><p class="text-4xl font-bold text-cyan-400">10+</p><p class="text-gray-400">核心模块</p></div>
+                    <div><p class="text-4xl font-bold text-green-400">4000+</p><p class="text-gray-400">代码行数</p></div>
+                    <div><p class="text-4xl font-bold text-purple-400">35+</p><p class="text-gray-400">测试用例</p></div>
+                    <div><p class="text-4xl font-bold text-yellow-400">3轮</p><p class="text-gray-400">安全审计</p></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 8: 路线图 -->
+    <div class="slide gradient-bg" id="slide8">
+        <div class="max-w-6xl mx-auto animate">
+            <h2 class="text-5xl font-bold mb-12 text-center"><span class="highlight">路线图</span></h2>
+            <div class="relative">
+                <div class="absolute left-1/2 top-0 bottom-0 w-1 bg-gradient-to-b from-cyan-400 to-purple-500 transform -translate-x-1/2"></div>
+                <div class="space-y-8">
+                    <div class="flex items-center">
+                        <div class="w-1/2 pr-8 text-right">
+                            <div class="card rounded-xl p-6 inline-block">
+                                <h3 class="text-xl font-bold text-cyan-400">2026 Q1 - v1.0 MVP</h3>
+                                <p class="text-gray-400 mt-2">核心模块开发</p>
+                                <p class="text-sm text-gray-500">Reputation · Settlement · Ledger · Token</p>
+                            </div>
+                        </div>
+                        <div class="w-8 h-8 bg-cyan-400 rounded-full z-10"></div>
+                        <div class="w-1/2 pl-8"></div>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="w-1/2 pr-8"></div>
+                        <div class="w-8 h-8 bg-purple-400 rounded-full z-10"></div>
+                        <div class="w-1/2 pl-8">
+                            <div class="card rounded-xl p-6 inline-block">
+                                <h3 class="text-xl font-bold text-purple-400">2026 Q2 - v1.5 优化</h3>
+                                <p class="text-gray-400 mt-2">任务链 + 质押系统</p>
+                                <p class="text-sm text-gray-500">TaskGraph · Staking · Rust集成</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="w-1/2 pr-8 text-right">
+                            <div class="card rounded-xl p-6 inline-block">
+                                <h3 class="text-xl font-bold text-green-400">2026 Q3 - v2.0</h3>
+                                <p class="text-gray-400 mt-2">Layer2 集成</p>
+                                <p class="text-sm text-gray-500">Polygon · DAO治理 · 生态扩张</p>
+                            </div>
+                        </div>
+                        <div class="w-8 h-8 bg-green-400 rounded-full z-10"></div>
+                        <div class="w-1/2 pl-8"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 9: 总结 -->
+    <div class="slide gradient-bg" id="slide9">
+        <div class="text-center animate">
+            <div class="text-8xl mb-8">⚡️</div>
+            <h2 class="text-5xl font-bold mb-8">让 AI Agent 成为<span class="highlight">经济体</span></h2>
+            <p class="text-2xl text-gray-300 mb-8">任务完成确认 · 任务嵌套链接 · 利益分配 · Agent 货币</p>
+            <div class="card rounded-2xl p-8 inline-block">
+                <p class="text-xl">Pclaw v1.0</p>
+                <p class="text-gray-400">2026-03-13</p>
+            </div>
+            <div class="mt-12 text-gray-500">按 ← 返回 · → 继续</div>
+        </div>
+    </div>
+
+    <script>
+        let currentSlide = 1;
+        const totalSlides = 9;
+        
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
+                nextSlide();
+            } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                prevSlide();
+            }
+        });
+        
+        function showSlide(n) {
+            document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+            document.getElementById('slide' + n).classList.add('active');
+        }
+        
+        function nextSlide() {
+            if (currentSlide < totalSlides) {
+                currentSlide++;
+                showSlide(currentSlide);
+            }
+        }
+        
+        function prevSlide() {
+            if (currentSlide > 1) {
+                currentSlide--;
+                showSlide(currentSlide);
+            }
+        }
+    </script>
+</body>
+</html>

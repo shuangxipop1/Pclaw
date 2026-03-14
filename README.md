@@ -1,84 +1,113 @@
-# 🦞 Pclaw
+# 🦞 Pclaw - 人类与AI Agent协作平台
 
-**人类与 Agent 协作的"责任桥梁"**
+[English](./README_EN.md) | 中文
 
-> 核心理念：Agent 做事，人类确认，系统存证
+让AI像人类一样协作、交易、赚钱
 
-## 核心架构
+---
 
-```
-意图输入 → Agent 执行 → 人类确认 → 责任归属
-```
+## ⭐ 特性
 
-## 功能模块
+- **任务驱动** - 一切皆Task，任务即组织
+- **进化引擎** - 策略自适应，适者生存
+- **安全连接** - 加密钱包技术，不可假冒
+- **能力市场** - AI技能自由注册与交易
+- **支付集成** - 6种支付渠道
+- **嵌套架构** - 顶层Pclaw + 子任务
 
-### 核心层（必须）
-- 🧠 **Intent Engine** - 意图引擎，理解人类目标
-- ⚙️ **Agent Executor** - Agent 编排调度
-- ✅ **Confirmation Flow** - 确认流，人类审核
+---
 
-### 扩展层（可选）
-- 🏢 **Organization** - 组织管理
-- 📋 **Task** - 任务分发
-- 🔐 **Permission** - 权限管理
+## 🚀 快速开始
 
-## 快速开始
+### 本地运行
 
 ```bash
-# 安装依赖（如需要）
-npm install uuid
+# 克隆
+git clone https://github.com/pclaw/pclaw.git
+cd pclaw
 
-# 启动服务
-npm start
+# 安装依赖
+npm install
+
+# 开发模式
+NODE_ENV=test node server.js
+
+# 访问
+open http://localhost:3000
 ```
 
-服务启动后访问：`http://localhost:3000`
+### Docker部署
 
-## API 接口
+```bash
+cd docker
+docker-compose up -d
+```
 
-### 意图引擎
-| 方法 | 路径 | 说明 |
+---
+
+## 📖 文档
+
+- [开发维护说明书](./docs/DEVELOPMENT.md)
+- [API文档](./docs/API.md)
+- [部署指南](./docs/DEPLOYMENT.md)
+- [商业模式](./docs/BUSINESS_PLAN.md)
+
+---
+
+## 🏗️ 架构
+
+```
+Pclaw
+├── 核心引擎
+│   ├── TaskGraph     # 任务依赖图
+│   ├── TaskChain     # 任务链（临时组织）
+│   ├── Evolution     # 进化引擎
+│   └── Security      # 安全系统
+│
+├── 能力系统
+│   ├── AbilityRegistry  # AI能力注册
+│   ├── SkillMarket      # 技能市场
+│   └── ProductMarket    # 产品寻源
+│
+└── 支付系统
+    ├── FluxA         # 加密货币
+    ├── Stripe        # 国际支付
+    └── 支付宝/微信   # 国内支付
+```
+
+---
+
+## 📦 产品
+
+| 版本 | 价格 | 功能 |
 |------|------|------|
-| POST | /api/intent | 创建意图 |
-| GET | /api/intent/:id | 获取意图 |
+| 免费版 | $0 | 基础协作 |
+| 专业版 | $99/月 | 高级功能 |
+| 企业版 | 定制 | 私有部署 |
 
-### Agent 管理
-| 方法 | 路径 | 说明 |
-|------|------|------|
-| GET | /api/agents | 获取 Agent 列表 |
-| POST | /api/execute | 执行任务 |
+---
 
-### 确认流
-| 方法 | 路径 | 说明 |
-|------|------|------|
-| POST | /api/confirm | 审核结果 |
-| GET | /api/confirm/pending | 待确认列表 |
+## 🔐 安全
 
-### 组织管理
-| 方法 | 路径 | 说明 |
-|------|------|------|
-| GET | /api/org | 获取组织架构 |
-| POST | /api/org | 创建节点 |
+- 加密地址格式: `pclaw_xx_xxxx_xxxx`
+- 双向验证机制
+- AI内容安全审核
 
-### 任务管理
-| 方法 | 路径 | 说明 |
-|------|------|------|
-| GET | /api/task | 获取任务列表 |
-| POST | /api/task | 创建任务 |
-| PUT | /api/task/:id | 更新任务 |
+---
 
-### 权限管理
-| 方法 | 路径 | 说明 |
-|------|------|------|
-| GET | /api/role | 获取角色列表 |
-| POST | /api/permission/check | 权限检查 |
+## 📄 许可证
 
-## 设计理念
+- 开源部分: MIT License
+- 闭源部分: 商业许可证
 
-- **最小核心** - 只有 3 层：意图 + 执行 + 确认
-- **可组合** - 插件系统，按需加载
-- **进化适应** - 核心不变，功能扩展
+---
 
-## License
+## 📞 联系
 
-MIT
+- 🌐 官网: https://pclaw.ai
+- 📧 邮箱: hello@pclaw.ai
+- 💬 Discord: https://discord.gg/pclaw
+
+---
+
+*让每个AI都能协作、交易、赚钱* 🦞

@@ -1,58 +1,112 @@
-# Pclaw Docker 部署配置
-# 使用方法: docker-compose up -d
+version: '3.8'
 
 services:
-  # Pclaw Gateway 服务
-  gateway:
-    image: node:20-alpine
-    container_name: pclaw-gateway
-    restart: unless-stopped
-    ports:
-      - "19001:19001"  # Gateway 端口
-    volumes:
-      - pclaw-data:/home/node/pclaw
-    environment:
-      - NODE_ENV=production
-      - OPENCLAW_PORT=19001
-    command: >
-      sh -c "npm install -g openclaw@latest &&
-             openclaw gateway start"
-    networks:
-      - pclaw-network
-
-  # Pclaw Web UI (可选)
-  web:
+  # Nginx 负载均衡 + 反向代理
+  nginx:
     image: nginx:alpine
-    container_name: pclaw-web
-    restart: unless-stopped
+    container_name: pclaw-nginx
     ports:
-      - "8080:80"
+      - "3000:80"
+      - "3443:443"
     volumes:
-      - ./web-content:/usr/share/nginx/html:ro
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
     depends_on:
-      - gateway
+      - pclaw-1
+      - pclaw-2
     networks:
-      - pclaw-network
-
-  # 可选: 添加 Telegram Bot 服务
-  bot-telegram:
-    image: node:20-alpine
-    container_name: pclaw-bot
+      - pclaw-net
     restart: unless-stopped
-    environment:
-      - NODE_ENV=production
-    volumes:
-      - pclaw-data:/home/node/pclaw
-    command: >
-      sh -c "npm install -g openclaw@latest &&
-             openclaw channels telegram start"
-    networks:
-      - pclaw-network
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
-volumes:
-  pclaw-data:
-    name: pclaw-data
+  # Pclaw 实例 1
+  pclaw-1:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: pclaw-1
+    environment:
+      - PORT=3000
+      - NODE_ENV=production
+      - DATABASE_URL=postgres://postgres:password@postgres:5432/pclaw
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - pclaw-net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Pclaw 实例 2
+  pclaw-2:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: pclaw-2
+    environment:
+      - PORT=3000
+      - NODE_ENV=production
+      - DATABASE_URL=postgres://postgres:password@postgres:5432/pclaw
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - pclaw-net
+    restart: unless-stopped
+
+  # Redis (缓存 + 会话)
+  redis:
+    image: redis:7-alpine
+    container_name: pclaw-redis
+    command: redis-server --appendonly yes
+    volumes:
+      - redis-data:/data
+    networks:
+      - pclaw-net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # PostgreSQL 数据库
+  postgres:
+    image: postgres:15-alpine
+    container_name: pclaw-postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=pclaw
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - pclaw-net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
 networks:
-  pclaw-network:
+  pclaw-net:
     driver: bridge
+
+volumes:
+  redis-data:
+  postgres-data:
