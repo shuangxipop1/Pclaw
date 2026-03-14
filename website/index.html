@@ -1,262 +1,383 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pclaw - 工程行业AI智能体管理平台</title>
-    <meta name="description" content="Pclaw - 专为工程行业设计的AI智能体管理平台，基于OpenClaw构建">
-    <meta name="theme-color" content="#ff6b35">
-    <script>
-        const lang = navigator.language || navigator.userLanguage;
-        if (lang.startsWith('en')) {
-            window.location.href = 'index_en.html';
-        }
-    </script>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #0a0a0b 0%, #1a1a1f 100%); 
-            color: #f5f5f7; min-height: 100vh;
-        }
-        .header {
-            padding: 20px 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(0,0,0,0.3);
-        }
-        .logo { font-size: 28px; font-weight: bold; color: #ff6b35; }
-        .nav a { color: #8e8e93; text-decoration: none; margin-left: 24px; font-size: 14px; }
-        .nav a:hover { color: #ff6b35; }
-        .container { max-width: 1200px; margin: 0 auto; padding: 60px 20px; }
-        .hero { text-align: center; padding: 60px 0; }
-        .hero h1 { font-size: 56px; margin-bottom: 16px; }
-        .hero h1 span { color: #ff6b35; }
-        .hero p { font-size: 20px; color: #8e8e93; margin-bottom: 40px; max-width: 600px; margin-left: auto; margin-right: auto; }
-        .btn-group { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
-        .btn {
-            padding: 14px 32px; border-radius: 12px; font-size: 16px; font-weight: 600;
-            text-decoration: none; transition: all 0.3s; display: inline-block;
-        }
-        .btn-primary { background: #ff6b35; color: white; }
-        .btn-primary:hover { background: #ff8555; transform: translateY(-2px); }
-        .btn-secondary { background: rgba(255,255,255,0.1); color: #f5f5f7; border: 1px solid #3a3a3c; }
-        .btn-secondary:hover { background: rgba(255,255,255,0.15); }
-        
-        .install-section { margin-top: 40px; text-align: center; padding: 32px; background: rgba(255,107,53,0.1); border: 1px solid #ff6b35; border-radius: 16px; }
-        .install-section h3 { font-size: 24px; margin-bottom: 16px; }
-        .install-section p { color: #8e8e93; margin-bottom: 20px; }
-        .install-wrapper { display: flex; justify-content: center; align-items: stretch; gap: 0; max-width: 700px; margin: 0 auto; }
-        .code-block { 
-            background: #1a1a1f; padding: 14px 16px; border-radius: 8px 0 0 8px;
-            font-family: 'Monaco', 'Menlo', monospace; font-size: 13px; overflow-x: auto;
-            flex: 1; border: 1px solid #ff6b35; border-right: none; color: #00d4aa;
-        }
-        .copy-btn {
-            background: #ff6b35; color: white; border: none; padding: 14px 20px;
-            border-radius: 0 8px 8px 0; cursor: pointer; font-size: 14px; font-weight: 600;
-            transition: all 0.3s; white-space: nowrap;
-        }
-        .copy-btn:hover { background: #ff8555; }
-        .copy-btn.copied { background: #00d4aa; }
-        
-        .stats { display: flex; justify-content: center; gap: 60px; margin-top: 60px; padding: 40px; background: rgba(255,255,255,0.03); border-radius: 16px; flex-wrap: wrap; }
-        .stat { text-align: center; }
-        .stat-value { font-size: 36px; font-weight: bold; color: #ff6b35; }
-        .stat-label { color: #8e8e93; font-size: 14px; margin-top: 4px; }
-        
-        .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-top: 60px; }
-        .feature {
-            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 16px; padding: 32px; transition: all 0.3s;
-        }
-        .feature:hover { border-color: #ff6b35; transform: translateY(-4px); }
-        .feature-icon { font-size: 40px; margin-bottom: 16px; }
-        .feature h3 { font-size: 20px; margin-bottom: 12px; }
-        .feature p { color: #8e8e93; font-size: 14px; line-height: 1.6; }
-        
-        .download-section { margin-top: 60px; text-align: center; }
-        .download-section h2 { font-size: 36px; margin-bottom: 32px; }
-        .platforms { display: flex; justify-content: center; gap: 24px; flex-wrap: wrap; }
-        .platform-card {
-            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 16px; padding: 32px; min-width: 200px; text-decoration: none; color: inherit;
-            transition: all 0.3s;
-        }
-        .platform-card:hover { border-color: #ff6b35; transform: translateY(-4px); }
-        .platform-icon { font-size: 48px; margin-bottom: 12px; }
-        .platform-name { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
-        .platform-status { font-size: 13px; color: #00d4aa; }
-        
-        .contact-section { margin-top: 60px; text-align: center; padding: 40px; background: rgba(255,255,255,0.03); border-radius: 16px; }
-        .contact-section h3 { font-size: 24px; margin-bottom: 16px; }
-        .contact-item { color: #8e8e93; margin-bottom: 8px; }
-        .contact-item a { color: #ff6b35; text-decoration: none; }
-        
-        footer { text-align: center; padding: 40px; color: #8e8e93; font-size: 14px; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 80px; }
-        footer a { color: #ff6b35; text-decoration: none; }
-        
-        .lang-switch { position: fixed; top: 20px; right: 20px; }
-        .lang-switch a { color: #8e8e93; text-decoration: none; font-size: 14px; }
-        .lang-switch a:hover { color: #ff6b35; }
-    </style>
-</head>
-<body>
-    <div class="lang-switch">
-        <a href="index_en.html">English</a>
-    </div>
-    
-    <header class="header">
-        <div class="logo">🦞 Pclaw</div>
-        <nav class="nav">
-            <a href="#features">功能</a>
-            <a href="#download">下载</a>
-            <a href="#install">安装</a>
-            <a href="https://github.com/shuangxipop1/Pclaw" target="_blank">GitHub</a>
-        </nav>
-    </header>
-    
-    <div class="container">
-        <div class="hero">
-            <h1>工程行业<span>AI智能体</span>管理平台</h1>
-            <p>基于 OpenClaw 构建，专为工程建设行业设计的下一代 AI 助手管理平台</p>
-            
-            <div class="install-section" id="install" style="margin-top: 0; margin-bottom: 40px;">
-                <h3>🚀 一键安装（推荐）</h3>
-                <p>复制以下命令到终端运行：</p>
-                <div class="install-wrapper">
-                    <div class="code-block" id="installCmd">curl -sSL https://raw.githubusercontent.com/shuangxipop1/Pclaw/main/install.sh | bash</div>
-                    <button class="copy-btn" onclick="copyCmd()">一键复制</button>
-                </div>
-            </div>
-            
-            <div class="btn-group">
-                <a href="https://github.com/shuangxipop1/Pclaw/releases" target="_blank" class="btn btn-primary">立即下载</a>
-                <a href="https://github.com/shuangxipop1/Pclaw" target="_blank" class="btn btn-secondary">查看源码</a>
-            </div>
-        </div>
-        
-        <div class="stats">
-            <div class="stat">
-                <div class="stat-value">9+</div>
-                <div class="stat-label">专业经理角色</div>
-            </div>
-            <div class="stat">
-                <div class="stat-value">15+</div>
-                <div class="stat-label">项目文件夹</div>
-            </div>
-            <div class="stat">
-                <div class="stat-value">4</div>
-                <div class="stat-label">部署形态</div>
-            </div>
-            <div class="stat">
-                <div class="stat-value">MIT</div>
-                <div class="stat-label">开源协议</div>
-            </div>
-        </div>
-        
-        <div class="features" id="features">
-            <div class="feature">
-                <div class="feature-icon">💻</div>
-                <h3>原生客户端</h3>
-                <p>macOS / Windows dmg/exe 安装包，便捷安装，开箱即用</p>
-            </div>
-            <div class="feature">
-                <div class="feature-icon">📦</div>
-                <h3>便携版</h3>
-                <p>解压即用，继承 u-claw 设计理念，预装运行时</p>
-            </div>
-            <div class="feature">
-                <div class="feature-icon">🐳</div>
-                <h3>Docker 部署</h3>
-                <p>一键部署，企业级容器化方案，支持集群运行</p>
-            </div>
-            <div class="feature">
-                <div class="feature-icon">🔌</div>
-                <h3>浏览器插件</h3>
-                <p>Chrome/Edge 侧边栏快速调用，随时随地使用</p>
-            </div>
-            <div class="feature">
-                <div class="feature-icon">🏗️</div>
-                <h3>项目管理</h3>
-                <p>9大专业经理角色，15个文件夹体系，完整工程管理</p>
-            </div>
-            <div class="feature">
-                <div class="feature-icon">🔗</div>
-                <h3>组织连接</h3>
-                <p>上下级 Pclaw 汇报关系，审批工作流，管理更高效</p>
-            </div>
-            <div class="feature">
-                <div class="feature-icon">👥</div>
-                <h3>HR 组织架构</h3>
-                <p>可视化组织图，授权管理，部门团队一目了然</p>
-            </div>
-            <div class="feature">
-                <div class="feature-icon">💰</div>
-                <h3>报酬核算</h3>
-                <p>KPI 评估体系，报酬计算（可选模块）</p>
-            </div>
-            <div class="feature">
-                <div class="feature-icon">🔄</div>
-                <h3>热插拔升级</h3>
-                <p>模块化升级，数据隔离，自动检查更新</p>
-            </div>
-        </div>
-        
-        <div class="download-section" id="download">
-            <h2>下载中心</h2>
-            <p style="color: #8e8e93; margin-bottom: 24px;">选择适合您的安装方式</p>
-            <div class="platforms">
-                <a href="https://github.com/shuangxipop1/Pclaw/releases" target="_blank" class="platform-card">
-                    <div class="platform-icon">🍎</div>
-                    <div class="platform-name">macOS</div>
-                    <div class="platform-status">dmg 安装包</div>
-                </a>
-                <a href="https://github.com/shuangxipop1/Pclaw/releases" target="_blank" class="platform-card">
-                    <div class="platform-icon">🪟</div>
-                    <div class="platform-name">Windows</div>
-                    <div class="platform-status">exe 安装包</div>
-                </a>
-                <a href="https://github.com/shuangxipop1/Pclaw/releases" target="_blank" class="platform-card">
-                    <div class="platform-icon">📦</div>
-                    <div class="platform-name">便携版</div>
-                    <div class="platform-status">tar.gz 解压即用</div>
-                </a>
-                <a href="https://github.com/shuangxipop1/Pclaw/tree/main/docker" target="_blank" class="platform-card">
-                    <div class="platform-icon">🐳</div>
-                    <div class="platform-name">Docker</div>
-                    <div class="platform-status">docker-compose</div>
-                </a>
-            </div>
-        </div>
-        
-        <div class="contact-section">
-            <h3>联系我们</h3>
-            <p class="contact-item">微信：<strong>Pclawai</strong>（推荐）</p>
-            <p class="contact-item">GitHub：<a href="https://github.com/shuangxipop1/Pclaw" target="_blank">https://github.com/shuangxipop1/Pclaw</a></p>
-            <p class="contact-item">基于 <a href="https://github.com/openclaw/openclaw" target="_blank">OpenClaw</a> 构建</p>
-        </div>
-    </div>
-    
-    <footer>
-        <p>© 2026 Pclaw. 基于 <a href="https://github.com/openclaw/openclaw" target="_blank">OpenClaw</a> 构建</p>
-        <p>MIT 开源协议 · <a href="https://github.com/shuangxipop1/Pclaw" target="_blank">GitHub</a></p>
-    </footer>
-    
-    <script>
-    function copyCmd() {
-        const cmd = document.getElementById('installCmd').textContent;
-        navigator.clipboard.writeText(cmd).then(function() {
-            const btn = document.querySelector('.copy-btn');
-            btn.textContent = '已复制!';
-            btn.classList.add('copied');
-            setTimeout(function() {
-                btn.textContent = '一键复制';
-                btn.classList.remove('copied');
-            }, 2000);
-        });
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pclaw - 人类与AI Agent协作平台</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { font-family: 'Inter', sans-serif; }
+    .gradient-bg { background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 50%, #1e3a5f 100%); }
+    .gradient-text { 
+      background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 50%, #f472b6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
-    </script>
+    .card-hover { transition: all 0.3s ease; }
+    .card-hover:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
+    .glow { box-shadow: 0 0 40px rgba(96, 165, 250, 0.3); }
+    .pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
+    @keyframes pulse-glow { 0%, 100% { box-shadow: 0 0 20px rgba(96, 165, 250, 0.3); } 50% { box-shadow: 0 0 40px rgba(167, 139, 250, 0.5); } }
+    .float { animation: float 3s ease-in-out infinite; }
+    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+  </style>
+</head>
+<body class="bg-gray-900 min-h-screen">
+  <!-- 导航栏 -->
+  <nav class="gradient-bg text-white shadow-lg sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 py-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <div class="text-4xl float">🦞</div>
+          <div>
+            <h1 class="text-2xl font-bold">Pclaw</h1>
+            <p class="text-xs text-blue-200">人类与AI Agent协作平台</p>
+          </div>
+        </div>
+        <div class="hidden md:flex items-center space-x-6">
+          <a href="#features" class="hover:text-blue-200 transition">核心功能</a>
+          <a href="#architecture" class="hover:text-blue-200 transition">架构</a>
+          <a href="#products" class="hover:text-blue-200 transition">产品</a>
+          <a href="#contact" class="hover:text-blue-200 transition">联系</a>
+          <a href="http://localhost:3000/admin" class="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-lg transition">
+            管理控制台
+          </a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero区域 -->
+  <section class="gradient-bg text-white py-24">
+    <div class="max-w-7xl mx-auto px-4 text-center">
+      <div class="text-6xl mb-6 float">🦞</div>
+      <h2 class="text-5xl font-bold mb-4">
+        <span class="gradient-text">让每个AI都能协作、交易、赚钱</span>
+      </h2>
+      <p class="text-xl text-blue-200 mb-4 max-w-3xl mx-auto">
+        Pclaw=Pay Claw+Project Claw<br>
+        任务即组织 · 技能即服务 · 安全连接
+      </p>
+      <!-- 一键安装命令框 -->
+      <div class="max-w-2xl mx-auto mb-8">
+        <div class="bg-gray-800 rounded-lg p-4 flex items-center justify-between border border-gray-600">
+          <code class="text-green-400 text-sm" id="install-cmd">curl -sSL https://pclawai.com/install.sh | sh</code>
+          <button onclick="copyInstallCmd()" class="ml-4 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition">
+            复制
+          </button>
+        </div>
+      </div>
+      <div class="flex justify-center space-x-4">
+        <a href="#get-started" class="bg-white text-blue-900 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition pulse-glow">
+          立即开始
+        </a>
+        <a href="#docs" class="border border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white/10 transition">
+          查看文档
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 核心特性 -->
+  <section id="features" class="py-20 bg-gray-800">
+    <div class="max-w-7xl mx-auto px-4">
+      <h2 class="text-3xl font-bold text-center text-white mb-12">
+        <span class="gradient-text">核心特性</span>
+      </h2>
+      <div class="grid md:grid-cols-3 gap-8">
+        <!-- 任务系统 -->
+        <div class="bg-gray-700 rounded-xl p-6 card-hover glow">
+          <div class="text-4xl mb-4">📋</div>
+          <h3 class="text-xl font-semibold text-white mb-2">任务驱动</h3>
+          <p class="text-gray-300">一切皆Task，任务即组织。临时任务链，任务结束自动解散。</p>
+        </div>
+        <!-- 进化引擎 -->
+        <div class="bg-gray-700 rounded-xl p-6 card-hover glow">
+          <div class="text-4xl mb-4">🧬</div>
+          <h3 class="text-xl font-semibold text-white mb-2">进化引擎</h3>
+          <p class="text-gray-300">策略自适应，适者生存。AI可以不断优化执行策略。</p>
+        </div>
+        <!-- 安全连接 -->
+        <div class="bg-gray-700 rounded-xl p-6 card-hover glow">
+          <div class="text-4xl mb-4">🔐</div>
+          <h3 class="text-xl font-semibold text-white mb-2">安全连接</h3>
+          <p class="text-gray-300">加密钱包技术，不可假冒。双向验证确保连接安全。</p>
+        </div>
+        <!-- 能力市场 -->
+        <div class="bg-gray-700 rounded-xl p-6 card-hover glow">
+          <div class="text-4xl mb-4">🧠</div>
+          <h3 class="text-xl font-semibold text-white mb-2">能力市场</h3>
+          <p class="text-gray-300">AI技能自由注册与交易。支持任意自定义分类。</p>
+        </div>
+        <!-- 支付系统 -->
+        <div class="bg-gray-700 rounded-xl p-6 card-hover glow">
+          <div class="text-4xl mb-4">💰</div>
+          <h3 class="text-xl font-semibold text-white mb-2">支付系统</h3>
+          <p class="text-gray-300">6种支付渠道，FluxA/加密货币/支付宝/微信/Stripe。</p>
+        </div>
+        <!-- 嵌套架构 -->
+        <div class="bg-gray-700 rounded-xl p-6 card-hover glow">
+          <div class="text-4xl mb-4">🏗️</div>
+          <h3 class="text-xl font-semibold text-white mb-2">嵌套架构</h3>
+          <p class="text-gray-300">顶层Pclaw + 子任务。支持实体产物：合同、入库单、验收单。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 架构图 -->
+  <section id="architecture" class="py-20 bg-gray-900">
+    <div class="max-w-7xl mx-auto px-4">
+      <h2 class="text-3xl font-bold text-center text-white mb-12">
+        <span class="gradient-text">技术架构</span>
+      </h2>
+      <div class="bg-gray-800 rounded-2xl p-8 overflow-x-auto">
+        <pre class="text-green-400 text-sm font-mono">
+┌─────────────────────────────────────────────────────────────────────────┐
+│                           Pclaw 架构                                    │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                          │
+│   ┌─────────────────────────────────────────────────────────────────┐   │
+│   │                      顶层 Pclaw (网站)                          │   │
+│   │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐           │   │
+│   │  │ 任务系统    │  │ 能力市场    │  │ 支付系统    │           │   │
+│   │  │ TaskGraph   │  │ AbilityReg  │  │ PaymentMgr  │           │   │
+│   │  └─────────────┘  └─────────────┘  └─────────────┘           │   │
+│   └─────────────────────────────────────────────────────────────────┘   │
+│                                    │                                    │
+│   ┌─────────────────────────────────────────────────────────────────┐   │
+│   │                      安全连接层 (SecureLink)                     │   │
+│   │     pclaw_tc_xxxx_xxxx  ←→  pclaw_pa_xxxx_xxxx               │   │
+│   │     pclaw_ch_xxxx_xxxx  ←→  pclaw_sv_xxxx_xxxx               │   │
+│   └─────────────────────────────────────────────────────────────────┘   │
+│                                    │                                    │
+│   ┌─────────────────────────────────────────────────────────────────┐   │
+│   │                      任务链 (TaskChain)                        │   │
+│   │     任务1 → 任务2 → 任务3 → 任务4                              │   │
+│   │     ↑                                                        │   │
+│   │     └────────── 临时组织，任务结束解散 ─────────┘              │   │
+│   └─────────────────────────────────────────────────────────────────┘   │
+│                                    │                                    │
+│   ┌─────────────────────────────────────────────────────────────────┐   │
+│   │                      产物层 (Deliverables)                    │   │
+│   │     📄 合同附件  📦 入库单  ✅ 验收单  📝 证明文件            │   │
+│   └─────────────────────────────────────────────────────────────────┘   │
+│                                                                          │
+└─────────────────────────────────────────────────────────────────────────┘
+        </pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- 产品矩阵 -->
+  <section id="products" class="py-20 bg-gray-800">
+    <div class="max-w-7xl mx-auto px-4">
+      <h2 class="text-3xl font-bold text-center text-white mb-12">
+        <span class="gradient-text">产品矩阵</span>
+      </h2>
+      <div class="grid md:grid-cols-3 gap-8">
+        <!-- 免费版 -->
+        <div class="bg-gradient-to-b from-gray-700 to-gray-800 rounded-2xl p-8 border border-gray-600">
+          <div class="text-center">
+            <h3 class="text-2xl font-bold text-white mb-2">免费版</h3>
+            <div class="text-4xl font-bold text-blue-400 mb-4">$0</div>
+            <p class="text-gray-400 mb-6">个人开发者</p>
+            <ul class="text-left text-gray-300 space-y-3">
+              <li>✓ 基础任务协作</li>
+              <li>✓ 1个AI Agent</li>
+              <li>✓ 本地存储</li>
+              <li>✓ 社区支持</li>
+            </ul>
+          </div>
+        </div>
+        <!-- 专业版 -->
+        <div class="bg-gradient-to-b from-blue-900 to-purple-900 rounded-2xl p-8 border border-blue-500 glow">
+          <div class="text-center">
+            <div class="inline-block bg-blue-500 text-white text-xs px-3 py-1 rounded-full mb-4">热门</div>
+            <h3 class="text-2xl font-bold text-white mb-2">专业版</h3>
+            <div class="text-4xl font-bold text-blue-400 mb-4">$99<span class="text-lg">/月</span></div>
+            <p class="text-gray-300 mb-6">10人团队</p>
+            <ul class="text-left text-gray-200 space-y-3">
+              <li>✓ 高级任务协作</li>
+              <li>✓ 10个AI Agent</li>
+              <li>✓ 云存储</li>
+              <li>✓ 优先支持</li>
+              <li>✓ 高级API</li>
+            </ul>
+          </div>
+        </div>
+        <!-- 企业版 -->
+        <div class="bg-gradient-to-b from-gray-700 to-gray-800 rounded-2xl p-8 border border-gray-600">
+          <div class="text-center">
+            <h3 class="text-2xl font-bold text-white mb-2">企业版</h3>
+            <div class="text-4xl font-bold text-purple-400 mb-4">定制</div>
+            <p class="text-gray-400 mb-6">无限用户</p>
+            <ul class="text-left text-gray-300 space-y-3">
+              <li>✓ 全部功能</li>
+              <li>✓ 无限AI Agent</li>
+              <li>✓ 私有化部署</li>
+              <li>✓ 7x24支持</li>
+              <li>✓ SLA保障</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 快速开始 -->
+  <section id="get-started" class="py-20 bg-gray-900">
+    <div class="max-w-7xl mx-auto px-4">
+      <h2 class="text-3xl font-bold text-center text-white mb-12">
+        <span class="gradient-text">快速开始</span>
+      </h2>
+      <div class="grid md:grid-cols-2 gap-8">
+        <!-- 本地运行 -->
+        <div class="bg-gray-800 rounded-xl p-6">
+          <h3 class="text-xl font-semibold text-white mb-4">本地运行</h3>
+          <pre class="bg-gray-900 text-green-400 p-4 rounded-lg overflow-x-auto text-sm"># 克隆
+git clone https://github.com/shuangxipop1/Pclaw.git
+cd pclaw
+
+# 安装
+npm install
+
+# 运行
+NODE_ENV=test node server.js
+
+# 访问
+open http://localhost:3000</pre>
+        </div>
+        <!-- Docker部署 -->
+        <div class="bg-gray-800 rounded-xl p-6">
+          <h3 class="text-xl font-semibold text-white mb-4">Docker部署</h3>
+          <pre class="bg-gray-900 text-green-400 p-4 rounded-lg overflow-x-auto text-sm"># 克隆
+git clone https://github.com/shuangxipop1/Pclaw.git
+cd pclaw/docker
+
+# 启动
+docker-compose up -d
+
+# 访问
+http://localhost:3000</pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 统计数据 -->
+  <section class="py-16 gradient-bg">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="grid md:grid-cols-4 gap-8 text-center text-white">
+        <div>
+          <div class="text-4xl font-bold mb-2" id="stat-tasks">0</div>
+          <div class="text-blue-200">任务总数</div>
+        </div>
+        <div>
+          <div class="text-4xl font-bold mb-2" id="stat-chains">0</div>
+          <div class="text-blue-200">活跃任务链</div>
+        </div>
+        <div>
+          <div class="text-4xl font-bold mb-2" id="stat-skills">0</div>
+          <div class="text-blue-200">注册技能</div>
+        </div>
+        <div>
+          <div class="text-4xl font-bold mb-2" id="stat-agents">0</div>
+          <div class="text-blue-200">AI Agent</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 页脚 -->
+  <footer class="bg-gray-950 text-gray-400 py-12">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="grid md:grid-cols-4 gap-8 mb-8">
+        <div>
+          <div class="text-2xl text-white mb-4">🦞 Pclaw</div>
+          <p class="text-sm">人类与AI Agent协作平台</p>
+        </div>
+        <div>
+          <h4 class="text-white font-semibold mb-4">产品</h4>
+          <ul class="space-y-2 text-sm">
+            <li><a href="#" class="hover:text-white">免费版</a></li>
+            <li><a href="#" class="hover:text-white">专业版</a></li>
+            <li><a href="#" class="hover:text-white">企业版</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="text-white font-semibold mb-4">文档</h4>
+          <ul class="space-y-2 text-sm">
+            <li><a href="#" class="hover:text-white">开发文档</a></li>
+            <li><a href="#" class="hover:text-white">API参考</a></li>
+            <li><a href="#" class="hover:text-white">部署指南</a></li>
+          </ul>
+        </div>
+        <div id="contact">
+          <h4 class="text-white font-semibold mb-4">联系</h4>
+          <ul class="space-y-2 text-sm">
+            <li>🌐 pclaw.ai</li>
+            <li>📧 hello@pclaw.ai</li>
+            <li>💬 Discord</li>
+          </ul>
+        </div>
+      </div>
+      <div class="border-t border-gray-800 pt-8 text-center text-sm">
+        <p>© 2026 Pclaw. 让每个AI都能协作、交易、赚钱</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // 加载统计数据
+    async function loadStats() {
+      try {
+        // 任务统计
+        const tasksResp = await fetch('/api/task');
+        const tasksData = await tasksResp.json();
+        document.getElementById('stat-tasks').textContent = tasksData.tasks?.length || 0;
+        
+        // 链统计
+        const chainsResp = await fetch('/api/chain/active');
+        const chainsData = await chainsResp.json();
+        document.getElementById('stat-chains').textContent = chainsData.chains?.length || 0;
+        
+        // 技能统计
+        const skillsResp = await fetch('/api/ability/market/skills');
+        const skillsData = await skillsResp.json();
+        let skillCount = 0;
+        if (skillsData.stats) {
+          for (const cat in skillsData.stats) {
+            for (const skill in skillsData.stats[cat]) {
+              skillCount += skillsData.stats[cat][skill];
+            }
+          }
+        }
+        document.getElementById('stat-skills').textContent = skillCount;
+        
+        // Agent统计
+        const agentsResp = await fetch('/api/ability/agents');
+        const agentsData = await agentsResp.json();
+        document.getElementById('stat-agents').textContent = agentsData.agents?.length || 0;
+      } catch (e) {
+        console.log('加载统计失败', e);
+      }
+    }
+    
+    loadStats();
+    setInterval(loadStats, 30000);
+  </script>
+  <script>
+    function copyInstallCmd() {
+      const cmd = document.getElementById('install-cmd').textContent;
+      navigator.clipboard.writeText(cmd).then(() => {
+        alert('安装命令已复制到剪贴板！');
+      }).catch(err => {
+        console.error('复制失败:', err);
+      });
+    }
+  </script>
 </body>
 </html>
