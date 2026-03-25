@@ -1,0 +1,24 @@
+name: Deploy to Aliyun
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy to Aliyun Server
+        env:
+          HOST: ${{ secrets.ALIYUN_HOST }}
+          USER: ${{ secrets.ALIYUN_SSH_USER }}
+          KEY: ${{ secrets.ALIYUN_SSH_KEY }}
+        run: |
+          echo "$KEY" > ~/aliyun.pem
+          chmod 600 ~/aliyun.pem
+          scp -i ~/aliyun.pem -o StrictHostKeyChecking=no website/*.html root@$HOST:/var/www/pclaw/ || true
+          ssh -i ~/aliyun.pem -o StrictHostKeyChecking=no root@$HOST "cd /var/www/pclaw-api && pm2 restart minimal 2>/dev/null || true"
+          echo "Done"
