@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>需求广场 - Pclaw 寻源引擎</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0a0a0a; color: #e0e0e0; min-height: 100vh; }
+    .nav { background: #111; border-bottom: 1px solid #222; padding: 12px 24px; display: flex; gap: 24px; align-items: center; }
+    .nav a { color: #888; text-decoration: none; font-size: 14px; }
+    .nav a:hover, .nav a.active { color: #fff; }
+    .nav .logo { font-weight: 700; font-size: 18px; color: #fff; margin-right: auto; }
+    .container { max-width: 960px; margin: 0 auto; padding: 32px 16px; }
+    h1 { font-size: 28px; margin-bottom: 8px; }
+    .subtitle { color: #888; margin-bottom: 32px; }
+    .publish-btn { background: #f59e0b; color: #000; border: none; padding: 12px 24px; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; margin-bottom: 32px; }
+    .publish-btn:hover { background: #fbbf24; }
+    .filters { display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
+    .filter { background: #1a1a1a; border: 1px solid #333; color: #aaa; padding: 8px 16px; border-radius: 20px; font-size: 13px; cursor: pointer; }
+    .filter.active { background: #f59e0b; color: #000; border-color: #f59e0b; }
+    .demand-list { display: flex; flex-direction: column; gap: 16px; }
+    .demand-card { background: #111; border: 1px solid #222; border-radius: 12px; padding: 20px; cursor: pointer; transition: border-color 0.2s; }
+    .demand-card:hover { border-color: #f59e0b; }
+    .demand-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+    .demand-title { font-size: 16px; font-weight: 600; }
+    .demand-budget { background: #1a1a1a; color: #f59e0b; padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; }
+    .demand-meta { display: flex; gap: 16px; color: #666; font-size: 13px; }
+    .demand-desc { color: #888; font-size: 14px; margin-bottom: 12px; line-height: 1.5; }
+    .demand-tags { display: flex; gap: 8px; flex-wrap: wrap; }
+    .tag { background: #1a1a1a; color: #666; padding: 4px 10px; border-radius: 4px; font-size: 12px; }
+    .empty { text-align: center; color: #555; padding: 60px 0; }
+    #demandList { min-height: 200px; }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <a href="index.html" class="logo">🦞 Pclaw</a>
+    <a href="index.html">首页</a>
+    <a href="dna-shop.html">知识商店</a>
+    <a href="demand-plaza.html" class="active">需求广场</a>
+    <a href="expo.html">数字展会</a>
+    <a href="my-dna.html">我的分润</a>
+    <a href="console.html">控制台</a>
+  </nav>
+  <div class="container">
+    <h1>需求广场</h1>
+    <p class="subtitle">发布需求，让资源方主动找你。需求提出者躺赚30%分成。</p>
+    <button class="publish-btn" onclick="location.href='console.html'">+ 发布需求</button>
+    <div class="filters">
+      <span class="filter active" data-type="all">全部</span>
+      <span class="filter" data-type="skill">技能</span>
+      <span class="filter" data-type="service">服务</span>
+      <span class="filter" data-type="material">材料</span>
+      <span class="filter" data-type="equipment">设备</span>
+      <span class="filter" data-type="human">人力</span>
+      <span class="filter" data-type="digital">数字</span>
+    </div>
+    <div id="demandList">
+      <div class="empty">加载中...</div>
+    </div>
+  </div>
+  <script>
+    const API = 'https://www.pclawai.com/api';
+    async function loadDemands(type) {
+      try {
+        const res = await fetch(`${API}/demand/list`);
+        const data = await res.json();
+        if (!data.demands || data.demands.length === 0) {
+          document.getElementById('demandList').innerHTML = '<div class="empty">暂无需求，<a href="console.html" style="color:#f59e0b">成为第一个发布者</a></div>';
+          return;
+        }
+        const filtered = type === 'all' ? data.demands : data.demands.filter(d => d.type === type);
+        document.getElementById('demandList').innerHTML = filtered.map(d => `
+          <div class="demand-card" onclick="location.href='offer-detail.html?id=${d.id}'">
+            <div class="demand-header">
+              <div class="demand-title">${d.title}</div>
+              <div class="demand-budget">¥${d.budget_min || 0} ~ ¥${d.budget_max || 0}</div>
+            </div>
+            <div class="demand-meta">
+              <span>类型：${d.type}</span>
+              <span>截止：${d.deadline || '不限'}</span>
+            </div>
+            <p class="demand-desc">${d.description || ''}</p>
+            <div class="demand-tags">
+              ${(d.tags || []).map(t => `<span class="tag">${t}</span>`).join('')}
+            </div>
+          </div>
+        `).join('');
+      } catch (e) {
+        document.getElementById('demandList').innerHTML = '<div class="empty">加载失败，请稍后重试</div>';
+      }
+    }
+    document.querySelectorAll('.filter').forEach(f => {
+      f.onclick = () => {
+        document.querySelectorAll('.filter').forEach(x => x.classList.remove('active'));
+        f.classList.add('active');
+        loadDemands(f.dataset.type);
+      };
+    });
+    loadDemands('all');
+  </script>
+</body>
+</html>

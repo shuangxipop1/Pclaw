@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>控制台 - Pclaw 创作者</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #0a0a0a; color: #e0e0e0; min-height: 100vh; }
+    .nav { background: #111; border-bottom: 1px solid #222; padding: 12px 24px; display: flex; gap: 24px; }
+    .nav a { color: #888; text-decoration: none; font-size: 14px; }
+    .nav a:hover, .nav a.active { color: #fff; }
+    .nav .logo { font-weight: 700; font-size: 18px; color: #fff; margin-right: auto; }
+    .container { max-width: 800px; margin: 0 auto; padding: 32px 16px; }
+    h1 { font-size: 28px; margin-bottom: 8px; }
+    .subtitle { color: #888; margin-bottom: 32px; }
+    .tabs { display: flex; gap: 8px; margin-bottom: 24px; border-bottom: 1px solid #222; padding-bottom: 8px; }
+    .tab { padding: 8px 20px; border-radius: 6px; font-size: 14px; cursor: pointer; color: #666; }
+    .tab.active { background: #f59e0b; color: #000; }
+    .form-group { margin-bottom: 20px; }
+    .form-group label { display: block; color: #888; font-size: 13px; margin-bottom: 6px; }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%; background: #111; border: 1px solid #333; color: #fff;
+      padding: 10px 12px; border-radius: 6px; font-size: 14px; outline: none;
+    }
+    .form-group input:focus, .form-group textarea:focus { border-color: #f59e0b; }
+    .form-group textarea { resize: vertical; min-height: 80px; }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .submit-btn { background: #f59e0b; color: #000; border: none; padding: 12px 32px; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; width: 100%; }
+    .submit-btn:hover { background: #fbbf24; }
+    .alert { background: #111; border: 1px solid #333; border-radius: 8px; padding: 16px; margin-bottom: 20px; }
+    .alert-success { border-color: #22c55e; }
+    .alert-error { border-color: #ef4444; }
+    .login-prompt { text-align: center; padding: 60px 0; }
+    .login-prompt a { color: #f59e0b; }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <a href="index.html" class="logo">🦞 Pclaw</a>
+    <a href="index.html">首页</a>
+    <a href="dna-shop.html">知识商店</a>
+    <a href="demand-plaza.html">需求广场</a>
+    <a href="expo.html">数字展会</a>
+    <a href="my-dna.html">我的分润</a>
+    <a href="console.html" class="active">控制台</a>
+  </nav>
+  <div class="container">
+    <h1>创作者控制台</h1>
+    <p class="subtitle">发布技能、发布需求、管理展会，一站式搞定。</p>
+    
+    <div class="tabs">
+      <div class="tab active" data-tab="skill">发布技能</div>
+      <div class="tab" data-tab="demand">发布需求</div>
+    </div>
+
+    <div id="alertBox"></div>
+
+    <!-- 发布技能表单 -->
+    <div id="skillForm">
+      <div class="form-group">
+        <label>技能名称 *</label>
+        <input type="text" id="skillName" placeholder="例如：管道取量技能">
+      </div>
+      <div class="row">
+        <div class="form-group">
+          <label>类型 *</label>
+          <select id="skillType">
+            <option value="skill">技能 (Skill)</option>
+            <option value="service">服务 (Service)</option>
+            <option value="material">材料 (Material)</option>
+            <option value="equipment">设备 (Equipment)</option>
+            <option value="human">人力 (Human)</option>
+            <option value="digital">数字 (Digital)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>行业分类 *</label>
+          <input type="text" id="skillCategory" placeholder="例如：管道工程、结构工程">
+        </div>
+      </div>
+      <div class="row">
+        <div class="form-group">
+          <label>单价 (CNY) *</label>
+          <input type="number" id="skillPrice" placeholder="0.01">
+        </div>
+        <div class="form-group">
+          <label>单位 *</label>
+          <input type="text" id="skillUnit" placeholder="次、人天、单">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>技能描述</label>
+        <textarea id="skillDesc" placeholder="简要描述技能功能、输入输出"></textarea>
+      </div>
+      <div class="form-group">
+        <label>标签（逗号分隔）</label>
+        <input type="text" id="skillTags" placeholder="BIM, PDF解析, BOM">
+      </div>
+      <button class="submit-btn" onclick="submitSkill()">发布技能</button>
+    </div>
+
+    <!-- 发布需求表单 -->
+    <div id="demandForm" style="display:none;">
+      <div class="form-group">
+        <label>需求标题 *</label>
+        <input type="text" id="demandTitle" placeholder="例如：需要管道等轴测图BOM提取">
+      </div>
+      <div class="row">
+        <div class="form-group">
+          <label>预算下限 (CNY) *</label>
+          <input type="number" id="demandBudgetMin" placeholder="50">
+        </div>
+        <div class="form-group">
+          <label>预算上限 (CNY) *</label>
+          <input type="number" id="demandBudgetMax" placeholder="200">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>截止日期</label>
+        <input type="date" id="demandDeadline">
+      </div>
+      <div class="form-group">
+        <label>需求描述</label>
+        <textarea id="demandDesc" placeholder="详细描述你的需求"></textarea>
+      </div>
+      <button class="submit-btn" onclick="submitDemand()">发布需求</button>
+    </div>
+  </div>
+
+  <script>
+    const API = 'https://www.pclawai.com/api';
+    const user = JSON.parse(localStorage.getItem('pclaw_user') || '{}');
+
+    document.querySelectorAll('.tab').forEach(t => {
+      t.onclick = () => {
+        document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+        t.classList.add('active');
+        document.getElementById('skillForm').style.display = t.dataset.tab === 'skill' ? 'block' : 'none';
+        document.getElementById('demandForm').style.display = t.dataset.tab === 'demand' ? 'block' : 'none';
+      };
+    });
+
+    function showAlert(msg, type) {
+      const box = document.getElementById('alertBox');
+      box.className = `alert alert-${type}`;
+      box.textContent = msg;
+      setTimeout(() => box.innerHTML = '', 4000);
+    }
+
+    async function submitSkill() {
+      const body = {
+        name: document.getElementById('skillName').value.trim(),
+        type: document.getElementById('skillType').value,
+        category: document.getElementById('skillCategory').value.trim(),
+        price: parseFloat(document.getElementById('skillPrice').value) || 0,
+        unit: document.getElementById('skillUnit').value.trim() || '次',
+        description: document.getElementById('skillDesc').value.trim(),
+        tags: (document.getElementById('skillTags').value || '').split(',').map(s => s.trim()).filter(Boolean)
+      };
+      if (!body.name || !body.category) return showAlert('请填写必填项', 'error');
+      try {
+        const res = await fetch(`${API}/skill/create`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+        const data = await res.json();
+        if (data.success) showAlert('技能发布成功！', 'success');
+        else showAlert(data.error || '发布失败', 'error');
+      } catch (e) { showAlert('网络错误', 'error'); }
+    }
+
+    async function submitDemand() {
+      const body = {
+        title: document.getElementById('demandTitle').value.trim(),
+        budget_min: parseFloat(document.getElementById('demandBudgetMin').value) || 0,
+        budget_max: parseFloat(document.getElementById('demandBudgetMax').value) || 0,
+        deadline: document.getElementById('demandDeadline').value,
+        description: document.getElementById('demandDesc').value.trim()
+      };
+      if (!body.title || !body.budget_min || !body.budget_max) return showAlert('请填写必填项', 'error');
+      try {
+        const res = await fetch(`${API}/demand/create`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+        const data = await res.json();
+        if (data.success) { showAlert('需求发布成功！', 'success'); location.href = 'demand-plaza.html'; }
+        else showAlert(data.error || '发布失败', 'error');
+      } catch (e) { showAlert('网络错误', 'error'); }
+    }
+  </script>
+</body>
+</html>

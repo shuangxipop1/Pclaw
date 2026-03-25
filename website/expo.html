@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>数字展会 - Pclaw 寻源引擎</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #0a0a0a; color: #e0e0e0; min-height: 100vh; }
+    .nav { background: #111; border-bottom: 1px solid #222; padding: 12px 24px; display: flex; gap: 24px; }
+    .nav a { color: #888; text-decoration: none; font-size: 14px; }
+    .nav a:hover, .nav a.active { color: #fff; }
+    .nav .logo { font-weight: 700; font-size: 18px; color: #fff; margin-right: auto; }
+    .container { max-width: 960px; margin: 0 auto; padding: 32px 16px; }
+    h1 { font-size: 28px; margin-bottom: 8px; }
+    .subtitle { color: #888; margin-bottom: 32px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+    .card { background: #111; border: 1px solid #222; border-radius: 12px; padding: 24px; }
+    .card-badge { display: inline-block; padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: 700; margin-bottom: 12px; }
+    .badge-gold { background: #f59e0b; color: #000; }
+    .badge-normal { background: #222; color: #888; }
+    .badge-crown { background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; }
+    .card h3 { font-size: 18px; margin-bottom: 8px; }
+    .card p { color: #666; font-size: 14px; margin-bottom: 16px; }
+    .card-features { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+    .card-features span { color: #888; font-size: 13px; }
+    .price { font-size: 24px; font-weight: 700; color: #f59e0b; }
+    .price span { font-size: 13px; color: #666; font-weight: 400; }
+    .join-btn { display: block; width: 100%; background: #f59e0b; color: #000; border: none; padding: 10px; border-radius: 6px; font-weight: 600; cursor: pointer; margin-top: 16px; text-align: center; text-decoration: none; }
+    .join-btn:hover { background: #fbbf24; }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <a href="index.html" class="logo">🦞 Pclaw</a>
+    <a href="index.html">首页</a>
+    <a href="dna-shop.html">知识商店</a>
+    <a href="demand-plaza.html">需求广场</a>
+    <a href="expo.html" class="active">数字展会</a>
+    <a href="my-dna.html">我的分润</a>
+    <a href="console.html">控制台</a>
+  </nav>
+  <div class="container">
+    <h1>数字展会</h1>
+    <p class="subtitle">打破地理限制，让供需双方高效匹配。展会期间成交自动分润。</p>
+    <div class="grid">
+      <div class="card">
+        <span class="card-badge badge-normal">普通展位</span>
+        <h3>标准展会</h3>
+        <p>适合个人创作者和小型团队展示技能</p>
+        <div class="card-features">
+          <span>✅ 基础展示位</span>
+          <span>✅ 搜索可见</span>
+          <span>✅ 自动分润</span>
+        </div>
+        <div class="price">¥99<span>/天起步</span></div>
+        <a href="console.html" class="join-btn">申请入驻</a>
+      </div>
+      <div class="card">
+        <span class="card-badge badge-gold">黄金展位</span>
+        <h3>黄金展会</h3>
+        <p>首页置顶，搜索优先，曝光翻倍</p>
+        <div class="card-features">
+          <span>✅ 首页置顶</span>
+          <span>✅ 搜索优先</span>
+          <span>✅ 专属标签</span>
+          <span>✅ 自动分润</span>
+        </div>
+        <div class="price">¥699<span>/展期(3-7天)</span></div>
+        <a href="console.html" class="join-btn">申请入驻</a>
+      </div>
+      <div class="card">
+        <span class="card-badge badge-crown">冠名展位</span>
+        <h3>冠名展会</h3>
+        <p>全站Banner曝光，专属专题页面，品牌效应最大化</p>
+        <div class="card-features">
+          <span>✅ 全站Banner</span>
+          <span>✅ 专属专题</span>
+          <span>✅ 无限展示</span>
+          <span>✅ 优先推荐</span>
+        </div>
+        <div class="price">¥1999<span>/展期</span></div>
+        <a href="console.html" class="join-btn">申请冠名</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
