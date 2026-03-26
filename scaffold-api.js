@@ -691,15 +691,14 @@ async function handleRequest(method, path, body, token) {
     // /api/payment/mock/charge
     if (endpoint === '/api/payment/mock/charge' && method === 'POST') {
         if (!token) return { error: '未授权', needAuth: true };
-        const decoded = verifyToken(token);
-        if (!decoded) return { error: '无效token', needAuth: true };
+        // token is already the decoded user object from HTTP server
         const { packageId } = jsonBody || {};
         const credits = { basic: 100, standard: 550, pro: 1200, enterprise: 7000 };
         const amounts = { basic: 10, standard: 50, pro: 100, enterprise: 500 };
         const creditAmount = credits[packageId] || 0;
         const orderId = 'PAY_MOCK_' + Date.now().toString(36).toUpperCase() + '_' + Math.random().toString(36).slice(2,6).toUpperCase();
         if (creditAmount > 0) {
-            const user = Object.values(data.users).find(u => u.id === decoded.userId);
+            const user = Object.values(data.users).find(u => u.id === token.userId);
             if (user) {
                 user.balance = (user.balance || 0) + creditAmount;
                 data.transactions.push({
@@ -753,10 +752,22 @@ const server = http.createServer(async (req, res) => {
             res.writeHead(200); res.end(JSON.stringify({ success: true, providers: { wechat: false, alipay: false, stripe: false, mock: true }, currency: 'CNY' })); return;
         }
         if (endpoint === '/api/payment/mock/charge' && req.method === 'POST') {
-            const { userId, packageId } = jsonBody || {};
+            if (!token) { res.writeHead(401); res.end(JSON.stringify({ error: '未授权', needAuth: true })); return; }
+            const { packageId } = jsonBody || {};
             const credits = { basic: 100, standard: 550, pro: 1200, enterprise: 7000 };
             const amounts = { basic: 10, standard: 50, pro: 100, enterprise: 500 };
-            res.writeHead(200); res.end(JSON.stringify({ success: true, data: { orderId: 'PAY_MOCK_' + Date.now(), userId, packageId, credits: credits[packageId]||0, amount: amounts[packageId]||0, status: 'paid', mock: true } })); return;
+            const creditAmount = credits[packageId] || 0;
+            const orderId = 'PAY_MOCK_' + Date.now().toString(36).toUpperCase() + '_' + Math.random().toString(36).slice(2,6).toUpperCase();
+            if (creditAmount > 0 && token && token.userId) {
+                const user = Object.values(data.users).find(u => u.id === token.userId);
+                if (user) {
+                    user.balance = (user.balance || 0) + creditAmount;
+                    data.transactions = data.transactions || [];
+                    data.transactions.push({ id: 'tx_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,6), userId: user.id, type: 'charge', amount: creditAmount, balanceBefore: user.balance - creditAmount, balanceAfter: user.balance, description: '充值:' + (amounts[packageId]||0) + '元(' + packageId + ')', createdAt: new Date().toISOString() });
+                    saveData(data);
+                }
+            }
+            res.writeHead(200); res.end(JSON.stringify({ success: true, data: { orderId, packageId, credits: creditAmount, amount: amounts[packageId]||0, status: 'paid', mock: true } })); return;
         }
         if (endpoint === '/api/payment/mock/success' && req.method === 'POST') {
             res.writeHead(200); res.end(JSON.stringify({ success: true, message: 'Mock支付成功' })); return;
