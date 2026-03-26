@@ -22,7 +22,7 @@
 
 ### GitHub
 - **仓库:** https://github.com/shuangxipop1/Pclaw
-- **PAT:** `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`
+- **PAT:** `ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`
 - **自动部署:** push 到 main 分支自动触发 GitHub Actions
 
 ## 🔄 更新流程
@@ -48,7 +48,7 @@ nginx -s reload
 ### 触发 GitHub Actions 手动部署
 ```bash
 curl -s -X POST \
-  -H "Authorization: token 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" \
+  -H "Authorization: token ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" \
   -H "Accept: application/vnd.github+json" \
   "https://api.github.com/repos/shuangxipop1/Pclaw/actions/workflows/deploy.yml/dispatches" \
   -d '{"ref":"main"}'
