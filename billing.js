@@ -1,5 +1,5 @@
 // Pclaw billing.js - 完整计费模块
-const { Pool } = require('pg');
+const { Pool: Pool } = require('pg');
 const crypto = require('crypto');
 const pg = new Pool({
   host: process.env.PG_HOST || 'db.cgdmbsnfhwrcdbmgcbwt.supabase.co',
