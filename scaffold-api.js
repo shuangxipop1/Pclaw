@@ -10,13 +10,16 @@ const dns = require('dns');
 const { Pool } = require('pg');
 
 // Resolve Supabase DB hostname to IPv4 address (Aliyun has no IPv6)
-let PG_HOST = 'db.cgdmbsnfhwrcdbmgcbwt.supabase.co';
+let PG_HOST_V4 = null;
 try {
-    const addr = dns.lookupSync(PG_HOST, { family: 4 });
-    if (addr) { PG_HOST = addr; console.log('Supabase DB resolved to IPv4:', PG_HOST); }
-    else console.log('Supabase DNS lookup failed, using hostname');
+    // dns.resolve4 returns IPv4 A records only
+    const addresses = dns.resolve4Sync('db.cgdmbsnfhwrcdbmgcbwt.supabase.co');
+    if (addresses && addresses.length > 0) {
+        PG_HOST_V4 = addresses[0];
+        console.log('Supabase DB IPv4:', PG_HOST_V4);
+    }
 } catch(e) {
-    console.log('Supabase DNS lookup error:', e.message);
+    console.log('Supabase DNS A record lookup failed:', e.message);
 }
 
 const PORT = 3001;
@@ -26,21 +29,25 @@ const DATA_FILE = '/tmp/pclaw-data.json';
 
 // Supabase PostgreSQL connection
 let pg = null;
-try {
-    const { Pool } = require('pg');
-    pg = new Pool({
-        host: PG_HOST,
-        port: 6543,
-        database: 'postgres',
-        user: 'postgres',
-        password: 'a1w2d3AWD!!!',
-        max: 5,
-        connectionTimeoutMillis: 3000,
-        idleTimeoutMillis: 10000,
-    });
-    pg.query('SELECT 1').then(() => console.log('Supabase connected:', PG_HOST)).catch(e => console.log('Supabase connection failed:', e.message));
-} catch(e) {
-    console.log('pg module error:', e.message);
+if (PG_HOST_V4) {
+    try {
+        const { Pool } = require('pg');
+        pg = new Pool({
+            host: PG_HOST_V4,
+            port: 6543,
+            database: 'postgres',
+            user: 'postgres',
+            password: 'a1w2d3AWD!!!',
+            max: 5,
+            connectionTimeoutMillis: 3000,
+            idleTimeoutMillis: 10000,
+        });
+        pg.query('SELECT 1').then(() => console.log('Supabase connected via IPv4')).catch(e => console.log('Supabase IPv4 connection failed:', e.message));
+    } catch(e) {
+        console.log('pg module error:', e.message);
+    }
+} else {
+    console.log('Supabase: no IPv4, pg disabled');
 }
 
 // Init DB tables (run once)
