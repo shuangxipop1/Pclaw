@@ -44,6 +44,7 @@ function initData() {
     data.comments = data.comments || {};
     data.messages = data.messages || {};
     data.withdrawals = data.withdrawals || {};
+    data.transactions = data.transactions || []; // 余额流水记录
     data.appeals = data.appeals || {};
     data.pageviews = data.pageviews || {};
     
@@ -200,6 +201,8 @@ async function handleRequest(method, path, body, token) {
         skill.sales += 1;
         saveData(data);
         createNotification(user.id, '技能调用完成', `您的技能"${skill.name}"已完成`, 'skill');
+        // 记录消费流水
+        data.transactions.push({ id: 'tx_' + Date.now() + '_' + Math.random().toString(36).slice(2,6), userId: user.id, type: 'spend', amount: skill.price, balanceBefore: user.balance + skill.price, balanceAfter: user.balance, description: '技能消费:' + skill.name, createdAt: new Date().toISOString() });
         return { success: true, call, remainingBalance: user.balance };
     }
     
@@ -357,6 +360,9 @@ async function handleRequest(method, path, body, token) {
         data.payments[paymentId] = { id: paymentId, userId: user.id, type: 'recharge', amount: parseFloat(amount), method: payMethod || 'alipay', status: 'completed', balanceBefore: user.balance - parseFloat(amount), balanceAfter: user.balance, createdAt: new Date().toISOString() };
         saveData(data);
         createNotification(user.id, '充值成功', `您已成功充值${amount}元，当前余额${user.balance}元`, 'payment');
+        // 记录交易流水
+        const balBefore = user.balance - parseFloat(amount);
+        data.transactions.push({ id: 'tx_' + Date.now() + '_' + Math.random().toString(36).slice(2,6), userId: user.id, type: 'charge', amount: parseFloat(amount), balanceBefore: balBefore, balanceAfter: user.balance, description: '充值:' + amount + '元', createdAt: new Date().toISOString() });
         return { success: true, newBalance: user.balance, payment: data.payments[paymentId] };
     }
     
@@ -364,7 +370,17 @@ async function handleRequest(method, path, body, token) {
         const userPayments = Object.values(data.payments).filter(p => p.userId === user.id).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 20);
         return { success: true, payments: userPayments, total: userPayments.length };
     }
-    
+
+    // 获取余额流水（交易记录）
+    if (endpoint === '/api/transactions' && method === 'GET') {
+        if (!user) return { error: '用户不存在' };
+        const userTx = data.transactions
+            .filter(t => t.userId === user.id)
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+            .slice(0, 50);
+        return { success: true, transactions: userTx };
+    }
+
     // 提现
     if (endpoint === '/api/payment/withdraw' && method === 'POST') {
         const { amount, method: payMethod, account } = body;
