@@ -1,152 +1,136 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pclaw - 知识变现平台 | 寻源引擎</title>
-  <meta name="description" content="汇聚各行业知识技能，供需智能匹配。需求方躺赚30%分成，资源方获得40%销售收益。">
-  <style>
-    *{margin:0;padding:0;box-sizing:border-box}
-    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0a0a0a;color:#e0e0e0;line-height:1.6}
-    .nav{background:#111;border-bottom:1px solid #222;padding:12px 24px;display:flex;gap:20px;align-items:center}
-    .nav a{color:#888;text-decoration:none;font-size:14px;transition:color 0.2s}
-    .nav a:hover,.nav a.active{color:#fff}
-    .nav .logo{font-weight:800;font-size:20px;color:#fff;margin-right:auto}
-    .hero{text-align:center;padding:80px 24px 60px}
-    .hero h1{font-size:52px;font-weight:800;background:linear-gradient(135deg,#f59e0b,#fbbf24);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:16px}
-    .hero p{font-size:18px;color:#888;max-width:600px;margin:0 auto 32px}
-    .hero-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
-    .btn-primary{background:#f59e0b;color:#000;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:700;font-size:15px}
-    .btn-secondary{background:#1a1a1a;color:#fff;border:1px solid #333;padding:12px 28px;border-radius:8px;text-decoration:none;font-size:15px}
-    .btn-outline{background:transparent;color:#888;border:1px solid #333;padding:10px 20px;border-radius:8px;text-decoration:none;font-size:14px}
-    .features{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;max-width:900px;margin:0 auto;padding:0 24px}
-    .feature{background:#111;border:1px solid #1e1e1e;border-radius:12px;padding:24px;text-align:center}
-    .feature-icon{font-size:32px;margin-bottom:12px}
-    .feature h3{font-size:16px;margin-bottom:8px}
-    .feature p{color:#666;font-size:13px}
-    .section{max-width:960px;margin:0 auto;padding:48px 24px}
-    .section h2{font-size:28px;font-weight:700;text-align:center;margin-bottom:8px}
-    .section .subtitle{color:#666;text-align:center;margin-bottom:32px}
-    .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-    .card{background:#111;border:1px solid #1e1e1e;border-radius:12px;padding:20px;transition:border-color 0.2s}
-    .card:hover{border-color:#f59e0b}
-    .card-tag{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;margin-bottom:12px}
-    .tag-skill{background:#1a1a1a;color:#f59e0b;border:1px solid #f59e0b}
-    .tag-service{background:#1a1a1a;color:#22c55e;border:1px solid #22c55e}
-    .card h3{font-size:15px;margin-bottom:8px}
-    .card p{color:#666;font-size:13px;margin-bottom:12px}
-    .card-meta{display:flex;justify-content:space-between;color:#444;font-size:12px}
-    .card-price{color:#f59e0b;font-size:18px;font-weight:700}
-    .banner{background:linear-gradient(135deg,#1a1a1a,#0f0f0a);border:1px solid #f59e0b;border-radius:16px;padding:48px 32px;text-align:center;margin:32px 0}
-    .banner h2{font-size:28px;font-weight:800;margin-bottom:12px}
-    .banner p{color:#888;margin-bottom:24px}
-    .stats-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;max-width:800px;margin:0 auto;padding:32px 24px}
-    .stat{text-align:center}
-    .stat-value{font-size:32px;font-weight:800;color:#f59e0b}
-    .stat-label{color:#666;font-size:13px;margin-top:4px}
-    .how-step{display:flex;gap:20px;align-items:flex-start;margin-bottom:24px}
-    .step-num{width:40px;height:40px;background:#f59e0b;color:#000;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;flex-shrink:0}
-    .step h3{font-size:16px;margin-bottom:6px}
-    .step p{color:#666;font-size:14px}
-    .footer{border-top:1px solid #1a1a1a;padding:32px 24px;text-align:center;color:#444;font-size:13px}
-    .footer a{color:#666;text-decoration:none;margin:0 8px}
-    .footer a:hover{color:#888}
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pclaw - 知识变现平台 | 寻源引擎</title>
+<meta name="description" content="Pclaw新一代寻源匹配平台。需求方躺赚30%分成，资源方获得40%销售收益。">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0a0a0a;color:#e0e0e0;line-height:1.6}
+a{color:#888;text-decoration:none}
+a:hover{color:#fff}
+.nav{background:#111;border-bottom:1px solid #222;padding:12px 24px;display:flex;gap:20px;align-items:center}
+.nav .logo{font-weight:800;font-size:20px;color:#fff;margin-right:auto}
+.nav a{color:#888;font-size:14px}
+.nav a:hover{color:#fff}
+.hero{text-align:center;padding:80px 24px 60px}
+.hero h1{font-size:52px;font-weight:800;background:linear-gradient(135deg,#f59e0b,#fbbf24);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:16px}
+.hero p{font-size:18px;color:#888;max-width:600px;margin:0 auto 32px}
+.hero-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.btn-primary{background:#f59e0b;color:#000;padding:12px 28px;border-radius:8px;font-weight:700;font-size:15px}
+.btn-secondary{background:#1a1a1a;color:#fff;border:1px solid #333;padding:12px 28px;border-radius:8px;font-size:15px}
+.btn-outline{background:transparent;color:#888;border:1px solid #333;padding:10px 20px;border-radius:8px;font-size:14px}
+.section{max-width:960px;margin:0 auto;padding:48px 24px}
+.section h2{font-size:28px;font-weight:700;text-align:center;margin-bottom:8px}
+.subtitle{color:#666;text-align:center;margin-bottom:32px}
+.features{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;max-width:900px;margin:0 auto}
+.feature{background:#111;border:1px solid #1e1e1e;border-radius:12px;padding:24px;text-align:center}
+.feature-icon{font-size:32px;margin-bottom:12px;display:block}
+.feature h3{font-size:16px;margin-bottom:8px}
+.feature p{color:#666;font-size:13px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.card{background:#111;border:1px solid #1e1e1e;border-radius:12px;padding:20px;transition:border-color 0.2s}
+.card:hover{border-color:#f59e0b}
+.tag{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;margin-bottom:12px}
+.tag-skill{background:#1a1a1a;color:#f59e0b;border:1px solid #f59e0b}
+.tag-service{background:#1a1a1a;color:#22c55e;border:1px solid #22c55e}
+.card h3{font-size:15px;margin-bottom:8px}
+.card p{color:#666;font-size:13px;margin:8px 0 12px}
+.card-meta{display:flex;justify-content:space-between;color:#444;font-size:12px}
+.price{color:#f59e0b;font-size:18px;font-weight:700}
+.banner{background:linear-gradient(135deg,#1a1a1a,#0f0f0a);border:1px solid #f59e0b;border-radius:16px;padding:48px 32px;text-align:center;margin:32px 0}
+.banner h2{font-size:28px;font-weight:800;margin-bottom:12px}
+.banner p{color:#888;margin-bottom:24px}
+.stats-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;max-width:800px;margin:0 auto;padding:32px 0}
+.stat{text-align:center}
+.stat-value{font-size:32px;font-weight:800;color:#f59e0b}
+.stat-label{color:#666;font-size:13px;margin-top:4px}
+.step{display:flex;gap:20px;align-items:flex-start;margin-bottom:24px}
+.step-num{width:40px;height:40px;background:#f59e0b;color:#000;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;flex-shrink:0}
+.step h3{font-size:16px;margin-bottom:6px}
+.step p{color:#666;font-size:14px}
+.footer{border-top:1px solid #1a1a1a;padding:32px 24px;text-align:center}
+.footer a{color:#666;margin:0 8px;font-size:13px}
+.footer a:hover{color:#888}
+.footer sub{color:#444;font-size:12px;display:block;margin-top:8px}
+</style>
 </head>
 <body>
-  <nav class="nav">
-    <a href="index.html" class="logo">🦞 Pclaw</a>
-    <a href="dna-shop.html">知识商店</a>
-    <a href="demand-plaza.html">需求广场</a>
-    <a href="expo.html">数字展会</a>
-    <a href="my-dna.html">我的分润</a>
-    <a href="console.html">控制台</a>
-  </nav>
+<nav class="nav">
+<a href="index.html" class="logo">🦞 Pclaw</a>
+<a href="dna-shop.html">知识商店</a>
+<a href="demand-plaza.html">需求广场</a>
+<a href="expo.html">数字展会</a>
+<a href="my-dna.html">我的分润</a>
+<a href="console.html">控制台</a>
+</nav>
 
-  <div class="hero">
-    <h1>让知识跑赢资源，让资源找到出口</h1>
-    <p>Pclaw 是新一代寻源匹配平台。需求方提出需求，资源方发布技能，系统自动撮合、全自动分润。需求方躺赚30%分成，资源方获得40%销售收益。</p>
-    <div class="hero-btns">
-      <a href="demand-plaza.html" class="btn-primary">发布需求</a>
-      <a href="dna-shop.html" class="btn-secondary">浏览技能</a>
-    </div>
-  </div>
+<div class="hero">
+<h1>让知识跑赢资源，让资源找到出口</h1>
+<p>Pclaw 是新一代寻源匹配平台。需求方发布需求，资源方发布技能，系统自动撮合全自动分润。需求方躺赚30%，资源方获得40%，平台收20%。</p>
+<div class="hero-btns">
+<a href="demand-plaza.html" class="btn-primary">发布需求</a>
+<a href="dna-shop.html" class="btn-secondary">浏览技能</a>
+</div>
+</div>
 
-  <div class="stats-bar">
-    <div class="stat"><div class="stat-value">¥999+</div><div class="stat-label">累计交易额</div></div>
-    <div class="stat"><div class="stat-value">50+</div><div class="stat-label">注册资源方</div></div>
-    <div class="stat"><div class="stat-value">30%</div><div class="stat-label">需求方躺赚</div></div>
-    <div class="stat"><div class="stat-value">40%</div><div class="stat-label">资源方实得</div></div>
-  </div>
+<div class="stats-bar">
+<div class="stat"><div class="stat-value">¥999+</div><div class="stat-label">累计交易额</div></div>
+<div class="stat"><div class="stat-value">50+</div><div class="stat-label">注册资源方</div></div>
+<div class="stat"><div class="stat-value">30%</div><div class="stat-label">需求方躺赚</div></div>
+<div class="stat"><div class="stat-value">40%</div><div class="stat-label">资源方实得</div></div>
+</div>
 
-  <div class="section">
-    <h2>为什么选 Pclaw</h2>
-    <p class="subtitle">平台自动撮合，你只管躺赚</p>
-    <div class="features">
-      <div class="feature"><div class="feature-icon">🤝</div><h3>智能撮合</h3><p>AI 自动匹配需求与资源，无需人工干预</p></div>
-      <div class="feature"><div class="feature-icon">💰</div><h3>躺赚30%</h3><p>需求方发布需求，成交后自动躺赚30%分成</p></div>
-      <div class="feature"><div class="feature-icon">⚡</div><h3>即时结算</h3><p>成交即分润，实时到账，无需等待</p></div>
-      <div class="feature"><div class="feature-icon">🔒</div><h3>安全合规</h3><p>平台担保交易，零资金风险</p></div>
-    </div>
-  </div>
+<div class="section">
+<h2>为什么选 Pclaw</h2>
+<p class="subtitle">平台自动撮合，你只管躺赚</p>
+<div class="features">
+<div class="feature"><span class="feature-icon">🤝</span><h3>智能撮合</h3><p>AI 自动匹配需求与资源，无需人工干预</p></div>
+<div class="feature"><span class="feature-icon">💰</span><h3>躺赚30%</h3><p>需求方发布需求，成交后自动躺赚30%分成</p></div>
+<div class="feature"><span class="feature-icon">⚡</span><h3>即时结算</h3><p>成交即分润，实时到账，无需等待</p></div>
+<div class="feature"><span class="feature-icon">🔒</span><h3>安全合规</h3><p>平台担保交易，零资金风险</p></div>
+</div>
+</div>
 
-  <div class="section">
-    <h2>热门技能</h2>
-    <p class="subtitle">真实需求，真实成交</p>
-    <div class="grid-3">
-      <div class="card">
-        <span class="card-tag tag-skill">技能</span>
-        <h3>管道等轴测图BOM提取</h3>
-        <p>上传管道等轴测图PDF，自动提取BOM清单</p>
-        <div class="card-meta"><span>管道工程</span><span class="card-price">¥50起</span></div>
-      </div>
-      <div class="card">
-        <span class="card-tag tag-service">服务</span>
-        <h3>法律合同风险评估</h3>
-        <p>建设工程合同专业法律风险评估，出具书面意见</p>
-        <div class="card-meta"><span>法律</span><span class="card-price">¥500起</span></div>
-      </div>
-      <div class="card">
-        <span class="card-tag tag-service">服务</span>
-        <h3>专业工程翻译</h3>
-        <p>中英互译，专业术语精准对应</p>
-        <div class="card-meta"><span>翻译</span><span class="card-price">¥100起</span></div>
-      </div>
-    </div>
-    <div style="text-align:center;margin-top:24px">
-      <a href="dna-shop.html" class="btn-outline">查看全部技能 →</a>
-    </div>
-  </div>
+<div class="section">
+<h2>热门技能</h2>
+<p class="subtitle">真实需求，真实成交</p>
+<div class="grid-3">
+<div class="card"><span class="tag tag-skill">技能</span><h3>管道等轴测图BOM提取</h3><p>上传管道等轴测图PDF，自动提取BOM清单</p><div class="card-meta"><span>管道工程</span><span class="price">¥50起</span></div></div>
+<div class="card"><span class="tag tag-service">服务</span><h3>法律合同风险评估</h3><p>建设工程合同专业风险评估，出具书面意见</p><div class="card-meta"><span>法律</span><span class="price">¥500起</span></div></div>
+<div class="card"><span class="tag tag-service">服务</span><h3>专业工程翻译</h3><p>中英互译，专业术语精准</p><div class="card-meta"><span>翻译</span><span class="price">¥100起</span></div></div>
+</div>
+<div style="text-align:center;margin-top:24px"><a href="dna-shop.html" class="btn-outline">查看全部技能 →</a></div>
+</div>
 
-  <div class="section">
-    <div class="banner">
-      <h2>成为资源方，发布技能赚40%</h2>
-      <p>你有一技之长？发布到 Pclaw 知识商店，自动分润 40%，零成本躺赚</p>
-      <a href="console.html" class="btn-primary">立即发布技能</a>
-    </div>
-  </div>
+<div class="section">
+<div class="banner">
+<h2>成为资源方，发布技能赚40%</h2>
+<p>你有一技之长？发布到 Pclaw 知识商店，自动分润40%，零成本躺赚</p>
+<a href="console.html" class="btn-primary">立即发布技能</a>
+</div>
+</div>
 
-  <div class="section">
-    <h2>寻源六步法</h2>
-    <p class="subtitle">从需求到成交，全自动完成</p>
-    <div>
-      <div class="how-step"><div class="step-num">1</div><div><h3>需求描述</h3><p>需求方在平台发布需求，描述需要的技能或资源类型</p></div></div>
-      <div class="how-step"><div class="step-num">2</div><div><h3>寻源匹配</h3><p>平台 AI 根据需求自动匹配最合适的资源方</p></div></div>
-      <div class="how-step"><div class="step-num">3</div><div><h3>询价议价</h3><p>供需双方线上议价，平台提供标准报价模板</p></div></div>
-      <div class="how-step"><div class="step-num">4</div><div><h3>成交下单</h3><p>确认价格后自动成交，平台冻结交易资金</p></div></div>
-      <div class="how-step"><div class="step-num">5</div><div><h3>履约执行</h3><p>资源方自行履约，平台不介入执行环节</p></div></div>
-      <div class="how-step"><div class="step-num">6</div><div><h3>验收结算</h3><p>需求方验收确认，资金自动分润：30%给需求方，40%给资源方，20%给平台，10%留基金</p></div></div>
-    </div>
-  </div>
+<div class="section">
+<h2>寻源六步法</h2>
+<p class="subtitle">从需求到成交，全自动完成</p>
+<div class="step"><div class="step-num">1</div><div><h3>需求描述</h3><p>需求方在平台发布需求，描述需要的技能或资源类型</p></div></div>
+<div class="step"><div class="step-num">2</div><div><h3>寻源匹配</h3><p>平台 AI 根据需求自动匹配最合适的资源方</p></div></div>
+<div class="step"><div class="step-num">3</div><div><h3>询价议价</h3><p>供需双方线上议价，平台提供标准报价模板</p></div></div>
+<div class="step"><div class="step-num">4</div><div><h3>成交下单</h3><p>确认价格后自动成交，平台冻结交易资金</p></div></div>
+<div class="step"><div class="step-num">5</div><div><h3>履约执行</h3><p>资源方自行履约，平台不介入执行环节</p></div></div>
+<div class="step"><div class="step-num">6</div><div><h3>验收结算</h3><p>需求方验收确认，资金自动分润：30%需求方，40%资源方，20%平台，10%基金</p></div></div>
+</div>
 
-  <div class="footer">
-    <a href="dna-shop.html">知识商店</a>
-    <a href="demand-plaza.html">需求广场</a>
-    <a href="expo.html">数字展会</a>
-    <a href="privacy.html">隐私政策</a>
-    <a href="terms.html">用户协议</a>
-    <br><br>
-    <span>© 2026 Pclaw. 寻源引擎 · 知识变现平台</span>
-  </div>
+<div class="footer">
+<a href="dna-shop.html">知识商店</a>
+<a href="demand-plaza.html">需求广场</a>
+<a href="expo.html">数字展会</a>
+<a href="my-dna.html">我的分润</a>
+<a href="privacy.html">隐私政策</a>
+<a href="terms.html">用户协议</a>
+<sub>© 2026 Pclaw. 寻源引擎 · 知识变现平台</sub>
+</div>
 </body>
 </html>
