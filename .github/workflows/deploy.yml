@@ -43,6 +43,16 @@ jobs:
           KEY: ${{ secrets.ALIYUN_SSH_KEY }}
         run: |
           echo "$KEY" > ~/aliyun.pem && chmod 600 ~/aliyun.pem
-          ssh -i ~/aliyun.pem -o StrictHostKeyChecking=no -o ConnectTimeout=30 root@$HOST \
-            "pkill -f 'node.*scaffold' 2>/dev/null; sleep 2; cd /var/www/pclaw-api && node scaffold-api.js >> /tmp/scaffold.log 2>&1 &"
-          echo "API restart triggered"
+          # Upload restart script
+          cat > /tmp/restart.sh << 'SCRIPT'
+          #!/bin/bash
+          pkill -f 'node.*scaffold' || true
+          sleep 1
+          cd /var/www/pclaw-api
+          nohup node scaffold-api.js > /tmp/scaffold.log 2>&1 &
+          sleep 3
+          ps aux | grep -v grep | grep 'node scaffold' && echo "OK" || echo "FAIL"
+          SCRIPT
+          scp -i ~/aliyun.pem -o StrictHostKeyChecking=no -o ConnectTimeout=30 /tmp/restart.sh root@$HOST:/tmp/restart.sh
+          ssh -i ~/aliyun.pem -o StrictHostKeyChecking=no -o ConnectTimeout=30 root@$HOST "bash /tmp/restart.sh"
+          echo "Restart complete"
