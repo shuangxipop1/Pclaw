@@ -6,7 +6,18 @@
 const http = require('http');
 const crypto = require('crypto');
 const fs = require('fs');
+const dns = require('dns');
 const { Pool } = require('pg');
+
+// Resolve Supabase DB hostname to IPv4 address (Aliyun has no IPv6)
+let PG_HOST = 'db.cgdmbsnfhwrcdbmgcbwt.supabase.co';
+try {
+    const addr = dns.lookupSync(PG_HOST, { family: 4 });
+    if (addr) { PG_HOST = addr; console.log('Supabase DB resolved to IPv4:', PG_HOST); }
+    else console.log('Supabase DNS lookup failed, using hostname');
+} catch(e) {
+    console.log('Supabase DNS lookup error:', e.message);
+}
 
 const PORT = 3001;
 
@@ -18,7 +29,7 @@ let pg = null;
 try {
     const { Pool } = require('pg');
     pg = new Pool({
-        host: 'db.cgdmbsnfhwrcdbmgcbwt.supabase.co',
+        host: PG_HOST,
         port: 6543,
         database: 'postgres',
         user: 'postgres',
@@ -27,8 +38,7 @@ try {
         connectionTimeoutMillis: 3000,
         idleTimeoutMillis: 10000,
     });
-    // Test connection immediately
-    pg.query('SELECT 1').then(() => console.log('Supabase connected')).catch(e => console.log('Supabase connection failed:', e.message));
+    pg.query('SELECT 1').then(() => console.log('Supabase connected:', PG_HOST)).catch(e => console.log('Supabase connection failed:', e.message));
 } catch(e) {
     console.log('pg module error:', e.message);
 }
@@ -867,6 +877,16 @@ const server = http.createServer(async (req, res) => {
     }
 });
 
+server.on('error', (e) => {
+    if (e.code === 'EADDRINUSE') {
+        console.log(`Port ${PORT} in use, killing old process...`);
+        require('child_process').exec(`kill -9 $(lsof -t -i:${PORT}) 2>/dev/null || true`, () => {
+            setTimeout(() => server.listen(PORT, '0.0.0.0', () => console.log(`Pclaw API restarted on port ${PORT}`)), 1000);
+        });
+    } else {
+        console.error('Server error:', e);
+    }
+});
 server.listen(PORT, '0.0.0.0', () => {
     console.log(`Pclaw API Server v6.0 running on port ${PORT}`);
 });
