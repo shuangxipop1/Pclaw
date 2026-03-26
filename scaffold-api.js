@@ -681,7 +681,7 @@ async function handleRequest(method, path, body, token) {
     // /api/payment/create
     if (endpoint === '/api/payment/create' && method === 'POST') {
         if (!token) return { error: '未授权', needAuth: true };
-        const { packageId, provider } = parsed || {};
+        const { packageId, provider } = jsonBody || {};
         const pkgs = { basic: { credits: 100, price: 10 }, standard: { credits: 550, price: 50 }, pro: { credits: 1200, price: 100 }, enterprise: { credits: 7000, price: 500 } };
         const pkg = pkgs[packageId];
         if (!pkg) return { error: '未知套餐' };
@@ -695,7 +695,7 @@ async function handleRequest(method, path, body, token) {
     // /api/payment/mock/charge
     if (endpoint === '/api/payment/mock/charge' && method === 'POST') {
         if (!token) return { error: '未授权', needAuth: true };
-        const { packageId } = parsed || {};
+        const { packageId } = jsonBody || {};
         const credits = { basic: 100, standard: 550, pro: 1200, enterprise: 7000 };
         const amounts = { basic: 10, standard: 50, pro: 100, enterprise: 500 };
         return { success: true, data: { orderId: 'PAY_MOCK_' + Date.now(), packageId, credits: credits[packageId]||0, amount: amounts[packageId]||0, status: 'paid', mock: true } };
@@ -714,6 +714,7 @@ const server = http.createServer(async (req, res) => {
     res.setHeader('Content-Type', 'application/json');
     
     try {
+        let body = '';
         for await (const chunk of req) { body += chunk; }
         let jsonBody = {};
         try { jsonBody = body ? JSON.parse(body) : {}; } catch {}
@@ -738,7 +739,7 @@ const server = http.createServer(async (req, res) => {
             res.writeHead(200); res.end(JSON.stringify({ success: true, providers: { wechat: false, alipay: false, stripe: false, mock: true }, currency: 'CNY' })); return;
         }
         if (endpoint === '/api/payment/mock/charge' && req.method === 'POST') {
-            const { userId, packageId } = parsed || {};
+            const { userId, packageId } = jsonBody || {};
             const credits = { basic: 100, standard: 550, pro: 1200, enterprise: 7000 };
             const amounts = { basic: 10, standard: 50, pro: 100, enterprise: 500 };
             res.writeHead(200); res.end(JSON.stringify({ success: true, data: { orderId: 'PAY_MOCK_' + Date.now(), userId, packageId, credits: credits[packageId]||0, amount: amounts[packageId]||0, status: 'paid', mock: true } })); return;
