@@ -25,6 +25,37 @@ const pg = new Pool({
     connectionTimeoutMillis: 5000,
 });
 
+// Init DB tables (run once)
+pg.query(`
+    CREATE TABLE IF NOT EXISTS profiles (
+        id TEXT PRIMARY KEY,
+        email TEXT UNIQUE,
+        username TEXT,
+        balance INTEGER DEFAULT 0,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+    );
+`).catch(() => {});
+pg.query(`
+    CREATE TABLE IF NOT EXISTS transactions (
+        id TEXT PRIMARY KEY,
+        user_id TEXT,
+        type TEXT,
+        amount INTEGER,
+        balance_after INTEGER,
+        description TEXT,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+    );
+`).catch(() => {});
+pg.query(`
+    CREATE TABLE IF NOT EXISTS earnings (
+        id TEXT PRIMARY KEY,
+        user_id TEXT,
+        amount INTEGER,
+        status TEXT DEFAULT 'pending',
+        created_at TIMESTAMPTZ DEFAULT NOW()
+    );
+`).catch(() => {});
+
 function loadData() {
     try {
         if (fs.existsSync(DATA_FILE)) {
@@ -342,7 +373,15 @@ async function handleRequest(method, path, body, token) {
     
     if (endpoint === '/api/user/balance') {
         if (!user) return { error: '用户不存在' };
-        return { success: true, balance: user.balance, frozenBalance: user.frozenBalance || 0, total: user.balance + (user.frozenBalance || 0) };
+        try {
+            const { rows } = await pg.query(
+                'SELECT balance FROM profiles WHERE id=$1', [user.id]
+            );
+            const balance = rows[0]?.balance || 0;
+            return { success: true, balance, frozenBalance: 0, total: balance };
+        } catch(e) {
+            return { success: true, balance: user.balance || 0, frozenBalance: 0, total: user.balance || 0 };
+        }
     }
     
     if (endpoint === '/api/payment/recharge' && method === 'POST') {
@@ -367,11 +406,15 @@ async function handleRequest(method, path, body, token) {
     // 获取余额流水（交易记录）
     if (endpoint === '/api/transactions' && method === 'GET') {
         if (!user) return { error: '用户不存在' };
-        const userTx = data.transactions
-            .filter(t => t.userId === user.id)
-            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-            .slice(0, 50);
-        return { success: true, transactions: userTx };
+        try {
+            const { rows } = await pg.query(
+                'SELECT id, type, amount, description, created_at FROM transactions WHERE user_id=$1 ORDER BY created_at DESC LIMIT 50',
+                [user.id]
+            );
+            return { success: true, transactions: rows || [] };
+        } catch(e) {
+            return { success: true, transactions: [] };
+        }
     }
 
     // 提现
@@ -772,12 +815,21 @@ const server = http.createServer(async (req, res) => {
             const creditAmount = credits[packageId] || 0;
             const orderId = 'PAY_MOCK_' + Date.now().toString(36).toUpperCase() + '_' + Math.random().toString(36).slice(2,6).toUpperCase();
             if (creditAmount > 0 && token && token.userId) {
-                const user = Object.values(data.users).find(u => u.id === token.userId);
-                if (user) {
-                    user.balance = (user.balance || 0) + creditAmount;
-                    data.transactions = data.transactions || [];
-                    data.transactions.push({ id: 'tx_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,6), userId: user.id, type: 'charge', amount: creditAmount, balanceBefore: user.balance - creditAmount, balanceAfter: user.balance, description: '充值:' + (amounts[packageId]||0) + '元(' + packageId + ')', createdAt: new Date().toISOString() });
-                    saveData(data);
+                try {
+                    // Update balance in Supabase profiles
+                    await pg.query(
+                        `INSERT INTO profiles (id, email, balance) VALUES ($1, $2, $3)
+                         ON CONFLICT (id) DO UPDATE SET balance = profiles.balance + $3`,
+                        [token.userId, token.email || 'unknown', creditAmount]
+                    );
+                    // Record transaction
+                    await pg.query(
+                        `INSERT INTO transactions (id, user_id, type, amount, description)
+                         VALUES ($1, $2, 'charge', $3, $4)`,
+                        ['tx_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,6), token.userId, creditAmount, '充值:' + (amounts[packageId]||0) + '元(' + packageId + ')']
+                    );
+                } catch(e) {
+                    console.log('Supabase write error:', e.message);
                 }
             }
             res.writeHead(200); res.end(JSON.stringify({ success: true, data: { orderId, packageId, credits: creditAmount, amount: amounts[packageId]||0, status: 'paid', mock: true } })); return;
