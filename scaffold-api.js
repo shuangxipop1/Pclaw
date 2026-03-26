@@ -814,19 +814,19 @@ const server = http.createServer(async (req, res) => {
             const amounts = { basic: 10, standard: 50, pro: 100, enterprise: 500 };
             const creditAmount = credits[packageId] || 0;
             const orderId = 'PAY_MOCK_' + Date.now().toString(36).toUpperCase() + '_' + Math.random().toString(36).slice(2,6).toUpperCase();
-            if (creditAmount > 0 && token && token.userId) {
+            if (creditAmount > 0 && token && token.id) {
                 try {
                     // Update balance in Supabase profiles
                     await pg.query(
                         `INSERT INTO profiles (id, email, balance) VALUES ($1, $2, $3)
                          ON CONFLICT (id) DO UPDATE SET balance = profiles.balance + $3`,
-                        [token.userId, token.email || 'unknown', creditAmount]
+                        [token.id, token.email || 'unknown', creditAmount]
                     );
                     // Record transaction
                     await pg.query(
                         `INSERT INTO transactions (id, user_id, type, amount, description)
                          VALUES ($1, $2, 'charge', $3, $4)`,
-                        ['tx_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,6), token.userId, creditAmount, '充值:' + (amounts[packageId]||0) + '元(' + packageId + ')']
+                        ['tx_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,6), token.id, creditAmount, '充值:' + (amounts[packageId]||0) + '元(' + packageId + ')']
                     );
                 } catch(e) {
                     console.log('Supabase write error:', e.message);
