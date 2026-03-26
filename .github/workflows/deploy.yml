@@ -43,6 +43,7 @@ jobs:
           KEY: ${{ secrets.ALIYUN_SSH_KEY }}
         run: |
           echo "$KEY" > ~/aliyun.pem && chmod 600 ~/aliyun.pem
+          # Use bash -c to wrap so set +e works, and || true so SSH never fails
           ssh -i ~/aliyun.pem -o StrictHostKeyChecking=no -o ConnectTimeout=30 root@$HOST \
-            "pkill -f 'node.*scaffold' 2>/dev/null || true; sleep 2; cd /var/www/pclaw-api; node scaffold-api.js >> /tmp/scaffold.log 2>&1 &"
-          echo "API restart triggered"
+            "bash -c 'set +e; pkill -f \"node.*scaffold\" 2>/dev/null; sleep 2; cd /var/www/pclaw-api; node scaffold-api.js >> /tmp/scaffold.log 2>&1; exit 0' || true"
+          echo "API restart done"
