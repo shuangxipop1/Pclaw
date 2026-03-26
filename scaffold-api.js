@@ -14,16 +14,23 @@ const PORT = 3001;
 const DATA_FILE = '/tmp/pclaw-data.json';
 
 // Supabase PostgreSQL connection
-const pg = new Pool({
-    host: 'db.cgdmbsnfhwrcdbmgcbwt.supabase.co',
-    port: 6543,
-    database: 'postgres',
-    user: 'postgres',
-    password: 'a1w2d3AWD!!!',
-    max: 10,
-    family: 4,
-    connectionTimeoutMillis: 5000,
-});
+let pg = null;
+try {
+    const { Pool } = require('pg');
+    pg = new Pool({
+        host: 'db.cgdmbsnfhwrcdbmgcbwt.supabase.co',
+        port: 6543,
+        database: 'postgres',
+        user: 'postgres',
+        password: 'a1w2d3AWD!!!',
+        max: 10,
+        family: 4,
+        connectionTimeoutMillis: 5000,
+    });
+    console.log('Supabase pg connected (Pool created)');
+} catch(e) {
+    console.log('pg module not available, using in-memory only:', e.message);
+}
 
 // Init DB tables (run once)
 pg.query(`
@@ -814,23 +821,26 @@ const server = http.createServer(async (req, res) => {
             const amounts = { basic: 10, standard: 50, pro: 100, enterprise: 500 };
             const creditAmount = credits[packageId] || 0;
             const orderId = 'PAY_MOCK_' + Date.now().toString(36).toUpperCase() + '_' + Math.random().toString(36).slice(2,6).toUpperCase();
-            if (creditAmount > 0 && token && token.id) {
+            if (creditAmount > 0 && token && token.userId) {
                 try {
                     // Update balance in Supabase profiles
                     await pg.query(
                         `INSERT INTO profiles (id, email, balance) VALUES ($1, $2, $3)
                          ON CONFLICT (id) DO UPDATE SET balance = profiles.balance + $3`,
-                        [token.id, token.email || 'unknown', creditAmount]
+                        [token.userId, token.email || 'unknown', creditAmount]
                     );
                     // Record transaction
                     await pg.query(
                         `INSERT INTO transactions (id, user_id, type, amount, description)
                          VALUES ($1, $2, 'charge', $3, $4)`,
-                        ['tx_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,6), token.id, creditAmount, '充值:' + (amounts[packageId]||0) + '元(' + packageId + ')']
+                        ['tx_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,6), token.userId, creditAmount, '充值:' + (amounts[packageId]||0) + '元(' + packageId + ')']
                     );
+                    console.log('Supabase charge success for userId:', token.userId, 'credits:', creditAmount);
                 } catch(e) {
                     console.log('Supabase write error:', e.message);
                 }
+            } else {
+                console.log('Charge skipped: creditAmount=', creditAmount, 'token=', JSON.stringify(token));
             }
             res.writeHead(200); res.end(JSON.stringify({ success: true, data: { orderId, packageId, credits: creditAmount, amount: amounts[packageId]||0, status: 'paid', mock: true } })); return;
         }
