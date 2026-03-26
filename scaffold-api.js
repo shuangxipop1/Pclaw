@@ -129,18 +129,8 @@ async function handleRequest(method, path, body, token) {
     
     // 技能列表
     if (endpoint === '/api/skill/list') {
-        // Try pg first, fall back to in-memory
-        let skills;
-        try {
-            const pg = require('pg');
-            const client = new pg.Client({ connectionString: 'postgresql://postgres:a1w2d3AWD!!!@db.cgdmbsnfhwrcdbmgcbwt.supabase.co:5432/postgres?sslmode=require' });
-            await client.connect();
-            const result = await client.query('SELECT * FROM skills WHERE enabled=1 ORDER BY sales_count DESC');
-            skills = result.rows;
-            await client.end();
-        } catch(e) {
-            skills = Object.values(data.skills).filter(s => s.enabled && s.status === 'approved');
-        }
+        // pg unavailable on server - use in-memory skills only
+        const skills = Object.values(data.skills).filter(s => s.enabled && s.status === 'approved');
         if (params.category) skills = skills.filter(s => s.category === params.category);
         if (params.search) {
             const keyword = params.search.toLowerCase();
@@ -155,29 +145,19 @@ async function handleRequest(method, path, body, token) {
     }
     
     if (endpoint === '/api/skill/categories') {
-        let categories = [];
-        try {
-            const { Pool } = require('pg');
-            const pool = new Pool({
-                host: 'db.cgdmbsnfhwrcdbmgcbwt.supabase.co',
-                port: 5432,
-                user: 'postgres',
-                password: 'a1w2d3AWD!!!',
-                database: 'postgres',
-                ssl: { rejectUnauthorized: false },
-                max: 5,
-                connectionTimeoutMillis: 5000,
-            });
-            const result = await pool.query('SELECT category, COUNT(*) as cnt FROM skills WHERE enabled=1 GROUP BY category ORDER BY cnt DESC');
-            categories = result.rows;
-            await pool.end();
-        } catch(e) {
-            categories = [{category: 'business', cnt: 0}];
+        // Use in-memory categories only
+        const allSkills = Object.values(data.skills).filter(s => s.enabled && s.status === 'approved');
+        const categoryMap = {};
+        for (const s of allSkills) {
+            const cat = s.category || 'other';
+            categoryMap[cat] = (categoryMap[cat] || 0) + 1;
         }
-        const catMap = { business: { name: '商业', icon: '📊' }, data: { name: '数据分析', icon: '📊' }, writing: { name: '文案写作', icon: '✍️' }, code: { name: '代码开发', icon: '💻' }, design: { name: '设计创意', icon: '🎨' }, translate: { name: '翻译服务', icon: '🌐' }};
-        return { success: true, categories: categories.map(c => ({ id: c.category, name: catMap[c.category]?.name || c.category, icon: catMap[c.category]?.icon || '🧬', count: parseInt(c.cnt) })) };
+        const categories = Object.entries(categoryMap)
+            .map(([name, count]) => ({ name, count }))
+            .sort((a, b) => b.count - a.count);
+        return { success: true, categories };
     }
-    
+
     const skillMatch = endpoint.match(/^\/api\/skill\/([^/]+)$/);
     if (skillMatch) {
         const skill = data.skills[skillMatch[1]];
