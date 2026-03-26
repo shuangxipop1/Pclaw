@@ -723,7 +723,30 @@ const server = http.createServer(async (req, res) => {
         
         const authHeader = req.headers.authorization;
         const token = authHeader ? verifyToken(authHeader.replace('Bearer ', '').trim()) : null;
-        
+
+        // ===== Public Payment Routes (no auth required) =====
+        const endpoint = new URL(req.url, `http://localhost:${PORT}`).pathname;
+        if (endpoint === '/api/payment/packages' && req.method === 'GET') {
+            res.writeHead(200); res.end(JSON.stringify({ success: true, packages: [
+                { id: 'basic', name: '基础包', credits: 100, price: 10, bonus: 0 },
+                { id: 'standard', name: '标准包', credits: 550, price: 50, bonus: 10 },
+                { id: 'pro', name: '专业包', credits: 1200, price: 100, bonus: 20 },
+                { id: 'enterprise', name: '企业包', credits: 7000, price: 500, bonus: 40 }
+            ]})); return;
+        }
+        if (endpoint === '/api/payment/config' && req.method === 'GET') {
+            res.writeHead(200); res.end(JSON.stringify({ success: true, providers: { wechat: false, alipay: false, stripe: false, mock: true }, currency: 'CNY' })); return;
+        }
+        if (endpoint === '/api/payment/mock/charge' && req.method === 'POST') {
+            const { userId, packageId } = jsonBody || {};
+            const credits = { basic: 100, standard: 550, pro: 1200, enterprise: 7000 };
+            const amounts = { basic: 10, standard: 50, pro: 100, enterprise: 500 };
+            res.writeHead(200); res.end(JSON.stringify({ success: true, data: { orderId: 'PAY_MOCK_' + Date.now(), userId, packageId, credits: credits[packageId]||0, amount: amounts[packageId]||0, status: 'paid', mock: true } })); return;
+        }
+        if (endpoint === '/api/payment/mock/success' && req.method === 'POST') {
+            res.writeHead(200); res.end(JSON.stringify({ success: true, message: 'Mock支付成功' })); return;
+        }
+
         const result = await handleRequest(req.method, req.url, jsonBody, token);
         res.writeHead(200);
         res.end(JSON.stringify(result));
