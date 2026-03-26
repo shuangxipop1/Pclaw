@@ -691,13 +691,15 @@ async function handleRequest(method, path, body, token) {
     // /api/payment/mock/charge
     if (endpoint === '/api/payment/mock/charge' && method === 'POST') {
         if (!token) return { error: '未授权', needAuth: true };
+        const decoded = verifyToken(token);
+        if (!decoded) return { error: '无效token', needAuth: true };
         const { packageId } = jsonBody || {};
         const credits = { basic: 100, standard: 550, pro: 1200, enterprise: 7000 };
         const amounts = { basic: 10, standard: 50, pro: 100, enterprise: 500 };
         const creditAmount = credits[packageId] || 0;
         const orderId = 'PAY_MOCK_' + Date.now().toString(36).toUpperCase() + '_' + Math.random().toString(36).slice(2,6).toUpperCase();
         if (creditAmount > 0) {
-            const user = Object.values(data.users).find(u => u.id === token.userId);
+            const user = Object.values(data.users).find(u => u.id === decoded.userId);
             if (user) {
                 user.balance = (user.balance || 0) + creditAmount;
                 data.transactions.push({
