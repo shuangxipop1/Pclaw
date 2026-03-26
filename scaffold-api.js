@@ -9,22 +9,21 @@ const fs = require('fs');
 const dns = require('dns');
 const { Pool } = require('pg');
 
-const PORT = 3001;
+// Load .env if present
+try { require('dotenv').config(); } catch(e) {}
 
-// 数据持久化
-const DATA_FILE = '/tmp/pclaw-data.json';
+const PORT = parseInt(process.env.PORT || '3001');
 
-// Supabase PostgreSQL connection (IPv4 only, Aliyun has no IPv6)
-let pg = null; // null until confirmed connected
+// PostgreSQL connection
+let pg = null;
 let pgReady = false;
 try {
-    const { Pool } = require('pg');
     const pgClient = new Pool({
-        host: 'db.cgdmbsnfhwrcdbmgcbwt.supabase.co',
-        port: 6543,
-        database: 'postgres',
+        host: process.env.PG_HOST || '127.0.0.1',
+        port: parseInt(process.env.PG_PORT || '5432'),
+        database: 'pclaw',
         user: 'postgres',
-        password: 'a1w2d3AWD!!!',
+        password: process.env.PG_PASSWORD || 'pclaw123',
         max: 5,
         family: 4,
         connectionTimeoutMillis: 5000,
@@ -44,8 +43,9 @@ try {
     console.log('pg module error:', e.message);
 }
 
-// Init DB tables (run once)
-pg.query(`
+// Init DB tables (run once, only if pg connected)
+if (pg) { 
+    pg.query(`
     CREATE TABLE IF NOT EXISTS profiles (
         id TEXT PRIMARY KEY,
         email TEXT UNIQUE,
@@ -53,8 +53,8 @@ pg.query(`
         balance INTEGER DEFAULT 0,
         created_at TIMESTAMPTZ DEFAULT NOW()
     );
-`).catch(() => {});
-pg.query(`
+    `).catch(() => {});
+    pg.query(`
     CREATE TABLE IF NOT EXISTS transactions (
         id TEXT PRIMARY KEY,
         user_id TEXT,
@@ -64,8 +64,8 @@ pg.query(`
         description TEXT,
         created_at TIMESTAMPTZ DEFAULT NOW()
     );
-`).catch(() => {});
-pg.query(`
+    `).catch(() => {});
+    pg.query(`
     CREATE TABLE IF NOT EXISTS earnings (
         id TEXT PRIMARY KEY,
         user_id TEXT,
@@ -73,25 +73,131 @@ pg.query(`
         status TEXT DEFAULT 'pending',
         created_at TIMESTAMPTZ DEFAULT NOW()
     );
-`).catch(() => {});
+    `).catch(() => {});
+}
+
+// ============================================================
+// PostgreSQL Helper Functions
+// ============================================================
+async function pgQuery(sql, params) {
+    return new Promise((resolve, reject) => {
+        if (!pg) {
+            if (pgReady === false) console.error('PG not ready yet, call skipped');
+            else console.error('PG not connected, call skipped:', sql.slice(0, 50));
+            reject(new Error('pg not ready')); return;
+        }
+        pg.query(sql, params, (err, result) => {
+            if (err) { console.error('PG Error:', err.message); reject(err); }
+            else resolve(result);
+        });
+    });
+}
+
+async function pgGetUser(email) {
+    const r = await pgQuery('SELECT * FROM users WHERE email = $1', [email]);
+    return r.rows[0] || null;
+}
+
+async function pgCreateUser(email, username, passwordHash) {
+    const r = await pgQuery(
+        'INSERT INTO users (id, email, username, password_hash, created_at) VALUES ($1, $2, $3, $4, NOW()) RETURNING *',
+        [crypto.randomUUID(), email, username || email.split('@')[0], passwordHash]
+    );
+    return r.rows[0];
+}
+
+async function pgGetBalance(userId) {
+    const r = await pgQuery('SELECT * FROM balances WHERE user_id = $1', [userId]);
+    return r.rows[0] || null;
+}
+
+async function pgCreateBalance(userId) {
+    const r = await pgQuery(
+        'INSERT INTO balances (user_id, balance, frozen_balance, updated_at) VALUES ($1, 1000, 0, NOW()) RETURNING *',
+        [userId]
+    );
+    return r.rows[0];
+}
+
+async function pgUpdateBalance(userId, newBalance) {
+    await pgQuery(
+        'UPDATE balances SET balance = $1, frozen_balance = 0, updated_at = NOW() WHERE user_id = $2',
+        [newBalance, userId]
+    );
+}
+
+async function pgAddTransaction(userId, type, amount, credits, description) {
+    await pgQuery(
+        'INSERT INTO transactions (user_id, type, amount, credits, description, created_at) VALUES ($1, $2, $3, $4, $5, NOW())',
+        [userId, type, amount || 0, credits || 0, description || '']
+    );
+}
+
+async function pgGetTransactions(userId, limit) {
+    const r = await pgQuery(
+        'SELECT * FROM transactions WHERE user_id = $1 ORDER BY created_at DESC LIMIT $2',
+        [userId, limit || 50]
+    );
+    return r.rows;
+}
+
+async function pgSetSession(token, userId, expiresAt) {
+    await pgQuery(
+        'INSERT INTO sessions (token, user_id, created_at, expires_at) VALUES ($1, $2, NOW(), $3) ON CONFLICT (token) DO UPDATE SET expires_at = $3',
+        [token, userId, expiresAt]
+    );
+}
+
+async function pgGetSession(token) {
+    const r = await pgQuery('SELECT * FROM sessions WHERE token = $1 AND expires_at > NOW()', [token]);
+    return r.rows[0] || null;
+}
+
+async function pgDeleteSession(token) {
+    await pgQuery('DELETE FROM sessions WHERE token = $1', [token]);
+}
+
+async function pgGetInvite(code) {
+    const r = await pgQuery('SELECT * FROM invites WHERE code = $1 AND used = false', [code]);
+    return r.rows[0] || null;
+}
+
+async function pgUseInvite(code, usedBy) {
+    await pgQuery('UPDATE invites SET used = true, used_by = $1, used_at = NOW() WHERE code = $2', [usedBy, code]);
+}
+
+// ============================================================
+// Data Layer - JSON file fallback
+// ============================================================
+let data = {};
+let DATA_FILE = '/tmp/pclaw-data.json';
 
 function loadData() {
     try {
         if (fs.existsSync(DATA_FILE)) {
-            const data = fs.readFileSync(DATA_FILE, 'utf8');
-            return JSON.parse(data);
+            data = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
+        } else {
+            data = { users: {}, sessions: {}, invites: {}, notifications: [], payments: [], pageviews: 0 };
         }
-    } catch (e) {}
-    return {};
+    } catch(e) {
+        data = { users: {}, sessions: {}, invites: {}, notifications: [], payments: [], pageviews: 0 };
+    }
 }
 
-function saveData(data) {
+function saveData(d) {
     try {
-        fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
-    } catch (e) {}
+        fs.writeFileSync(DATA_FILE, JSON.stringify(d || data, null, 2));
+    } catch(e) {
+        console.error('saveData error:', e.message);
+    }
 }
 
-let data = loadData();
+// Initialize on startup
+loadData();
+
+// ============================================================
+// Data Layer - JSON file fallback (reuses original loadData/saveData above)
+// ============================================================
 
 // 初始化数据
 function initData() {
@@ -138,14 +244,29 @@ initData();
 // Token管理
 function createToken(user) {
     const token = crypto.randomUUID();
+    const expiresAt = Date.now() + 7 * 24 * 60 * 60 * 1000;
+    // Always save to memory
     data.sessions[token] = { userId: user.id, email: user.email, createdAt: Date.now() };
     saveData(data);
+    // Also persist to PostgreSQL (fire-and-forget)
+    pgSetSession(token, user.id, new Date(expiresAt)).catch(e => console.error('pgSetSession error:', e.message));
     return token;
 }
 
 function verifyToken(tokenStr) {
-    if (!tokenStr || !data.sessions[tokenStr]) return null;
-    const session = data.sessions[tokenStr];
+    if (!tokenStr) return null;
+    let session = data.sessions[tokenStr];
+    if (!session) {
+        // Try PG session async (fire-and-forget, won't affect this request)
+        pgGetSession(tokenStr).then(s => {
+            if (s && Date.now() - new Date(s.expires_at).getTime() <= 0) {
+                // Session still valid in PG, migrate to memory
+                data.sessions[tokenStr] = { userId: s.user_id, email: '', createdAt: Date.now() };
+                saveData(data);
+            }
+        }).catch(() => {});
+        return null;
+    }
     if (Date.now() - session.createdAt > 24 * 60 * 60 * 1000) {
         delete data.sessions[tokenStr];
         saveData(data);
@@ -329,6 +450,13 @@ async function handleRequest(method, path, body, token) {
         }
         const userId = crypto.randomUUID();
         const user = { id: userId, email, username: username || email.split('@')[0], password, balance: 1000 + bonus, frozenBalance: 0, vipLevel: 0, avatar: '', bio: '', inviteCode: 'INV' + userId.slice(0, 6).toUpperCase(), invitedBy: inviteCode || null, role: 'user', createdAt: new Date().toISOString(), lastLoginAt: new Date().toISOString() };
+        // Compute password hash (SHA256 fallback - bcrypt not installed)
+        const passwordHash = crypto.createHash('sha256').update(password).digest('hex');
+        // Save to PostgreSQL (fire-and-forget, don't await)
+        pgCreateUser(email, username || email.split('@')[0], password).catch(e => console.error('pgCreateUser error:', e.message));
+        pgCreateBalance(userId).catch(e => console.error('pgCreateBalance error:', e.message));
+        if (inviteCode) { pgUseInvite(inviteCode, email).catch(() => {}); }
+        // Always also save to JSON as fallback
         data.users[email] = user;
         if (!data.invites) data.invites = {};
         data.invites[user.inviteCode] = { email, invitedBy: inviteCode, createdAt: new Date().toISOString() };
@@ -341,7 +469,17 @@ async function handleRequest(method, path, body, token) {
     if (endpoint === '/api/auth/login' && method === 'POST') {
         const { email, password } = body;
         if (!email || !password) return { error: '邮箱和密码必填' };
-        const user = data.users[email];
+        let user;
+        try {
+            const pgUser = await pgGetUser(email);
+            if (pgUser) {
+                const bcryptMatch = await bcrypt.compare(password, pgUser.password_hash);
+                if (bcryptMatch) {
+                    user = { id: pgUser.id, email: pgUser.email, username: pgUser.username, createdAt: pgUser.created_at };
+                }
+            }
+        } catch(e) { console.error('PG login error:', e.message); }
+        if (!user) user = data.users[email];
         if (!user || user.password !== password) return { error: '邮箱或密码错误' };
         user.lastLoginAt = new Date().toISOString();
         saveData(data);
@@ -392,15 +530,16 @@ async function handleRequest(method, path, body, token) {
     
     if (endpoint === '/api/user/balance') {
         if (!user) return { error: '用户不存在' };
+        let balance = 1000; // default initial
         try {
-            const { rows } = await pg.query(
-                'SELECT balance FROM profiles WHERE id=$1', [user.id]
-            );
-            const balance = rows[0]?.balance || 0;
-            return { success: true, balance, frozenBalance: 0, total: balance };
-        } catch(e) {
-            return { success: true, balance: user.balance || 0, frozenBalance: 0, total: user.balance || 0 };
-        }
+            const b = await pgGetBalance(userId);
+            if (b) balance = parseFloat(b.balance);
+            else {
+                const memUser = data.users ? Object.values(data.users).find(u => u.id === userId) : null;
+                if (memUser) balance = memUser.balance || 1000;
+            }
+        } catch(e) { console.error('Balance error:', e.message); }
+        return { success: true, balance, frozenBalance: 0, total: balance };
     }
     
     if (endpoint === '/api/payment/recharge' && method === 'POST') {
@@ -409,11 +548,15 @@ async function handleRequest(method, path, body, token) {
         user.balance = (user.balance || 0) + parseFloat(amount);
         const paymentId = 'pay_' + crypto.randomUUID().slice(0, 12);
         data.payments[paymentId] = { id: paymentId, userId: user.id, type: 'recharge', amount: parseFloat(amount), method: payMethod || 'alipay', status: 'completed', balanceBefore: user.balance - parseFloat(amount), balanceAfter: user.balance, createdAt: new Date().toISOString() };
-        saveData(data);
         createNotification(user.id, '充值成功', `您已成功充值${amount}元，当前余额${user.balance}元`, 'payment');
-        // 记录交易流水
-        const balBefore = user.balance - parseFloat(amount);
-        data.transactions.push({ id: 'tx_' + Date.now() + '_' + Math.random().toString(36).slice(2,6), userId: user.id, type: 'charge', amount: parseFloat(amount), balanceBefore: balBefore, balanceAfter: user.balance, description: '充值:' + amount + '元', createdAt: new Date().toISOString() });
+        // Save to PostgreSQL
+        try {
+            await pgAddTransaction(user.id, 'charge', amount, 0, '充值:' + amount + '元');
+            await pgUpdateBalance(user.id, user.balance);
+        } catch(e) {
+            data.transactions.push({ id: 'tx_' + Date.now() + '_' + Math.random().toString(36).slice(2,6), userId: user.id, type: 'charge', amount: parseFloat(amount), balanceBefore: user.balance - parseFloat(amount), balanceAfter: user.balance, description: '充值:' + amount + '元', createdAt: new Date().toISOString() });
+            saveData(data);
+        }
         return { success: true, newBalance: user.balance, payment: data.payments[paymentId] };
     }
     
@@ -426,10 +569,7 @@ async function handleRequest(method, path, body, token) {
     if (endpoint === '/api/transactions' && method === 'GET') {
         if (!user) return { error: '用户不存在' };
         try {
-            const { rows } = await pg.query(
-                'SELECT id, type, amount, description, created_at FROM transactions WHERE user_id=$1 ORDER BY created_at DESC LIMIT 50',
-                [user.id]
-            );
+            const rows = await pgGetTransactions(user.id, 50);
             return { success: true, transactions: rows || [] };
         } catch(e) {
             return { success: true, transactions: [] };
@@ -802,7 +942,7 @@ const server = http.createServer(async (req, res) => {
     res.setHeader('Content-Type', 'application/json');
     
     try {
-        let body = '';
+        body = '';
         for await (const chunk of req) { body += chunk; }
         let jsonBody = {};
         try { jsonBody = body ? JSON.parse(body) : {}; } catch {}
@@ -856,9 +996,8 @@ const server = http.createServer(async (req, res) => {
                     user.balance = (user.balance || 0) + creditAmount;
                     data.transactions = data.transactions || [];
                     data.transactions.push({ id: 'tx_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,6), userId: uid, type: 'charge', amount: creditAmount, balanceBefore: user.balance - creditAmount, balanceAfter: user.balance, description: '充值:' + (amounts[packageId]||0) + '元(' + packageId + ')', createdAt: new Date().toISOString() });
+                    console.log('Charge: local only for', uid);
                     saveData(data);
-                    if (pgWriteDone) console.log('Charge: PG + local updated for', uid);
-                    else console.log('Charge: local only for', uid);
                 }
             }
             res.writeHead(200); res.end(JSON.stringify({ success: true, data: { orderId, packageId, credits: creditAmount, amount: amounts[packageId]||0, status: 'paid', mock: true } })); return;

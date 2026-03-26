@@ -2,20 +2,17 @@
   "name": "pclaw",
   "version": "1.0.0",
   "description": "Pclaw - 人类与Agent协作的责任桥梁",
-  "main": "src/index.js",
+  "main": "scaffold-api.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "node server.js"
+    "start": "node scaffold-api.js",
+    "dev": "node scaffold-api.js"
   },
-  "keywords": [
-    "ai",
-    "agent",
-    "project-management",
-    "collaboration"
-  ],
+  "keywords": ["ai", "agent", "project-management", "collaboration"],
   "author": "Pclaw Team",
   "license": "MIT",
   "dependencies": {
+    "bcrypt": "^5.1.1",
+    "dotenv": "^16.4.5",
     "ethers": "^6.16.0",
     "pg": "^8.20.0",
     "uuid": "^13.0.0"
