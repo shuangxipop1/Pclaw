@@ -19,18 +19,33 @@ jobs:
         run: |
           echo "$KEY" > ~/aliyun.pem
           chmod 600 ~/aliyun.pem
-          echo "Deploying files..."
+          echo "Deploying website files..."
           scp -i ~/aliyun.pem -o StrictHostKeyChecking=no -o ConnectTimeout=30 \
             website/*.html website/*.jpg \
             root@$HOST:/var/www/pclaw/
-          echo "Files deployed"
+          echo "Website files deployed"
 
-      - name: Restart API (only if scaffold-api.js is running)
+      - name: Deploy API files to Aliyun
         env:
           HOST: ${{ secrets.ALIYUN_HOST }}
           KEY: ${{ secrets.ALIYUN_SSH_KEY }}
         run: |
           echo "$KEY" > ~/aliyun.pem
           chmod 600 ~/aliyun.pem
+          echo "Deploying API files..."
+          scp -i ~/aliyun.pem -o StrictHostKeyChecking=no -o ConnectTimeout=30 \
+            scaffold-api.js minimal.js payment_inline.js \
+            root@$HOST:/var/www/pclaw-api/
+          echo "API files deployed"
+
+      - name: Restart API service
+        env:
+          HOST: ${{ secrets.ALIYUN_HOST }}
+          KEY: ${{ secrets.ALIYUN_SSH_KEY }}
+        run: |
+          echo "$KEY" > ~/aliyun.pem
+          chmod 600 ~/aliyun.pem
+          echo "Restarting API..."
           ssh -i ~/aliyun.pem -o StrictHostKeyChecking=no -o ConnectTimeout=30 \
-            root@$HOST "ps aux | grep scaffold-api | grep -v grep && echo 'API running' || (cd /var/www/pclaw-api && node scaffold-api.js >> /tmp/scaffold.log 2>&1 &)"
+            root@$HOST "ps aux | grep 'scaffold-api.js' | grep -v grep | awk '{print \$2}' | xargs -r kill 2>/dev/null; sleep 2; cd /var/www/pclaw-api && nohup node scaffold-api.js >> /tmp/scaffold.log 2>&1 & echo API restarted PID: \$!"
+          echo "Done"
