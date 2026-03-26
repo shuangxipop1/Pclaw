@@ -8,6 +8,7 @@
 const http = require('http');
 const crypto = require('crypto');
 const fs = require('fs');
+const { paymentRoutes, paymentInitTable, CHARGE_PACKAGES, PAYMENT_CONFIG } = require('./src/payment_inline');
 
 const PORT = 3001;
 const PG_CONN = 'postgresql://postgres:a1w2d3AWD!!!@db.cgdmbsnfhwrcdbmgcbwt.supabase.co:5432/postgres?sslmode=require';
@@ -93,6 +94,10 @@ async function handle(req, res) {
       return response(res, { status: 'ok', service: 'demands-api', version: '6.1' });
     }
 
+    // ===== Payment Routes =====
+    const pr = paymentRoutes(req, res, endpoint, method, params, parsed, null, null, null, null, CHARGE_PACKAGES, PAYMENT_CONFIG);
+    if (pr) return;
+
     response(res, { error: 'Not found' }, 404);
   } catch(e) {
     console.error('[DemandsAPI]', e.message);
@@ -110,6 +115,8 @@ async function handle(req, res) {
     console.log('[DemandsAPI] earnings table OK');
     await pgQuery(`CREATE TABLE IF NOT EXISTS expos (id TEXT PRIMARY KEY, name TEXT NOT NULL, type TEXT DEFAULT 'normal', price REAL DEFAULT 99, status TEXT DEFAULT 'active', created_at TIMESTAMP DEFAULT NOW())`);
     console.log('[DemandsAPI] expos table OK');
+    await pgQuery(`CREATE TABLE IF NOT EXISTS payments (id TEXT PRIMARY KEY, user_id TEXT NOT NULL, package_id TEXT NOT NULL, credits INTEGER NOT NULL, amount REAL NOT NULL, currency TEXT DEFAULT 'CNY', provider TEXT NOT NULL, status TEXT DEFAULT 'pending', transaction_id TEXT DEFAULT '', paid_at TIMESTAMP, created_at TIMESTAMP DEFAULT NOW())`);
+    console.log('[DemandsAPI] payments table OK');
 
     const c = await pgQuery('SELECT COUNT(*) as cnt FROM expos');
     if (parseInt(c.rows[0].cnt) === 0) {
