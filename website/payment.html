@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>充值中心 - Pclaw</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #0a0a0a;
+  color: #e0e0e0;
+  min-height: 100vh;
+}
+.nav {
+  background: #111;
+  border-bottom: 1px solid #222;
+  padding: 12px 24px;
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+.nav img { height: 32px; vertical-align: middle; }
+.nav a { color: #888; font-size: 14px; text-decoration: none; }
+.nav a:hover { color: #fff; }
+.container { max-width: 800px; margin: 0 auto; padding: 40px 24px; }
+h1 { font-size: 32px; font-weight: 800; margin-bottom: 8px; color: #fff; }
+.subtitle { color: #666; margin-bottom: 32px; }
+.packages { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 16px; margin-bottom: 32px; }
+.pkg {
+  background: #111;
+  border: 2px solid #1e1e1e;
+  border-radius: 16px;
+  padding: 24px 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s, transform 0.1s;
+  position: relative;
+}
+.pkg:hover { border-color: #f59e0b; transform: translateY(-2px); }
+.pkg.selected { border-color: #f59e0b; background: #1a1500; }
+.pkg-badge {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #f59e0b;
+  color: #000;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+.pkg-name { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 8px; }
+.pkg-credits { font-size: 28px; font-weight: 800; color: #f59e0b; margin-bottom: 4px; }
+.pkg-credits-label { font-size: 12px; color: #666; margin-bottom: 12px; }
+.pkg-price { font-size: 20px; font-weight: 700; color: #fff; }
+.pkg-bonus { font-size: 12px; color: #22c55e; margin-top: 4px; }
+.pkg.selected .pkg-bonus { color: #4ade80; }
+
+.provider-section { margin-bottom: 32px; }
+.provider-section h3 { font-size: 18px; margin-bottom: 16px; }
+.providers { display: flex; gap: 12px; flex-wrap: wrap; }
+.provider {
+  background: #111;
+  border: 2px solid #1e1e1e;
+  border-radius: 12px;
+  padding: 16px 24px;
+  cursor: pointer;
+  text-align: center;
+  min-width: 100px;
+  transition: border-color 0.2s;
+  font-size: 14px;
+  font-weight: 600;
+}
+.provider:hover { border-color: #444; }
+.provider.selected { border-color: #f59e0b; }
+.provider img { width: 40px; height: 40px; margin-bottom: 8px; display: block; margin-left: auto; margin-right: auto; }
+
+.btn-pay {
+  width: 100%;
+  background: #f59e0b;
+  color: #000;
+  border: none;
+  padding: 16px;
+  border-radius: 12px;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-pay:hover { background: #fbbf24; }
+.btn-pay:disabled { background: #444; color: #888; cursor: not-allowed; }
+
+.pay-result {
+  margin-top: 24px;
+  padding: 24px;
+  background: #111;
+  border: 1px solid #1e1e1e;
+  border-radius: 12px;
+  text-align: center;
+}
+.pay-result.success { border-color: #22c55e; }
+.pay-result .icon { font-size: 48px; margin-bottom: 16px; }
+.pay-result h3 { font-size: 20px; margin-bottom: 8px; }
+.pay-result p { color: #888; font-size: 14px; }
+.qr-container { margin: 16px auto; text-align: center; }
+.qr-container img { border-radius: 8px; border: 4px solid #222; }
+.pay-link { display: inline-block; margin-top: 16px; padding: 12px 32px; background: #222; color: #fff; border-radius: 8px; text-decoration: none; font-weight: 600; }
+.pay-link:hover { background: #333; }
+
+.mock-notice {
+  background: #1a1a00;
+  border: 1px solid #f59e0b;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 24px;
+  font-size: 13px;
+  color: #f59e0b;
+}
+
+.order-info {
+  background: #111;
+  border: 1px solid #222;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 24px;
+  font-size: 14px;
+}
+.order-info .row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #1a1a1a; }
+.order-info .row:last-child { border-bottom: none; }
+.order-info .label { color: #666; }
+.order-info .value { font-weight: 600; }
+.order-info .value.highlight { color: #f59e0b; }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+<a href="index.html"><img src="logo.jpg" alt="Pclaw" height="32" style="vertical-align:middle"></a>
+<a href="dna-shop.html">知识商店</a>
+<a href="demand-plaza.html">需求广场</a>
+<a href="expo.html">数字展会</a>
+<a href="my-dna.html">我的分润</a>
+<a href="console.html">控制台</a>
+</nav>
+
+<div class="container">
+<h1>💰 充值中心</h1>
+<p class="subtitle">选择套餐，一键充值，自动到账</p>
+
+<div class="mock-notice" id="mockNotice" style="display:none">
+  ⚠️ 当前为<strong>开发测试模式</strong>，支付通道未接通。选择套餐后点击"立即充值"即可模拟支付成功。
+</div>
+
+<!-- 充值套餐 -->
+<div class="packages" id="packages"></div>
+
+<!-- 支付方式 -->
+<div class="provider-section">
+<h3>支付方式</h3>
+<div class="providers" id="providers">
+  <div class="provider" data-provider="wechat">
+    <span>微信支付</span>
+  </div>
+  <div class="provider" data-provider="alipay">
+    <span>支付宝</span>
+  </div>
+  <div class="provider" data-provider="stripe">
+    <span>💳 Stripe</span>
+  </div>
+</div>
+</div>
+
+<!-- 订单确认 -->
+<div class="order-info" id="orderInfo" style="display:none">
+<div class="row"><span class="label">充值套餐</span><span class="value" id="oiPackage">—</span></div>
+<div class="row"><span class="label">到账Credits</span><span class="value highlight" id="oiCredits">—</span></div>
+<div class="row"><span class="label">支付金额</span><span class="value highlight" id="oiAmount">—</span></div>
+<div class="row"><span class="label">支付方式</span><span class="value" id="oiProvider">—</span></div>
+</div>
+
+<button class="btn-pay" id="payBtn" disabled>请选择套餐和支付方式</button>
+
+<!-- 支付结果 -->
+<div id="payResult"></div>
+</div>
+
+<script>
+// ---------- 状态 ----------
+let selectedPackage = null;
+let selectedProvider = null;
+let currentOrder = null;
+
+// ---------- 初始化 ----------
+async function init() {
+  // 加载套餐
+  const r = await fetch('/api/payment/packages');
+  const { data: packages } = await r.json();
+  renderPackages(packages);
+
+  // 加载支付配置
+  const cfgR = await fetch('/api/payment/config');
+  const { data: cfg } = await cfgR.json();
+  renderProviders(cfg);
+
+  // 检查开发模式
+  if (cfg.mock && !cfg.stripe && !cfg.wechat && !cfg.alipay) {
+    document.getElementById('mockNotice').style.display = 'block';
+    // 自动选 mock
+    document.querySelector('[data-provider="wechat"]').style.display = 'none';
+    document.querySelector('[data-provider="alipay"]').style.display = 'none';
+    document.querySelector('[data-provider="stripe"]').style.display = 'none';
+  }
+
+  // 绑定事件
+  document.querySelectorAll('.provider').forEach(el => {
+    el.addEventListener('click', () => {
+      if (el.style.display === 'none') return;
+      document.querySelectorAll('.provider').forEach(p => p.classList.remove('selected'));
+      el.classList.add('selected');
+      selectedProvider = el.dataset.provider;
+      updateBtn();
+    });
+  });
+
+  document.getElementById('payBtn').addEventListener('click', handlePay);
+}
+
+function renderPackages(packages) {
+  const el = document.getElementById('packages');
+  el.innerHTML = packages.map(pkg => {
+    const badge = pkg.bonus > 0 ? `<div class="pkg-badge">赠送${pkg.bonus}</div>` : '';
+    const bonusHtml = pkg.bonus > 0 ? `<div class="pkg-bonus">含赠送${pkg.bonus} Credits</div>` : '';
+    return `<div class="pkg" data-id="${pkg.id}">
+      ${badge}
+      <div class="pkg-name">${pkg.name}</div>
+      <div class="pkg-credits">${pkg.credits}</div>
+      <div class="pkg-credits-label">Credits</div>
+      ${bonusHtml}
+      <div class="pkg-price">¥${pkg.price}</div>
+    </div>`;
+  }).join('');
+
+  el.querySelectorAll('.pkg').forEach(el => {
+    el.addEventListener('click', () => {
+      document.querySelectorAll('.pkg').forEach(p => p.classList.remove('selected'));
+      el.classList.add('selected');
+      selectedPackage = packages.find(p => p.id === el.dataset.id);
+      selectedProvider = null;
+      document.querySelectorAll('.provider').forEach(p => p.classList.remove('selected'));
+      updateBtn();
+      document.getElementById('orderInfo').style.display = 'none';
+      document.getElementById('payResult').innerHTML = '';
+    });
+  });
+}
+
+function renderProviders(cfg) {
+  if (!cfg.providers.wechat) {
+    document.querySelector('[data-provider="wechat"]').style.display = 'none';
+  }
+  if (!cfg.providers.alipay) {
+    document.querySelector('[data-provider="alipay"]').style.display = 'none';
+  }
+  if (!cfg.providers.stripe) {
+    document.querySelector('[data-provider="stripe"]').style.display = 'none';
+  }
+}
+
+function updateBtn() {
+  const btn = document.getElementById('payBtn');
+  if (!selectedPackage || !selectedProvider) {
+    btn.disabled = true;
+    btn.textContent = '请选择套餐和支付方式';
+    return;
+  }
+  btn.disabled = false;
+  btn.textContent = `立即充值 ¥${selectedPackage.price}`;
+}
+
+// ---------- 支付 ----------
+async function handlePay() {
+  if (!selectedPackage || !selectedProvider) return;
+  const btn = document.getElementById('payBtn');
+  btn.disabled = true;
+  btn.textContent = '创建订单...';
+
+  try {
+    // 模拟用户登录（实际从登录态获取）
+    const userId = localStorage.getItem('pclaw_user_id') || 'user_' + Math.random().toString(36).slice(2, 8);
+
+    const res = await fetch('/api/payment/create', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        userId,
+        packageId: selectedPackage.id,
+        provider: selectedProvider,
+      }),
+    });
+
+    const { data: result, error } = await res.json();
+    if (error) {
+      alert('创建订单失败：' + error);
+      btn.disabled = false;
+      btn.textContent = `立即充值 ¥${selectedPackage.price}`;
+      return;
+    }
+
+    currentOrder = result;
+
+    // 显示订单信息
+    document.getElementById('orderInfo').style.display = 'block';
+    document.getElementById('oiPackage').textContent = result.credits + ' Credits';
+    document.getElementById('oiCredits').textContent = result.credits + ' Credits';
+    document.getElementById('oiAmount').textContent = '¥' + result.amount;
+    document.getElementById('oiProvider').textContent = { wechat: '微信支付', alipay: '支付宝', stripe: 'Stripe 💳', mock: '测试模式' }[result.provider] || result.provider;
+
+    // 显示支付方式/二维码
+    const resultEl = document.getElementById('payResult');
+    if (result.mock) {
+      // Mock 模式：自动提示成功
+      btn.textContent = '模拟支付中... (5秒)';
+      let countdown = 5;
+      const timer = setInterval(() => {
+        countdown--;
+        if (countdown > 0) {
+          btn.textContent = `模拟支付中... (${countdown}秒)`;
+        } else {
+          clearInterval(timer);
+          mockSuccess(result.orderId);
+        }
+      }, 1000);
+    } else if (result.qrCode) {
+      // 微信扫码
+      btn.textContent = '已创建订单，请扫码支付';
+      resultEl.innerHTML = `<div class="pay-result">
+        <div class="icon">📱</div>
+        <h3>请使用${result.provider === 'wechat' ? '微信' : '支付宝'}扫码支付</h3>
+        <p>支付 ¥${result.amount}，充值 ${result.credits} Credits</p>
+        <div class="qr-container"><img src="${result.qrCode}" width="200" alt="支付二维码"></div>
+        <p style="font-size:12px;color:#666">支付完成后刷新页面查看余额</p>
+      </div>`;
+    } else if (result.payUrl) {
+      // 支付宝链接
+      btn.textContent = '已创建订单';
+      resultEl.innerHTML = `<div class="pay-result">
+        <div class="icon">💳</div>
+        <h3>订单已创建</h3>
+        <p>金额 ¥${result.amount}，充值 ${result.credits} Credits</p>
+        <a class="pay-link" href="${result.payUrl}" target="_blank">打开支付宝支付</a>
+      </div>`;
+    } else if (result.clientSecret) {
+      // Stripe
+      btn.textContent = '请在弹出窗口完成支付';
+      resultEl.innerHTML = `<div class="pay-result">
+        <div class="icon">💳</div>
+        <h3>Stripe 支付</h3>
+        <p>金额 ¥${result.amount}</p>
+        <div id="stripe-mount"></div>
+        <p style="font-size:12px;color:#666">支付完成后刷新页面查看余额</p>
+      </div>`;
+      // 加载Stripe.js
+      const script = document.createElement('script');
+      script.src = 'https://js.stripe.com/v3/';
+      script.onload = () => initStripe(result.clientSecret);
+      document.head.appendChild(script);
+    }
+
+  } catch(e) {
+    alert('支付出错：' + e.message);
+    btn.disabled = false;
+  }
+}
+
+async function mockSuccess(orderId) {
+  await fetch('/api/payment/mock/success', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ orderId }),
+  });
+  document.getElementById('payResult').innerHTML = `<div class="pay-result success">
+    <div class="icon">✅</div>
+    <h3>充值成功！</h3>
+    <p>${currentOrder.credits} Credits 已到账</p>
+    <p style="font-size:12px;color:#666;margin-top:8px">订单号：${orderId}</p>
+  </div>`;
+  document.getElementById('payBtn').style.display = 'none';
+}
+
+function initStripe(clientSecret) {
+  const stripe = Stripe('pk_test_YOUR_STRIPE_PUBLISHABLE_KEY'); // 需配置
+  const elements = stripe.elements({ clientSecret });
+  elements.create('payment').mount('#stripe-mount');
+  // 实际项目中需要表单提交和 stripe.confirmPayment
+}
+
+init();
+</script>
+</body>
+</html>
