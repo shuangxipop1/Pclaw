@@ -6,11 +6,24 @@
 const http = require('http');
 const crypto = require('crypto');
 const fs = require('fs');
+const { Pool } = require('pg');
 
 const PORT = 3001;
 
 // 数据持久化
 const DATA_FILE = '/tmp/pclaw-data.json';
+
+// Supabase PostgreSQL connection
+const pg = new Pool({
+    host: 'db.cgdmbsnfhwrcdbmgcbwt.supabase.co',
+    port: 6543,
+    database: 'postgres',
+    user: 'postgres',
+    password: 'a1w2d3AWD!!!',
+    max: 10,
+    family: 4,
+    connectionTimeoutMillis: 5000,
+});
 
 function loadData() {
     try {

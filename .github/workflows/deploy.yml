@@ -33,9 +33,19 @@ jobs:
           echo "$KEY" > ~/aliyun.pem
           chmod 600 ~/aliyun.pem
           scp -i ~/aliyun.pem -o StrictHostKeyChecking=no -o ConnectTimeout=30 \
-            scaffold-api.js minimal.js payment_inline.js \
+            scaffold-api.js minimal.js payment_inline.js package.json \
             root@$HOST:/var/www/pclaw-api/
           echo "API files deployed"
+
+      - name: Install dependencies
+        env:
+          HOST: ${{ secrets.ALIYUN_HOST }}
+          KEY: ${{ secrets.ALIYUN_SSH_KEY }}
+        run: |
+          echo "$KEY" > ~/aliyun.pem && chmod 600 ~/aliyun.pem
+          ssh -i ~/aliyun.pem -o StrictHostKeyChecking=no -o ConnectTimeout=30 root@$HOST \
+            "cd /var/www/pclaw-api && npm install --production 2>&1 | tail -5"
+          echo "Dependencies installed"
 
       - name: Restart API
         continue-on-error: true

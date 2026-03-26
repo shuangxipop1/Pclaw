@@ -133,7 +133,10 @@ async function handleRequest(method, path, body, token) {
         let skills;
         try {
             const pg = require('pg');
-            const client = new pg.Client({ connectionString: 'postgresql://postgres:a1w2d3AWD!!!@db.cgdmbsnfhwrcdbmgcbwt.supabase.co:5432/postgres?sslmode=require' });
+            const client = new pg.Client({
+                connectionString: 'postgresql://postgres:a1w2d3AWD!!!@db.cgdmbsnfhwrcdbmgcbwt.supabase.co:5432/postgres?sslmode=require',
+                family: 4,
+            });
             await client.connect();
             const result = await client.query('SELECT * FROM skills WHERE enabled=1 ORDER BY sales_count DESC');
             skills = result.rows;
@@ -164,8 +167,9 @@ async function handleRequest(method, path, body, token) {
                 user: 'postgres',
                 password: 'a1w2d3AWD!!!',
                 database: 'postgres',
-                ssl: { rejectUnauthorized: false },
+                ssl: { rejectUnauthorized: true },
                 max: 5,
+                family: 4,
                 connectionTimeoutMillis: 5000,
             });
             const result = await pool.query('SELECT category, COUNT(*) as cnt FROM skills WHERE enabled=1 GROUP BY category ORDER BY cnt DESC');

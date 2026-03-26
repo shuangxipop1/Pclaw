@@ -9,6 +9,7 @@ const pg = new Pool({
   password: process.env.PG_PASSWORD || 'a1w2d3AWD!!!',
   max: 10,
   idleTimeoutMillis: 30000,
+  family: 4,
 });
 
 const JWT_SECRET = process.env.JWT_SECRET || 'claw-jwt-secret-change-in-production';
