@@ -26,6 +26,29 @@ body {
 .container { max-width: 800px; margin: 0 auto; padding: 40px 24px; }
 h1 { font-size: 32px; font-weight: 800; margin-bottom: 8px; color: #fff; }
 .subtitle { color: #666; margin-bottom: 32px; }
+
+.mock-banner {
+  background: linear-gradient(135deg, #1a1500, #2d1f00);
+  border: 1px solid #f59e0b;
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  font-size: 14px;
+  color: #f59e0b;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.mock-banner .tag {
+  background: #f59e0b;
+  color: #000;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
 .packages { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 16px; margin-bottom: 32px; }
 .pkg {
   background: #111;
@@ -59,24 +82,18 @@ h1 { font-size: 32px; font-weight: 800; margin-bottom: 8px; color: #fff; }
 .pkg-bonus { font-size: 12px; color: #22c55e; margin-top: 4px; }
 .pkg.selected .pkg-bonus { color: #4ade80; }
 
-.provider-section { margin-bottom: 32px; }
-.provider-section h3 { font-size: 18px; margin-bottom: 16px; }
-.providers { display: flex; gap: 12px; flex-wrap: wrap; }
-.provider {
+.pay-summary {
   background: #111;
-  border: 2px solid #1e1e1e;
+  border: 1px solid #222;
   border-radius: 12px;
-  padding: 16px 24px;
-  cursor: pointer;
-  text-align: center;
-  min-width: 100px;
-  transition: border-color 0.2s;
-  font-size: 14px;
-  font-weight: 600;
+  padding: 20px;
+  margin-bottom: 20px;
 }
-.provider:hover { border-color: #444; }
-.provider.selected { border-color: #f59e0b; }
-.provider img { width: 40px; height: 40px; margin-bottom: 8px; display: block; margin-left: auto; margin-right: auto; }
+.pay-summary .row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #1a1a1a; font-size: 14px; }
+.pay-summary .row:last-child { border-bottom: none; }
+.pay-summary .label { color: #666; }
+.pay-summary .value { font-weight: 700; color: #fff; }
+.pay-summary .value.highlight { color: #f59e0b; font-size: 18px; }
 
 .btn-pay {
   width: 100%;
@@ -89,312 +106,207 @@ h1 { font-size: 32px; font-weight: 800; margin-bottom: 8px; color: #fff; }
   font-weight: 700;
   cursor: pointer;
   transition: background 0.2s;
+  margin-bottom: 16px;
 }
 .btn-pay:hover { background: #fbbf24; }
-.btn-pay:disabled { background: #444; color: #888; cursor: not-allowed; }
+.btn-pay:disabled { background: #333; color: #666; cursor: not-allowed; }
 
-.pay-result {
+.result-box {
   margin-top: 24px;
   padding: 24px;
   background: #111;
-  border: 1px solid #1e1e1e;
   border-radius: 12px;
   text-align: center;
+  border: 1px solid #22c55e;
 }
-.pay-result.success { border-color: #22c55e; }
-.pay-result .icon { font-size: 48px; margin-bottom: 16px; }
-.pay-result h3 { font-size: 20px; margin-bottom: 8px; }
-.pay-result p { color: #888; font-size: 14px; }
-.qr-container { margin: 16px auto; text-align: center; }
-.qr-container img { border-radius: 8px; border: 4px solid #222; }
-.pay-link { display: inline-block; margin-top: 16px; padding: 12px 32px; background: #222; color: #fff; border-radius: 8px; text-decoration: none; font-weight: 600; }
-.pay-link:hover { background: #333; }
+.result-box.success { border-color: #22c55e; }
+.result-box .icon { font-size: 48px; margin-bottom: 12px; }
+.result-box h3 { font-size: 20px; margin-bottom: 8px; color: #fff; }
+.result-box p { color: #888; font-size: 14px; line-height: 1.6; }
+.result-box .order-id { font-family: monospace; font-size: 12px; color: #666; margin-top: 8px; }
 
-.mock-notice {
-  background: #1a1a00;
-  border: 1px solid #f59e0b;
-  border-radius: 8px;
-  padding: 12px 16px;
-  margin-bottom: 24px;
-  font-size: 13px;
-  color: #f59e0b;
+.loading {
+  display: inline-block; width: 20px; height: 20px;
+  border: 2px solid #0003; border-radius: 50%;
+  border-top-color: #000; animation: spin 0.8s linear infinite;
 }
-
-.order-info {
-  background: #111;
-  border: 1px solid #222;
-  border-radius: 12px;
-  padding: 20px;
-  margin-bottom: 24px;
-  font-size: 14px;
-}
-.order-info .row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #1a1a1a; }
-.order-info .row:last-child { border-bottom: none; }
-.order-info .label { color: #666; }
-.order-info .value { font-weight: 600; }
-.order-info .value.highlight { color: #f59e0b; }
+@keyframes spin { to { transform: rotate(360deg); } }
 </style>
 </head>
 <body>
 
 <nav class="nav">
-<a href="index.html"><img src="logo.jpg" alt="Pclaw" height="32" style="vertical-align:middle"></a>
-<a href="dna-shop.html">知识商店</a>
-<a href="demand-plaza.html">需求广场</a>
-<a href="expo.html">数字展会</a>
-<a href="my-dna.html">我的分润</a>
-<a href="console.html">控制台</a>
+  <a href="index.html"><img src="logo.jpg" alt="Pclaw" height="32" style="vertical-align:middle"></a>
+  <a href="dna-shop.html">知识商店</a>
+  <a href="demand-plaza.html">需求广场</a>
+  <a href="expo.html">数字展会</a>
+  <a href="my-dna.html">我的分润</a>
+  <a href="payment.html" style="color:#f59e0b">充值中心</a>
+  <a href="console.html">控制台</a>
 </nav>
 
 <div class="container">
-<h1>💰 充值中心</h1>
-<p class="subtitle">选择套餐，一键充值，自动到账</p>
+  <h1>💰 充值中心</h1>
+  <p class="subtitle">选择套餐，一键充值，自动到账</p>
 
-<div class="mock-notice" id="mockNotice" style="display:none">
-  ⚠️ 当前为<strong>开发测试模式</strong>，支付通道未接通。选择套餐后点击"立即充值"即可模拟支付成功。
-</div>
-
-<!-- 充值套餐 -->
-<div class="packages" id="packages"></div>
-
-<!-- 支付方式 -->
-<div class="provider-section">
-<h3>支付方式</h3>
-<div class="providers" id="providers">
-  <div class="provider" data-provider="wechat">
-    <span>微信支付</span>
+  <div class="mock-banner" id="mockBanner">
+    <span class="tag">开发模式</span>
+    <span>当前为 Mock 测试模式，充值立即到账。正式上线后自动接通微信/支付宝/Stripe。</span>
   </div>
-  <div class="provider" data-provider="alipay">
-    <span>支付宝</span>
+
+  <!-- 充值套餐 -->
+  <div class="packages" id="packages">
+    <div style="text-align:center;color:#666;padding:40px">加载中...</div>
   </div>
-  <div class="provider" data-provider="stripe">
-    <span>💳 Stripe</span>
+
+  <!-- 充值确认 -->
+  <div id="paySummary" style="display:none">
+    <div class="pay-summary">
+      <div class="row"><span class="label">充值套餐</span><span class="value" id="sPackage">—</span></div>
+      <div class="row"><span class="label">到账 Credits</span><span class="value highlight" id="sCredits">—</span></div>
+      <div class="row"><span class="label">支付金额</span><span class="value highlight" id="sAmount">—</span></div>
+      <div class="row"><span class="label">支付方式</span><span class="value" id="sProvider">Mock测试</span></div>
+    </div>
+    <button class="btn-pay" id="payBtn" disabled onclick="handlePay()">请选择套餐</button>
   </div>
-</div>
-</div>
 
-<!-- 订单确认 -->
-<div class="order-info" id="orderInfo" style="display:none">
-<div class="row"><span class="label">充值套餐</span><span class="value" id="oiPackage">—</span></div>
-<div class="row"><span class="label">到账Credits</span><span class="value highlight" id="oiCredits">—</span></div>
-<div class="row"><span class="label">支付金额</span><span class="value highlight" id="oiAmount">—</span></div>
-<div class="row"><span class="label">支付方式</span><span class="value" id="oiProvider">—</span></div>
-</div>
-
-<button class="btn-pay" id="payBtn" disabled>请选择套餐和支付方式</button>
-
-<!-- 支付结果 -->
-<div id="payResult"></div>
+  <!-- 结果 -->
+  <div id="resultBox" style="display:none"></div>
 </div>
 
 <script>
 // ---------- 状态 ----------
-let selectedPackage = null;
-let selectedProvider = null;
-let currentOrder = null;
+let packages = [];
+let selectedPkg = null;
+let currentOrderId = null;
+let isLoading = false;
 
 // ---------- 初始化 ----------
 async function init() {
-  // 加载套餐
-  const r = await fetch('/api/payment/packages');
-  const { data: packages } = await r.json();
-  renderPackages(packages);
+  try {
+    const r = await fetch('/api/payment/config');
+    const cfg = await r.json();
+    if (cfg.data?.providers?.mock) {
+      document.getElementById('mockBanner').style.display = 'flex';
+    }
+  } catch(e) {}
 
-  // 加载支付配置
-  const cfgR = await fetch('/api/payment/config');
-  const { data: cfg } = await cfgR.json();
-  renderProviders(cfg);
-
-  // 检查开发模式
-  if (cfg.mock && !cfg.stripe && !cfg.wechat && !cfg.alipay) {
-    document.getElementById('mockNotice').style.display = 'block';
-    // 自动选 mock
-    document.querySelector('[data-provider="wechat"]').style.display = 'none';
-    document.querySelector('[data-provider="alipay"]').style.display = 'none';
-    document.querySelector('[data-provider="stripe"]').style.display = 'none';
+  try {
+    const r = await fetch('/api/payment/packages');
+    const j = await r.json();
+    packages = j.data?.packages || j.packages || [];
+    renderPackages();
+  } catch(e) {
+    document.getElementById('packages').innerHTML = '<div style="text-align:center;color:#f59e0b;padding:40px">加载失败，请刷新重试</div>';
   }
-
-  // 绑定事件
-  document.querySelectorAll('.provider').forEach(el => {
-    el.addEventListener('click', () => {
-      if (el.style.display === 'none') return;
-      document.querySelectorAll('.provider').forEach(p => p.classList.remove('selected'));
-      el.classList.add('selected');
-      selectedProvider = el.dataset.provider;
-      updateBtn();
-    });
-  });
-
-  document.getElementById('payBtn').addEventListener('click', handlePay);
 }
 
-function renderPackages(packages) {
+function renderPackages() {
   const el = document.getElementById('packages');
+  if (!packages.length) {
+    el.innerHTML = '<div style="text-align:center;color:#666;padding:40px">暂无可用套餐</div>';
+    return;
+  }
   el.innerHTML = packages.map(pkg => {
-    const badge = pkg.bonus > 0 ? `<div class="pkg-badge">赠送${pkg.bonus}</div>` : '';
-    const bonusHtml = pkg.bonus > 0 ? `<div class="pkg-bonus">含赠送${pkg.bonus} Credits</div>` : '';
-    return `<div class="pkg" data-id="${pkg.id}">
+    const badge = pkg.bonus > 0 ? `<div class="pkg-badge">赠${pkg.bonus}</div>` : '';
+    const bonusLine = pkg.bonus > 0 ? `<div class="pkg-bonus">含赠${pkg.bonus} Credits</div>` : '';
+    return `<div class="pkg" data-id="${pkg.id}" onclick="selectPkg('${pkg.id}')">
       ${badge}
       <div class="pkg-name">${pkg.name}</div>
       <div class="pkg-credits">${pkg.credits}</div>
       <div class="pkg-credits-label">Credits</div>
-      ${bonusHtml}
+      ${bonusLine}
       <div class="pkg-price">¥${pkg.price}</div>
     </div>`;
   }).join('');
-
-  el.querySelectorAll('.pkg').forEach(el => {
-    el.addEventListener('click', () => {
-      document.querySelectorAll('.pkg').forEach(p => p.classList.remove('selected'));
-      el.classList.add('selected');
-      selectedPackage = packages.find(p => p.id === el.dataset.id);
-      selectedProvider = null;
-      document.querySelectorAll('.provider').forEach(p => p.classList.remove('selected'));
-      updateBtn();
-      document.getElementById('orderInfo').style.display = 'none';
-      document.getElementById('payResult').innerHTML = '';
-    });
-  });
 }
 
-function renderProviders(cfg) {
-  if (!cfg.providers.wechat) {
-    document.querySelector('[data-provider="wechat"]').style.display = 'none';
-  }
-  if (!cfg.providers.alipay) {
-    document.querySelector('[data-provider="alipay"]').style.display = 'none';
-  }
-  if (!cfg.providers.stripe) {
-    document.querySelector('[data-provider="stripe"]').style.display = 'none';
-  }
+function selectPkg(id) {
+  selectedPkg = packages.find(p => p.id === id);
+  document.querySelectorAll('.pkg').forEach(el => el.classList.remove('selected'));
+  document.querySelector(`.pkg[data-id="${id}"]`)?.classList.add('selected');
+  showSummary();
 }
 
-function updateBtn() {
+function showSummary() {
+  if (!selectedPkg) return;
+  document.getElementById('sPackage').textContent = `${selectedPkg.name} (${selectedPkg.credits} Credits)`;
+  document.getElementById('sCredits').textContent = `${selectedPkg.credits + (selectedPkg.bonus||0)} Credits`;
+  document.getElementById('sAmount').textContent = `¥${selectedPkg.price}`;
+  document.getElementById('paySummary').style.display = 'block';
+  document.getElementById('resultBox').style.display = 'none';
   const btn = document.getElementById('payBtn');
-  if (!selectedPackage || !selectedProvider) {
-    btn.disabled = true;
-    btn.textContent = '请选择套餐和支付方式';
-    return;
-  }
   btn.disabled = false;
-  btn.textContent = `立即充值 ¥${selectedPackage.price}`;
+  btn.textContent = `立即充值 ¥${selectedPkg.price}`;
 }
 
-// ---------- 支付 ----------
+// ---------- 充值流程 ----------
 async function handlePay() {
-  if (!selectedPackage || !selectedProvider) return;
+  if (!selectedPkg || isLoading) return;
+  isLoading = true;
   const btn = document.getElementById('payBtn');
   btn.disabled = true;
-  btn.textContent = '创建订单...';
+  btn.innerHTML = '<span class="loading"></span> 充值中...';
 
   try {
-    // 模拟用户登录（实际从登录态获取）
-    const userId = localStorage.getItem('pclaw_user_id') || 'user_' + Math.random().toString(36).slice(2, 8);
-
-    const res = await fetch('/api/payment/create', {
+    // 步骤1: 创建订单 (mock/charge 直接充值，跳过中间环节)
+    const res = await fetch('/api/payment/mock/charge', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        userId,
-        packageId: selectedPackage.id,
-        provider: selectedProvider,
+        userId: getUserId(),
+        packageId: selectedPkg.id,
       }),
     });
-
-    const { data: result, error } = await res.json();
-    if (error) {
-      alert('创建订单失败：' + error);
-      btn.disabled = false;
-      btn.textContent = `立即充值 ¥${selectedPackage.price}`;
-      return;
+    const j = await res.json();
+    if (!res.ok || !j.success) {
+      throw new Error(j.error || '充值失败');
     }
 
-    currentOrder = result;
+    const data = j.data || j;
+    currentOrderId = data.orderId;
 
-    // 显示订单信息
-    document.getElementById('orderInfo').style.display = 'block';
-    document.getElementById('oiPackage').textContent = result.credits + ' Credits';
-    document.getElementById('oiCredits').textContent = result.credits + ' Credits';
-    document.getElementById('oiAmount').textContent = '¥' + result.amount;
-    document.getElementById('oiProvider').textContent = { wechat: '微信支付', alipay: '支付宝', stripe: 'Stripe 💳', mock: '测试模式' }[result.provider] || result.provider;
-
-    // 显示支付方式/二维码
-    const resultEl = document.getElementById('payResult');
-    if (result.mock) {
-      // Mock 模式：自动提示成功
-      btn.textContent = '模拟支付中... (5秒)';
-      let countdown = 5;
-      const timer = setInterval(() => {
-        countdown--;
-        if (countdown > 0) {
-          btn.textContent = `模拟支付中... (${countdown}秒)`;
-        } else {
-          clearInterval(timer);
-          mockSuccess(result.orderId);
-        }
-      }, 1000);
-    } else if (result.qrCode) {
-      // 微信扫码
-      btn.textContent = '已创建订单，请扫码支付';
-      resultEl.innerHTML = `<div class="pay-result">
-        <div class="icon">📱</div>
-        <h3>请使用${result.provider === 'wechat' ? '微信' : '支付宝'}扫码支付</h3>
-        <p>支付 ¥${result.amount}，充值 ${result.credits} Credits</p>
-        <div class="qr-container"><img src="${result.qrCode}" width="200" alt="支付二维码"></div>
-        <p style="font-size:12px;color:#666">支付完成后刷新页面查看余额</p>
-      </div>`;
-    } else if (result.payUrl) {
-      // 支付宝链接
-      btn.textContent = '已创建订单';
-      resultEl.innerHTML = `<div class="pay-result">
-        <div class="icon">💳</div>
-        <h3>订单已创建</h3>
-        <p>金额 ¥${result.amount}，充值 ${result.credits} Credits</p>
-        <a class="pay-link" href="${result.payUrl}" target="_blank">打开支付宝支付</a>
-      </div>`;
-    } else if (result.clientSecret) {
-      // Stripe
-      btn.textContent = '请在弹出窗口完成支付';
-      resultEl.innerHTML = `<div class="pay-result">
-        <div class="icon">💳</div>
-        <h3>Stripe 支付</h3>
-        <p>金额 ¥${result.amount}</p>
-        <div id="stripe-mount"></div>
-        <p style="font-size:12px;color:#666">支付完成后刷新页面查看余额</p>
-      </div>`;
-      // 加载Stripe.js
-      const script = document.createElement('script');
-      script.src = 'https://js.stripe.com/v3/';
-      script.onload = () => initStripe(result.clientSecret);
-      document.head.appendChild(script);
-    }
+    // 步骤2: 显示成功
+    showSuccess(data);
 
   } catch(e) {
-    alert('支付出错：' + e.message);
+    document.getElementById('resultBox').innerHTML = `<div class="result-box" style="border-color:#ef4444">
+      <div class="icon">❌</div>
+      <h3>充值失败</h3>
+      <p>${e.message}</p>
+    </div>`;
+    document.getElementById('resultBox').style.display = 'block';
+    document.getElementById('paySummary').style.display = 'none';
     btn.disabled = false;
+    btn.textContent = `立即充值 ¥${selectedPkg.price}`;
+    isLoading = false;
   }
 }
 
-async function mockSuccess(orderId) {
-  await fetch('/api/payment/mock/success', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ orderId }),
-  });
-  document.getElementById('payResult').innerHTML = `<div class="pay-result success">
-    <div class="icon">✅</div>
-    <h3>充值成功！</h3>
-    <p>${currentOrder.credits} Credits 已到账</p>
-    <p style="font-size:12px;color:#666;margin-top:8px">订单号：${orderId}</p>
-  </div>`;
-  document.getElementById('payBtn').style.display = 'none';
+function showSuccess(data) {
+  document.getElementById('paySummary').style.display = 'none';
+  document.getElementById('resultBox').innerHTML = `
+    <div class="result-box success">
+      <div class="icon">🎉</div>
+      <h3>充值成功！</h3>
+      <p><strong>${data.credits || selectedPkg.credits} Credits</strong> 已到账</p>
+      <p style="margin-top:8px">¥${data.amount || selectedPkg.price} · 订单号：${currentOrderId}</p>
+      <div class="order-id">${data.mock ? '· Mock测试模式' : ''}</div>
+      <p style="margin-top:16px"><a href="console.html" style="color:#f59e0b">去控制台使用 →</a></p>
+    </div>
+  `;
+  document.getElementById('resultBox').style.display = 'block';
+  isLoading = false;
 }
 
-function initStripe(clientSecret) {
-  const stripe = Stripe('pk_test_YOUR_STRIPE_PUBLISHABLE_KEY'); // 需配置
-  const elements = stripe.elements({ clientSecret });
-  elements.create('payment').mount('#stripe-mount');
-  // 实际项目中需要表单提交和 stripe.confirmPayment
+// ---------- 用户ID（本地生成或从localStorage读取）----------
+function getUserId() {
+  let uid = localStorage.getItem('pclaw_uid');
+  if (!uid) {
+    uid = 'user_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,6);
+    localStorage.setItem('pclaw_uid', uid);
+  }
+  return uid;
 }
 
 init();
