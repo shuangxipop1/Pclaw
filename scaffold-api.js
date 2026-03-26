@@ -23,13 +23,14 @@ try {
         database: 'postgres',
         user: 'postgres',
         password: 'a1w2d3AWD!!!',
-        max: 10,
-        family: 4,
-        connectionTimeoutMillis: 5000,
+        max: 5,
+        connectionTimeoutMillis: 3000,
+        idleTimeoutMillis: 10000,
     });
-    console.log('Supabase pg connected (Pool created)');
+    // Test connection immediately
+    pg.query('SELECT 1').then(() => console.log('Supabase connected')).catch(e => console.log('Supabase connection failed:', e.message));
 } catch(e) {
-    console.log('pg module not available, using in-memory only:', e.message);
+    console.log('pg module error:', e.message);
 }
 
 // Init DB tables (run once)
@@ -822,25 +823,33 @@ const server = http.createServer(async (req, res) => {
             const creditAmount = credits[packageId] || 0;
             const orderId = 'PAY_MOCK_' + Date.now().toString(36).toUpperCase() + '_' + Math.random().toString(36).slice(2,6).toUpperCase();
             if (creditAmount > 0 && token && token.userId) {
+                const uid = token.userId;
+                const email = token.email || 'unknown';
+                // Try Supabase first, fallback to local memory
                 try {
-                    // Update balance in Supabase profiles
-                    await pg.query(
-                        `INSERT INTO profiles (id, email, balance) VALUES ($1, $2, $3)
-                         ON CONFLICT (id) DO UPDATE SET balance = profiles.balance + $3`,
-                        [token.userId, token.email || 'unknown', creditAmount]
-                    );
-                    // Record transaction
-                    await pg.query(
-                        `INSERT INTO transactions (id, user_id, type, amount, description)
-                         VALUES ($1, $2, 'charge', $3, $4)`,
-                        ['tx_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,6), token.userId, creditAmount, '充值:' + (amounts[packageId]||0) + '元(' + packageId + ')']
-                    );
-                    console.log('Supabase charge success for userId:', token.userId, 'credits:', creditAmount);
+                    if (pg) {
+                        await pg.query(
+                            `INSERT INTO profiles (id, email, balance) VALUES ($1, $2, $3)
+                             ON CONFLICT (id) DO UPDATE SET balance = profiles.balance + $3`,
+                            [uid, email, creditAmount]
+                        );
+                        await pg.query(
+                            `INSERT INTO transactions (id, user_id, type, amount, description)
+                             VALUES ($1, $2, 'charge', $3, $4)`,
+                            ['tx_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,6), uid, creditAmount, '充值:' + (amounts[packageId]||0) + '元(' + packageId + ')']
+                        );
+                    }
                 } catch(e) {
-                    console.log('Supabase write error:', e.message);
+                    console.log('Supabase error, using local fallback:', e.message);
                 }
-            } else {
-                console.log('Charge skipped: creditAmount=', creditAmount, 'token=', JSON.stringify(token));
+                // Always update local memory as fallback/auth
+                const user = Object.values(data.users).find(u => u.id === uid);
+                if (user) {
+                    user.balance = (user.balance || 0) + creditAmount;
+                    data.transactions = data.transactions || [];
+                    data.transactions.push({ id: 'tx_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,6), userId: uid, type: 'charge', amount: creditAmount, balanceBefore: user.balance - creditAmount, balanceAfter: user.balance, description: '充值:' + (amounts[packageId]||0) + '元(' + packageId + ')', createdAt: new Date().toISOString() });
+                    saveData(data);
+                }
             }
             res.writeHead(200); res.end(JSON.stringify({ success: true, data: { orderId, packageId, credits: creditAmount, amount: amounts[packageId]||0, status: 'paid', mock: true } })); return;
         }
