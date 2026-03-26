@@ -14,32 +14,30 @@ const PORT = 3001;
 // 数据持久化
 const DATA_FILE = '/tmp/pclaw-data.json';
 
-// Supabase PostgreSQL connection
+// Supabase PostgreSQL connection (IPv4 only, Aliyun has no IPv6)
 let pg = null;
 try {
     const { Pool } = require('pg');
-    // Use IPv4 address directly to avoid IPv6 issue
-    // Supabase: port 6543, direct IPv4
-    pg = new Pool({
+    const pgClient = new Pool({
         host: 'db.cgdmbsnfhwrcdbmgcbwt.supabase.co',
         port: 6543,
         database: 'postgres',
         user: 'postgres',
         password: 'a1w2d3AWD!!!',
         max: 5,
-        connectionTimeoutMillis: 5000,
-        // Force IPv4 family
         family: 4,
+        connectionTimeoutMillis: 3000,
     });
-    // Test connection async
-    pg.query('SELECT 1').then(() => {
+    // Only enable pg after successful connection
+    pgClient.query('SELECT 1').then(() => {
+        pg = pgClient;
         console.log('Supabase pg connected');
     }).catch(e => {
-        console.log('Supabase pg connection failed (will use memory):', e.message);
+        console.log('Supabase pg failed (using memory fallback):', e.message);
         pg = null;
     });
 } catch(e) {
-    console.log('pg module error:', e.message);
+    console.log('pg module unavailable:', e.message);
 }
 
 // Init DB tables (run once)
