@@ -738,7 +738,7 @@ const server = http.createServer(async (req, res) => {
             res.writeHead(200); res.end(JSON.stringify({ success: true, providers: { wechat: false, alipay: false, stripe: false, mock: true }, currency: 'CNY' })); return;
         }
         if (endpoint === '/api/payment/mock/charge' && req.method === 'POST') {
-            const { userId, packageId } = jsonBody || {};
+            const { userId, packageId } = parsed || {};
             const credits = { basic: 100, standard: 550, pro: 1200, enterprise: 7000 };
             const amounts = { basic: 10, standard: 50, pro: 100, enterprise: 500 };
             res.writeHead(200); res.end(JSON.stringify({ success: true, data: { orderId: 'PAY_MOCK_' + Date.now(), userId, packageId, credits: credits[packageId]||0, amount: amounts[packageId]||0, status: 'paid', mock: true } })); return;
