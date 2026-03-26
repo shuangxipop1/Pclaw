@@ -44,6 +44,22 @@ jobs:
         run: |
           echo "$KEY" > ~/aliyun.pem
           chmod 600 ~/aliyun.pem
+          # Kill existing, wait, start in background (nohup prevents SIGHUP)
           ssh -i ~/aliyun.pem -o StrictHostKeyChecking=no -o ConnectTimeout=30 \
-            root@$HOST "pkill -f 'node.*scaffold-api' || true; sleep 2; cd /var/www/pclaw-api && node scaffold-api.js >> /tmp/scaffold.log 2>&1 &"
-          echo "API restarted"
+            root@$HOST '
+            pkill -f "node.*scaffold" 2>/dev/null || true
+            sleep 2
+            cd /var/www/pclaw-api
+            nohup node scaffold-api.js >> /tmp/scaffold.log 2>&1 &
+            echo "Node PID: $!"
+            sleep 3
+            # Verify it's running
+            if ps aux | grep -v grep | grep "node scaffold"; then
+              echo "Node is running"
+            else
+              echo "Node FAILED to start - check log:"
+              tail -10 /tmp/scaffold.log
+              exit 1
+            fi
+          '
+          echo "Restart complete"
