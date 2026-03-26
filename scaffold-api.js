@@ -694,7 +694,23 @@ async function handleRequest(method, path, body, token) {
         const { packageId } = jsonBody || {};
         const credits = { basic: 100, standard: 550, pro: 1200, enterprise: 7000 };
         const amounts = { basic: 10, standard: 50, pro: 100, enterprise: 500 };
-        return { success: true, data: { orderId: 'PAY_MOCK_' + Date.now(), packageId, credits: credits[packageId]||0, amount: amounts[packageId]||0, status: 'paid', mock: true } };
+        const creditAmount = credits[packageId] || 0;
+        const orderId = 'PAY_MOCK_' + Date.now().toString(36).toUpperCase() + '_' + Math.random().toString(36).slice(2,6).toUpperCase();
+        if (creditAmount > 0) {
+            const user = Object.values(data.users).find(u => u.id === token.userId);
+            if (user) {
+                user.balance = (user.balance || 0) + creditAmount;
+                data.transactions.push({
+                    id: 'tx_' + Date.now() + '_' + Math.random().toString(36).slice(2,6),
+                    userId: user.id, type: 'charge', amount: creditAmount,
+                    balanceBefore: user.balance - creditAmount, balanceAfter: user.balance,
+                    description: '充值:' + (amounts[packageId]||0) + '元(' + packageId + ')',
+                    createdAt: new Date().toISOString()
+                });
+                saveData(data);
+            }
+        }
+        return { success: true, data: { orderId, packageId, credits: creditAmount, amount: amounts[packageId]||0, status: 'paid', mock: true } };
     }
     const pr = null; // placeholder
     return { error: 'Not Found', path: endpoint };
