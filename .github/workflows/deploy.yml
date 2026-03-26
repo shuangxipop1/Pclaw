@@ -33,7 +33,7 @@ jobs:
           echo "$KEY" > ~/aliyun.pem
           chmod 600 ~/aliyun.pem
           scp -i ~/aliyun.pem -o StrictHostKeyChecking=no -o ConnectTimeout=30 \
-            scaffold-api.js minimal.js payment_inline.js package.json \
+            scaffold-api.js minimal.js payment_inline.js package.json restart.sh \
             root@$HOST:/var/www/pclaw-api/
           echo "API files deployed"
 
@@ -44,7 +44,7 @@ jobs:
         run: |
           echo "$KEY" > ~/aliyun.pem && chmod 600 ~/aliyun.pem
           ssh -i ~/aliyun.pem -o StrictHostKeyChecking=no -o ConnectTimeout=30 root@$HOST \
-            "cd /var/www/pclaw-api && npm install --production 2>&1 | tail -5"
+            "cd /var/www/pclaw-api && chmod +x restart.sh && npm install --production 2>&1 | tail -3"
           echo "Dependencies installed"
 
       - name: Restart API
@@ -53,7 +53,6 @@ jobs:
           KEY: ${{ secrets.ALIYUN_SSH_KEY }}
         run: |
           echo "$KEY" > ~/aliyun.pem && chmod 600 ~/aliyun.pem
-          # Force kill anything on port 3001, then start node (no error if nothing running)
-          ssh -i ~/aliyun.pem -o StrictHostKeyChecking=no -o ConnectTimeout=15 root@$HOST \
-            "kill -9 \$(lsof -t -i:3001) 2>/dev/null; sleep 2; cd /var/www/pclaw-api && node scaffold-api.js &"
-          echo "Done"
+          ssh -i ~/aliyun.pem -o StrictHostKeyChecking=no -o ConnectTimeout=60 root@$HOST \
+            "bash /var/www/pclaw-api/restart.sh"
+          echo "Restart done"
