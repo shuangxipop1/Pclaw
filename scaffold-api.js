@@ -9,19 +9,6 @@ const fs = require('fs');
 const dns = require('dns');
 const { Pool } = require('pg');
 
-// Resolve Supabase DB hostname to IPv4 address (Aliyun has no IPv6)
-let PG_HOST_V4 = null;
-try {
-    // dns.resolve4 returns IPv4 A records only
-    const addresses = dns.resolve4Sync('db.cgdmbsnfhwrcdbmgcbwt.supabase.co');
-    if (addresses && addresses.length > 0) {
-        PG_HOST_V4 = addresses[0];
-        console.log('Supabase DB IPv4:', PG_HOST_V4);
-    }
-} catch(e) {
-    console.log('Supabase DNS A record lookup failed:', e.message);
-}
-
 const PORT = 3001;
 
 // 数据持久化
@@ -29,25 +16,30 @@ const DATA_FILE = '/tmp/pclaw-data.json';
 
 // Supabase PostgreSQL connection
 let pg = null;
-if (PG_HOST_V4) {
-    try {
-        const { Pool } = require('pg');
-        pg = new Pool({
-            host: PG_HOST_V4,
-            port: 6543,
-            database: 'postgres',
-            user: 'postgres',
-            password: 'a1w2d3AWD!!!',
-            max: 5,
-            connectionTimeoutMillis: 3000,
-            idleTimeoutMillis: 10000,
-        });
-        pg.query('SELECT 1').then(() => console.log('Supabase connected via IPv4')).catch(e => console.log('Supabase IPv4 connection failed:', e.message));
-    } catch(e) {
-        console.log('pg module error:', e.message);
-    }
-} else {
-    console.log('Supabase: no IPv4, pg disabled');
+try {
+    const { Pool } = require('pg');
+    // Use IPv4 address directly to avoid IPv6 issue
+    // Supabase: port 6543, direct IPv4
+    pg = new Pool({
+        host: 'db.cgdmbsnfhwrcdbmgcbwt.supabase.co',
+        port: 6543,
+        database: 'postgres',
+        user: 'postgres',
+        password: 'a1w2d3AWD!!!',
+        max: 5,
+        connectionTimeoutMillis: 5000,
+        // Force IPv4 family
+        family: 4,
+    });
+    // Test connection async
+    pg.query('SELECT 1').then(() => {
+        console.log('Supabase pg connected');
+    }).catch(e => {
+        console.log('Supabase pg connection failed (will use memory):', e.message);
+        pg = null;
+    });
+} catch(e) {
+    console.log('pg module error:', e.message);
 }
 
 // Init DB tables (run once)
