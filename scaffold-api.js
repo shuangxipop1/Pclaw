@@ -15,7 +15,8 @@ const PORT = 3001;
 const DATA_FILE = '/tmp/pclaw-data.json';
 
 // Supabase PostgreSQL connection (IPv4 only, Aliyun has no IPv6)
-let pg = null;
+let pg = null; // null until confirmed connected
+let pgReady = false;
 try {
     const { Pool } = require('pg');
     const pgClient = new Pool({
@@ -26,18 +27,21 @@ try {
         password: 'a1w2d3AWD!!!',
         max: 5,
         family: 4,
-        connectionTimeoutMillis: 3000,
+        connectionTimeoutMillis: 5000,
+        idleTimeoutMillis: 30000,
     });
-    // Only enable pg after successful connection
-    pgClient.query('SELECT 1').then(() => {
+    // Wait for connection, only enable if successful
+    pgClient.query('SELECT 1 as ok').then(r => {
         pg = pgClient;
-        console.log('Supabase pg connected');
+        pgReady = true;
+        console.log('Supabase pg connected:', r.rows);
     }).catch(e => {
-        console.log('Supabase pg failed (using memory fallback):', e.message);
         pg = null;
+        pgReady = false;
+        console.log('Supabase pg failed (using memory only):', e.code, e.message);
     });
 } catch(e) {
-    console.log('pg module unavailable:', e.message);
+    console.log('pg module error:', e.message);
 }
 
 // Init DB tables (run once)
@@ -832,30 +836,29 @@ const server = http.createServer(async (req, res) => {
             if (creditAmount > 0 && token && token.userId) {
                 const uid = token.userId;
                 const email = token.email || 'unknown';
-                // Try Supabase first, fallback to local memory
-                try {
-                    if (pg) {
-                        await pg.query(
-                            `INSERT INTO profiles (id, email, balance) VALUES ($1, $2, $3)
-                             ON CONFLICT (id) DO UPDATE SET balance = profiles.balance + $3`,
-                            [uid, email, creditAmount]
-                        );
-                        await pg.query(
-                            `INSERT INTO transactions (id, user_id, type, amount, description)
-                             VALUES ($1, $2, 'charge', $3, $4)`,
-                            ['tx_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,6), uid, creditAmount, '充值:' + (amounts[packageId]||0) + '元(' + packageId + ')']
-                        );
-                    }
-                } catch(e) {
-                    console.log('Supabase error, using local fallback:', e.message);
+                // Write to Supabase if connected (fire-and-forget, don't block response)
+                if (pgReady && pg) {
+                    pg.query(
+                        `INSERT INTO profiles (id, email, balance) VALUES ($1, $2, $3)
+                         ON CONFLICT (id) DO UPDATE SET balance = profiles.balance + $3`,
+                        [uid, email, creditAmount]
+                    ).catch(e => console.log('PG insert error:', e.message));
+                    pg.query(
+                        `INSERT INTO transactions (id, user_id, type, amount, description)
+                         VALUES ($1, $2, 'charge', $3, $4)`,
+                        ['tx_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,6), uid, creditAmount, '充值:' + (amounts[packageId]||0) + '元(' + packageId + ')']
+                    ).catch(e => console.log('PG tx error:', e.message));
+                    console.log('PG write fired for', uid);
                 }
-                // Always update local memory as fallback/auth
+                // Always update local memory
                 const user = Object.values(data.users).find(u => u.id === uid);
                 if (user) {
                     user.balance = (user.balance || 0) + creditAmount;
                     data.transactions = data.transactions || [];
                     data.transactions.push({ id: 'tx_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,6), userId: uid, type: 'charge', amount: creditAmount, balanceBefore: user.balance - creditAmount, balanceAfter: user.balance, description: '充值:' + (amounts[packageId]||0) + '元(' + packageId + ')', createdAt: new Date().toISOString() });
                     saveData(data);
+                    if (pgWriteDone) console.log('Charge: PG + local updated for', uid);
+                    else console.log('Charge: local only for', uid);
                 }
             }
             res.writeHead(200); res.end(JSON.stringify({ success: true, data: { orderId, packageId, credits: creditAmount, amount: amounts[packageId]||0, status: 'paid', mock: true } })); return;
