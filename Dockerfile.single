@@ -1,0 +1,106 @@
+FROM ubuntu:24.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install all dependencies
+RUN apt-get update && apt-get install -y \
+    postgresql-16 \
+    nodejs \
+    npm \
+    nginx \
+    curl \
+    supervisor \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
+
+# PostgreSQL directories
+RUN mkdir -p /var/run/postgresql /var/lib/postgresql/16/main \
+    && chown postgres:postgres /var/run/postgresql /var/lib/postgresql/16/main
+
+WORKDIR /app
+
+# Copy and install npm deps
+COPY package.json ./
+RUN npm install --omit=dev
+
+# Copy app files
+COPY scaffold-api.js ./
+COPY website/ ./website/
+
+# Copy init SQL (will be run on container start)
+COPY scripts/init-pg.sql /docker-entrypoint-initdb.d/init.sql
+RUN chmod 644 /docker-entrypoint-initdb.d/init.sql 2>/dev/null || true
+
+# nginx config
+RUN printf '%s\n' \
+    'server {' \
+    '    listen 80 default_server;' \
+    '    server_name _;' \
+    '    root /app/website;' \
+    '    index index.html;' \
+    '    location /api/ {' \
+    '        proxy_pass http://127.0.0.1:3001;' \
+    '        proxy_http_version 1.1;' \
+    '        proxy_set_header Host $host;' \
+    '        proxy_set_header X-Real-IP $remote_addr;' \
+    '        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;' \
+    '        proxy_set_header Connection "";' \
+    '    }' \
+    '    location / {' \
+    '        try_files $uri $uri/ /index.html;' \
+    '    }' \
+    '}' > /etc/nginx/sites-available/default
+
+# Supervisor config
+RUN printf '%s\n' \
+    '[supervisord]' \
+    'nodaemon=true' \
+    'logfile=/var/log/supervisor/supervisord.log' \
+    'pidfile=/var/run/supervisord.pid' \
+    '' \
+    '[program:postgres]' \
+    'command=/bin/bash -c "service postgresql start && tail -f /dev/null"' \
+    'autostart=true' \
+    'autorestart=true' \
+    'stdout_logfile=/var/log/supervisor/postgres.log' \
+    'stderr_logfile=/var/log/supervisor/postgres.err' \
+    '' \
+    '[program:nginx]' \
+    'command=/usr/sbin/nginx -g \"daemon off;\"' \
+    'autostart=true' \
+    'autorestart=true' \
+    'stdout_logfile=/var/log/supervisor/nginx.log' \
+    'stderr_logfile=/var/log/supervisor/nginx.err' \
+    '' \
+    '[program:api]' \
+    'command=/bin/bash -c \"sleep 8 && cd /app && node scaffold-api.js\"' \
+    'autostart=true' \
+    'autorestart=true' \
+    'stdout_logfile=/var/log/supervisor/api.log' \
+    'stderr_logfile=/var/log/supervisor/api.err' \
+    > /etc/supervisor/conf.d/pclaw.conf
+
+# Start script: init PG + start services
+RUN printf '%s\n' \
+    '#!/bin/bash' \
+    '# Initialize PostgreSQL if first run' \
+    'if [ ! -f /var/lib/postgresql/16/main/PG_VERSION ]; then' \
+    '    echo "=== Initializing PostgreSQL ==="' \
+    '    chown -R postgres:postgres /var/lib/postgresql' \
+    '    su postgres -c "/usr/lib/postgresql/16/bin/initdb -D /var/lib/postgresql/16/main" 2>/dev/null || true' \
+    'fi' \
+    '# Start PostgreSQL' \
+    'su postgres -c "/usr/lib/postgresql/16/bin/postgres -D /var/lib/postgresql/16/main -c config_file=/etc/postgresql/16/main/postgresql.conf" &' \
+    'sleep 4' \
+    '# Create DB' \
+    'su postgres -c "psql -c \\"CREATE DATABASE pclaw;\\"" 2>/dev/null || true' \
+    '# Create tables from init script' \
+    'su postgres -c "psql -d pclaw -f /docker-entrypoint-initdb.d/init.sql" 2>/dev/null || true' \
+    '# Run supervisor' \
+    'echo "=== Starting all services ==="' \
+    'exec /usr/bin/supervisord -c /etc/supervisor/conf.d/pclaw.conf' \
+    > /start.sh && chmod +x /start.sh
+
+EXPOSE 80 3001 5432
+
+CMD ["/start.sh"]
