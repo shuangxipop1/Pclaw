@@ -51,34 +51,36 @@ RUN printf '%s\n' \
     '    }' \
     '}' > /etc/nginx/sites-available/default
 
-# Supervisor config
-RUN printf '%s\n' \
-    '[supervisord]' \
-    'nodaemon=true' \
-    'logfile=/var/log/supervisor/supervisord.log' \
-    'pidfile=/var/run/supervisord.pid' \
-    '' \
-    '[program:postgres]' \
-    'command=/bin/bash -c "service postgresql start && tail -f /dev/null"' \
-    'autostart=true' \
-    'autorestart=true' \
-    'stdout_logfile=/var/log/supervisor/postgres.log' \
-    'stderr_logfile=/var/log/supervisor/postgres.err' \
-    '' \
-    '[program:nginx]' \
-    'command=/usr/sbin/nginx -g \"daemon off;\"' \
-    'autostart=true' \
-    'autorestart=true' \
-    'stdout_logfile=/var/log/supervisor/nginx.log' \
-    'stderr_logfile=/var/log/supervisor/nginx.err' \
-    '' \
-    '[program:api]' \
-    'command=/bin/bash -c \"sleep 8 && cd /app && node scaffold-api.js\"' \
-    'autostart=true' \
-    'autorestart=true' \
-    'stdout_logfile=/var/log/supervisor/api.log' \
-    'stderr_logfile=/var/log/supervisor/api.err' \
-    > /etc/supervisor/conf.d/pclaw.conf
+# Supervisor config - use heredoc to avoid shell escaping issues
+RUN cat > /etc/supervisor/conf.d/pclaw.conf << 'CONFEOF'
+[supervisord]
+nodaemon=true
+logfile=/var/log/supervisor/supervisord.log
+pidfile=/var/run/supervisord.pid
+
+[program:postgres]
+command=/bin/bash -c "service postgresql start && tail -f /dev/null"
+autostart=true
+autorestart=true
+stdout_logfile=/var/log/supervisor/postgres.log
+stderr_logfile=/var/log/supervisor/postgres.err
+
+[program:nginx]
+command=/usr/sbin/nginx -g "daemon off;"
+autostart=true
+autorestart=true
+stdout_logfile=/var/log/supervisor/nginx.log
+stderr_logfile=/var/log/supervisor/nginx.err
+
+[program:api]
+command=/bin/bash -c "sleep 5 && cd /app && exec node scaffold-api.js"
+autostart=true
+autorestart=true
+startretries=5
+exitcodes=0
+stdout_logfile=/var/log/supervisor/api.log
+stderr_logfile=/var/log/supervisor/api.err
+CONFEOF
 
 # Start script: init PG + start services
 RUN printf '%s\n' \
