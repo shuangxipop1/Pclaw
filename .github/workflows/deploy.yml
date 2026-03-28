@@ -1,4 +1,4 @@
-name: Deploy to Aliyun (Docker)
+name: Deploy to Aliyun
 
 on:
   push:
@@ -11,93 +11,46 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Login to Docker Hub (for registry)
-        if: false  # Skip for now, use local registry
-
-      # ============================================================
-      # Step 1: Copy all files to server
-      # ============================================================
-      - name: Deploy all files to server
+      - name: Deploy
         env:
           HOST: ${{ secrets.ALIYUN_HOST }}
-          KEY: ${{ secrets.ALIYUN_SSH_KEY }}
-        run: |
-          echo "$KEY" > ~/aliyun.pem
-          chmod 600 ~/aliyun.pem
-          
-          # Create remote directories
-          ssh -i ~/aliyun.pem -o StrictHostKeyChecking=no root@$HOST "mkdir -p /opt/pclaw/{website,api,nginx,scripts}"
-          
-          # Copy website files
-          scp -i ~/aliyun.pem -o StrictHostKeyChecking=no -r \
-            website/*.html website/*.jpg website/*.css website/js website/css \
-            root@$HOST:/opt/pclaw/website/ 2>/dev/null || true
-          
-          # Copy API files
-          scp -i ~/aliyun.pem -o StrictHostKeyChecking=no \
-            scaffold-api.js package.json Dockerfile.api \
-            root@$HOST:/opt/pclaw/api/
-          
-          # Copy Docker & nginx configs
-          scp -i ~/aliyun.pem -o StrictHostKeyChecking=no \
-            docker-compose.yml Dockerfile.frontend \
-            nginx/nginx.conf scripts/init-pg.sql .env.example \
-            root@$HOST:/opt/pclaw/
-          
-          echo "All files copied to /opt/pclaw/"
-
-      # ============================================================
-      # Step 2: Build & start Docker containers on server
-      # ============================================================
-      - name: Start Docker containers
-        env:
-          HOST: ${{ secrets.ALIYUN_HOST }}
-          KEY: ${{ secrets.ALIYUN_SSH_KEY }}
+          DEPLOY_KEY: ${{ secrets.ALIYUN_SSH_KEY }}
+          DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
           PG_PASSWORD: ${{ secrets.PG_PASSWORD }}
         run: |
-          echo "$KEY" > ~/aliyun.pem
-          chmod 600 ~/aliyun.pem
-          
-          ssh -i ~/aliyun.pem -o StrictHostKeyChecking=no root@$HOST << 'SSHEOF'
-            set -e
-            cd /opt/pclaw
-            
-            # Create .env from example + secrets
-            cp .env.example .env
-            echo "PG_PASSWORD=$PG_PASSWORD" >> .env
-            echo "JWT_SECRET=claw-jwt-$(date +%s)-prod" >> .env
-            
-            # Stop old containers if running
-            docker compose down 2>/dev/null || true
-            
-            # Build and start containers
-            docker compose up -d --build
-            
-            # Wait for containers to be healthy
-            echo "Waiting for services..."
-            sleep 30
-            
-            # Check status
-            docker compose ps
-            
-            # Verify API is up
-            curl -sf http://localhost:8080/api/payment/packages && echo "API OK" || echo "API FAILED"
-            
-            echo "Deploy complete!"
-          SSHEOF
+          echo "$DEPLOY_KEY" > ~/deploy.pem
+          chmod 600 ~/deploy.pem
 
-      # ============================================================
-      # Step 3: Stop old host-mode node processes
-      # ============================================================
-      - name: Stop old node processes
-        env:
-          HOST: ${{ secrets.ALIYUN_HOST }}
-          KEY: ${{ secrets.ALIYUN_SSH_KEY }}
-        run: |
-          echo "$KEY" > ~/aliyun.pem
-          chmod 600 ~/aliyun.pem
-          ssh -i ~/aliyun.pem -o StrictHostKeyChecking=no root@$HOST \
-            "pkill -f 'node.*scaffold' 2>/dev/null || true; pkill -f 'node.*minimal' 2>/dev/null || true; echo 'Old processes stopped'"
+          cat > ~/deploy.sh << 'SCRIPT'
+          set -e
+          cd /opt
+
+          if [ -d pclaw ]; then
+            mv pclaw pclaw_bak_$(date +%s)
+          fi
+
+          git clone --depth=1 https://$DEPLOY_TOKEN@github.com/shuangxipop1/Pclaw.git pclaw
+          cd pclaw
+
+          cp .env.example .env
+          sed -i "s/PG_PASSWORD=.*/PG_PASSWORD=$PG_PASSWORD/" .env
+
+          docker build -t pclaw:latest -f Dockerfile.single .
+          docker rm -f pclaw 2>/dev/null || true
+          docker run -d --name pclaw --restart unless-stopped -p 3001:3001 pclaw:latest
+
+          systemctl reload nginx 2>/dev/null || true
+
+          echo "Waiting 40s for init..."
+          sleep 40
+
+          docker ps | grep pclaw && echo "Container OK"
+          curl -sf http://localhost:3001/api/payment/packages && echo " API OK"
+
+          rm -rf /opt/pclaw_bak_*
+          echo "Deploy complete!"
+          SCRIPT
+
+          chmod +x ~/deploy.sh
+          scp -o StrictHostKeyChecking=no -o ConnectTimeout=30 -i ~/deploy.pem ~/deploy.sh root@$HOST:/tmp/deploy.sh
+          ssh -o StrictHostKeyChecking=no -o ConnectTimeout=30 -i ~/deploy.pem root@$HOST "bash /tmp/deploy.sh"
