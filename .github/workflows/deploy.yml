@@ -20,24 +20,31 @@ jobs:
         run: |
           echo "$DEPLOY_KEY" > ~/deploy.pem && chmod 600 ~/deploy.pem
 
-          ssh -o StrictHostKeyChecking=no -o ConnectTimeout=30 -i ~/deploy.pem root@$HOST chmod 755 /opt
+          # Setup git credentials on server first
+          ssh -o StrictHostKeyChecking=no -o ConnectTimeout=30 -i ~/deploy.pem root@$HOST "
+            git config --global credential.helper store
+            echo https://$DEPLOY_TOKEN@github.com > ~/.git-credentials
+            chmod 600 ~/.git-credentials
+            git config --global url.https://github.com/.insteadOf git@github.com:
+            git config --global url.https://github.com/.insteadOf ssh://git@github.com/
+          "
 
-          ssh -o StrictHostKeyChecking=no -o ConnectTimeout=30 -i ~/deploy.pem root@$HOST '
+          # Now clone without embedding token
+          ssh -o StrictHostKeyChecking=no -o ConnectTimeout=30 -i ~/deploy.pem root@$HOST "
             set -e
             cd /opt
-            rm -rf pclaw_old 2>/dev/null || true
             [ -d pclaw ] && mv pclaw pclaw_old
-            git clone --depth=1 https://$DEPLOY_TOKEN@github.com/shuangxipop1/Pclaw.git pclaw
+            git clone --depth=1 https://github.com/shuangxipop1/Pclaw.git pclaw
             cd pclaw
             cp .env.example .env
-            sed -i "s/PG_PASSWORD=.*/PG_PASSWORD=$PG_PASSWORD/" .env
+            sed -i 's/PG_PASSWORD=.*/PG_PASSWORD='"'"'$PG_PASSWORD'"'"'/' .env
             docker build -t pclaw:latest -f Dockerfile.single .
             docker rm -f pclaw 2>/dev/null || true
             docker run -d --name pclaw --restart unless-stopped -p 3001:3001 pclaw:latest
             systemctl reload nginx 2>/dev/null || true
             sleep 40
             docker ps | grep pclaw
-            curl -sf http://localhost:3001/api/payment/packages && echo " API OK"
+            curl -sf http://localhost:3001/api/payment/packages && echo ' API OK'
             rm -rf /opt/pclaw_old
-            echo "Done!"
-          '
+            echo 'Deploy done!'
+          "
