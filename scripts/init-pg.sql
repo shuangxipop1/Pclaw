@@ -218,3 +218,48 @@ INSERT INTO skills (id, name, category, description, price, enabled, status, sal
 ('99999999-9999-9999-9999-999999999999', '设备采购技术参数生成', 'digital', '输入设备名称和工况，AI生成技术规格书', 120.00, true, 'approved', 0, NOW(), NOW()),
 ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '施工组织设计摘要', 'service', '上传施工组织设计文档，AI提取关键路径/工期/资源配置', 350.00, true, 'approved', 0, NOW(), NOW())
 ON CONFLICT (id) DO NOTHING;
+
+
+-- Seller applications
+CREATE TABLE IF NOT EXISTS seller_applications (
+    id SERIAL PRIMARY KEY,
+    user_id VARCHAR NOT NULL,
+    real_name VARCHAR NOT NULL,
+    id_card VARCHAR,
+    bank_card VARCHAR,
+    bank_name VARCHAR,
+    alipay VARCHAR,
+    status VARCHAR DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user_id)
+);
+
+-- Withdrawals
+CREATE TABLE IF NOT EXISTS withdrawals (
+    id VARCHAR PRIMARY KEY,
+    user_id VARCHAR NOT NULL,
+    amount DECIMAL(10,2) NOT NULL,
+    method VARCHAR DEFAULT 'bank',
+    status VARCHAR DEFAULT 'pending',
+    transaction_id VARCHAR,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Skills: ensure file_url column exists
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='skills' AND column_name='file_url') THEN
+        ALTER TABLE skills ADD COLUMN file_url TEXT;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='skills' AND column_name='seller_id') THEN
+        ALTER TABLE skills ADD COLUMN seller_id VARCHAR;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='skills' AND column_name='avg_rating') THEN
+        ALTER TABLE skills ADD COLUMN avg_rating DECIMAL(3,2) DEFAULT 0;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='skills' AND column_name='review_count') THEN
+        ALTER TABLE skills ADD COLUMN review_count INTEGER DEFAULT 0;
+    END IF;
+END$$;
