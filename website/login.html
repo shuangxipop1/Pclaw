@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>登录 - Pclaw</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0a0e27; color: #fff; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+.container { width: 100%; max-width: 400px; padding: 20px; }
+.card { background: #131852; border: 1px solid #2a3a8a; border-radius: 16px; padding: 40px; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+.logo { text-align: center; margin-bottom: 32px; }
+.logo h1 { font-size: 28px; color: #4f8eff; margin-bottom: 4px; }
+.logo p { font-size: 13px; color: #6b7ab8; }
+.tabs { display: flex; background: #0d1235; border-radius: 10px; padding: 4px; margin-bottom: 28px; }
+.tab { flex: 1; text-align: center; padding: 10px; border-radius: 8px; font-size: 14px; cursor: pointer; transition: all 0.2s; color: #6b7ab8; }
+.tab.active { background: #1e3a9e; color: #fff; font-weight: 600; }
+.form-group { margin-bottom: 18px; }
+.form-group label { display: block; font-size: 13px; color: #8b9fd4; margin-bottom: 6px; }
+.form-group input { width: 100%; padding: 12px 14px; background: #0d1235; border: 1px solid #2a3a8a; border-radius: 8px; color: #fff; font-size: 14px; outline: none; transition: border-color 0.2s; }
+.form-group input:focus { border-color: #4f8eff; }
+.btn { width: 100%; padding: 14px; background: linear-gradient(135deg, #4f8eff, #2d5de0); border: none; border-radius: 10px; color: #fff; font-size: 15px; font-weight: 600; cursor: pointer; transition: opacity 0.2s; }
+.btn:hover { opacity: 0.9; }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.msg { margin-top: 16px; padding: 10px 14px; border-radius: 8px; font-size: 13px; display: none; }
+.msg.error { background: rgba(255,70,70,0.15); border: 1px solid rgba(255,70,70,0.4); color: #ff6b6b; }
+.msg.success { background: rgba(72,199,116,0.15); border: 1px solid rgba(72,199,116,0.4); color: #48c774; }
+.redirect { margin-top: 20px; text-align: center; font-size: 13px; color: #6b7ab8; }
+.redirect a { color: #4f8eff; text-decoration: none; }
+.hidden { display: none; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="card">
+    <div class="logo">
+      <h1>🐔 Pclaw</h1>
+      <p>工程全要素寻源平台</p>
+    </div>
+    <div class="tabs">
+      <div class="tab active" id="tabLogin" onclick="switchTab('login')">登录</div>
+      <div class="tab" id="tabRegister" onclick="switchTab('register')">注册</div>
+    </div>
+    <form id="loginForm" onsubmit="doLogin(event)">
+      <div class="form-group">
+        <label>邮箱</label>
+        <input type="email" id="loginEmail" placeholder="your@email.com" required>
+      </div>
+      <div class="form-group">
+        <label>密码</label>
+        <input type="password" id="loginPassword" placeholder="••••••••" required>
+      </div>
+      <button type="submit" class="btn" id="loginBtn">登录</button>
+      <div id="loginMsg" class="msg"></div>
+    </form>
+    <form id="registerForm" class="hidden" onsubmit="doRegister(event)">
+      <div class="form-group">
+        <label>用户名</label>
+        <input type="text" id="regUsername" placeholder="用户名" required>
+      </div>
+      <div class="form-group">
+        <label>邮箱</label>
+        <input type="email" id="regEmail" placeholder="your@email.com" required>
+      </div>
+      <div class="form-group">
+        <label>密码</label>
+        <input type="password" id="regPassword" placeholder="至少6位" required minlength="6">
+      </div>
+      <button type="submit" class="btn" id="regBtn">注册</button>
+      <div id="regMsg" class="msg"></div>
+    </form>
+    <div class="redirect">
+      <a href="my-dna.html">← 返回首页</a>
+    </div>
+  </div>
+</div>
+<script>
+const API = 'https://www.pclawai.com';
+if (localStorage.getItem('token')) { window.location.href = 'my-dna.html'; }
+function switchTab(tab) {
+  document.getElementById('tabLogin').classList.toggle('active', tab === 'login');
+  document.getElementById('tabRegister').classList.toggle('active', tab === 'register');
+  document.getElementById('loginForm').classList.toggle('hidden', tab !== 'login');
+  document.getElementById('registerForm').classList.toggle('hidden', tab !== 'register');
+  document.getElementById('loginMsg').style.display = 'none';
+  document.getElementById('regMsg').style.display = 'none';
+}
+function showMsg(id, msg, type) {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.className = 'msg ' + type;
+  el.style.display = 'block';
+}
+function getReturnUrl() { return new URLSearchParams(window.location.search).get('return') || 'my-dna.html'; }
+async function doLogin(e) {
+  e.preventDefault();
+  const btn = document.getElementById('loginBtn');
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  btn.disabled = true; btn.textContent = '登录中...';
+  try {
+    const res = await fetch(API + '/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
+    const data = await res.json();
+    if (data.token) {
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('userId', data.user?.id || '');
+      localStorage.setItem('username', data.user?.username || email);
+      showMsg('loginMsg', '登录成功！跳转中...', 'success');
+      setTimeout(() => window.location.href = getReturnUrl(), 500);
+    } else {
+      showMsg('loginMsg', data.error || '登录失败', 'error');
+      btn.disabled = false; btn.textContent = '登录';
+    }
+  } catch(err) {
+    showMsg('loginMsg', '网络错误，请重试', 'error');
+    btn.disabled = false; btn.textContent = '登录';
+  }
+}
+async function doRegister(e) {
+  e.preventDefault();
+  const btn = document.getElementById('regBtn');
+  const username = document.getElementById('regUsername').value.trim();
+  const email = document.getElementById('regEmail').value.trim();
+  const password = document.getElementById('regPassword').value;
+  btn.disabled = true; btn.textContent = '注册中...';
+  try {
+    const res = await fetch(API + '/api/auth/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username, email, password }) });
+    const data = await res.json();
+    if (data.token) {
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('userId', data.user?.id || '');
+      localStorage.setItem('username', data.user?.username || username);
+      showMsg('regMsg', '注册成功！获得1000积分，跳转中...', 'success');
+      setTimeout(() => window.location.href = getReturnUrl(), 500);
+    } else {
+      showMsg('regMsg', data.error || '注册失败', 'error');
+      btn.disabled = false; btn.textContent = '注册';
+    }
+  } catch(err) {
+    showMsg('regMsg', '网络错误，请重试', 'error');
+    btn.disabled = false; btn.textContent = '注册';
+  }
+}
+</script>
+</body>
+</html>
