@@ -24,9 +24,15 @@
     .card-body { padding: 16px; }
     .card-title { font-size: 15px; font-weight: 600; margin-bottom: 8px; }
     .card-meta { display: flex; justify-content: space-between; color: #666; font-size: 12px; margin-bottom: 12px; }
-    .card-price { color: #f59e0b; font-size: 18px; font-weight: 700; }
+    .card-price { color: #f59e0b; font-size: 18px; font-weight: 700; margin-bottom: 12px; }
     .card-price span { font-size: 12px; color: #666; font-weight: 400; }
+    .buy-btn { display: block; width: 100%; padding: 10px; background: #f59e0b; color: #000; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; text-align: center; transition: background 0.2s; }
+    .buy-btn:hover { background: #fbbf24; }
+    .buy-btn:disabled { background: #333; color: #666; cursor: not-allowed; }
     .empty { text-align: center; color: #555; padding: 60px 0; }
+    .msg { margin-top: 8px; padding: 8px 12px; border-radius: 6px; font-size: 12px; text-align: center; }
+    .msg.ok { background: rgba(72,199,116,0.15); color: #48c774; }
+    .msg.err { background: rgba(255,70,70,0.15); color: #ff6b6b; }
   </style>
 </head>
 <body>
@@ -38,7 +44,7 @@
     <a href="expo.html">数字展会</a>
     <a href="my-dna.html">我的分润</a>
     <a href="console.html">控制台</a>
-<a href="payment.html">充值中心</a>
+    <a href="payment.html">充值中心</a>
   </nav>
   <div class="container">
     <h1>知识商店</h1>
@@ -56,6 +62,8 @@
   </div>
   <script>
     const API = 'https://www.pclawai.com/api';
+    function getToken() { return localStorage.getItem('token'); }
+    function getBalance() { return parseInt(localStorage.getItem('balance') || '0'); }
     async function loadSkills(type) {
       try {
         const res = await fetch(`${API}/skill/list`);
@@ -64,20 +72,62 @@
           document.getElementById('skillGrid').innerHTML = '<div class="empty">暂无技能，<a href="console.html" style="color:#f59e0b">成为第一个创作者</a></div>';
           return;
         }
-        const filtered = type === 'all' ? data.skills : data.skills.filter(s => s.type === type);
+        const filtered = type === 'all' ? data.skills : data.skills.filter(s => (s.category || s.type) === type);
+        const token = getToken();
         document.getElementById('skillGrid').innerHTML = filtered.map(s => `
           <div class="card">
             <div class="card-img">🧬</div>
             <div class="card-body">
               <div class="card-title">${s.name}</div>
-              <div class="card-meta"><span>${s.category || s.type}</span><span>${s.sales_count || 0}次使用</span></div>
+              <div class="card-meta"><span>${s.category || s.type || ''}</span><span>${s.sales_count || s.sales || 0}次使用</span></div>
               <div class="card-price">¥${s.price || 0}<span>/${s.unit || '次'}</span></div>
+              ${token ? `<button class="buy-btn" onclick="buySkill('${s.id}', '${s.name}', ${s.price || 0}, this)">立即购买</button>` : `<button class="buy-btn" onclick="location.href='login.html?return=dna-shop.html'">登录后购买</button>`}
+              <div class="msg" id="msg-${s.id}" style="display:none"></div>
             </div>
           </div>
         `).join('');
       } catch (e) {
         document.getElementById('skillGrid').innerHTML = '<div class="empty">加载失败</div>';
       }
+    }
+    async function buySkill(id, name, price, btn) {
+      const token = getToken();
+      if (!token) { location.href = 'login.html?return=dna-shop.html'; return; }
+      const balance = getBalance();
+      if (balance < price) {
+        showMsg(id, '余额不足，请先充值', 'err');
+        return;
+      }
+      btn.disabled = true;
+      btn.textContent = '购买中...';
+      try {
+        const res = await fetch(`${API}/skill/buy`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+          body: JSON.stringify({ skillId: id })
+        });
+        const d = await res.json();
+        if (d.success) {
+          localStorage.setItem('balance', d.newBalance);
+          showMsg(id, `购买成功！余额 ¥${d.newBalance}`, 'ok');
+          btn.textContent = '已购买';
+          btn.disabled = true;
+        } else {
+          showMsg(id, d.error || '购买失败', 'err');
+          btn.disabled = false;
+          btn.textContent = '立即购买';
+        }
+      } catch(e) {
+        showMsg(id, '网络错误', 'err');
+        btn.disabled = false;
+        btn.textContent = '立即购买';
+      }
+    }
+    function showMsg(id, text, type) {
+      const el = document.getElementById('msg-' + id);
+      el.textContent = text;
+      el.className = 'msg ' + type;
+      el.style.display = 'block';
     }
     document.querySelectorAll('.filter').forEach(f => {
       f.onclick = () => {
