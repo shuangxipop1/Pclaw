@@ -106,6 +106,13 @@ async function pgCreateUser(email, username, passwordHash) {
     return r.rows[0];
 }
 
+async function pgListSkills() {
+    const r = await pgQuery(
+        "SELECT id, name, category, description, price, icon, prompt, model, created_at FROM skills WHERE enabled = true ORDER BY created_at DESC"
+    );
+    return r.rows.map(row => ({ ...row, sales: 0, enabled: true, status: 'approved' }));
+}
+
 async function pgGetBalance(userId) {
     const r = await pgQuery('SELECT * FROM balances WHERE user_id = $1', [userId]);
     return r.rows[0] || null;
@@ -152,6 +159,8 @@ async function pgGetSession(token) {
     const r = await pgQuery('SELECT * FROM sessions WHERE token = $1 AND expires_at > NOW()', [token]);
     return r.rows[0] || null;
 }
+
+
 
 async function pgDeleteSession(token) {
     await pgQuery('DELETE FROM sessions WHERE token = $1', [token]);
@@ -313,8 +322,13 @@ async function handleRequest(method, path, body, token) {
     
     // 技能列表
     if (endpoint === '/api/skill/list') {
-        // pg unavailable on server - use in-memory skills only
-        const skills = Object.values(data.skills).filter(s => s.enabled && s.status === 'approved');
+        let skills;
+        try {
+            skills = await pgListSkills();
+            skills = skills.map(s => ({ ...s, sales: s.sales || 0, status: 'approved', enabled: true }));
+        } catch(e) {
+            skills = Object.values(data.skills).filter(s => s.enabled && s.status === 'approved');
+        }
         if (params.category) skills = skills.filter(s => s.category === params.category);
         if (params.search) {
             const keyword = params.search.toLowerCase();
