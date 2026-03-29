@@ -203,3 +203,18 @@ CREATE INDEX IF NOT EXISTS idx_messages_task_id ON messages(task_id);
 CREATE INDEX IF NOT EXISTS idx_earnings_user_id ON earnings(user_id);
 CREATE INDEX IF NOT EXISTS idx_withdrawals_user_id ON withdrawals(user_id);
 CREATE INDEX IF NOT EXISTS idx_appeals_task_id ON appeals(task_id);
+
+
+-- Seed 10 engineering skills
+INSERT INTO skills (id, name, category, description, price, enabled, status, sales_count, created_at, updated_at) VALUES
+('11111111-1111-1111-1111-111111111111', '管道BOM智能提取', 'skill', '上传管道等轴测图，AI自动提取BOM清单，输出Excel格式', 200.00, true, 'approved', 0, NOW(), NOW()),
+('22222222-2222-2222-2222-222222222222', '施工图合规性审查', 'skill', '上传施工图，AI自动核查消防/抗震/节能规范符合性', 300.00, true, 'approved', 0, NOW(), NOW()),
+('33333333-3333-3333-3333-333333333333', '工程量清单自动统计', 'skill', '上传图纸或表格，AI自动统计工程量', 150.00, true, 'approved', 0, NOW(), NOW()),
+('44444444-4444-4444-4444-444444444444', '造价文件智能比对', 'skill', '上传两份造价文件，AI自动比对差异项', 250.00, true, 'approved', 0, NOW(), NOW()),
+('55555555-5555-5555-5555-555555555555', 'CAD图纸批量转PDF', 'digital', '批量上传DWG格式CAD图纸，自动转为PDF', 50.00, true, 'approved', 0, NOW(), NOW()),
+('66666666-6666-6666-6666-666666666666', '专业工程英文翻译', 'service', '工程类文档专业翻译（合同/规范/说明书）', 80.00, true, 'approved', 0, NOW(), NOW()),
+('77777777-7777-7777-7777-777777777777', '法律合同风险评估', 'service', '建设工程合同AI风险评估，识别条款漏洞', 500.00, true, 'approved', 0, NOW(), NOW()),
+('88888888-8888-8888-8888-888888888888', '工程结算书编制', 'service', 'AI辅助编制工程结算书', 800.00, true, 'approved', 0, NOW(), NOW()),
+('99999999-9999-9999-9999-999999999999', '设备采购技术参数生成', 'digital', '输入设备名称和工况，AI生成技术规格书', 120.00, true, 'approved', 0, NOW(), NOW()),
+('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '施工组织设计摘要', 'service', '上传施工组织设计文档，AI提取关键路径/工期/资源配置', 350.00, true, 'approved', 0, NOW(), NOW())
+ON CONFLICT (id) DO NOTHING;
